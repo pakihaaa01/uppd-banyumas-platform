@@ -658,3 +658,445 @@ status: ok, database: connected, totalUsers: jumlah akun.
 
 \- 503: database tidak terhubung pada endpoint health/db.
 
+## Lokasi Layanan
+
+
+
+Pengelolaan sementara khusus ADMINISTRATOR.
+
+Kewenangan final harus dikonfirmasi sebelum testing keseluruhan.
+
+
+
+\### GET /locations
+
+
+
+Respons 200: { "locations": \[...] }
+
+
+
+Maksimal 100 lokasi, urutan pembuatan terbaru.
+
+Mencakup lokasi terbit dan belum terbit.
+
+
+
+\### POST /locations
+
+
+
+Field wajib:
+
+\- name: teks 1–200 karakter.
+
+\- address: teks 1–1000 karakter.
+
+\- operatingHours: teks 1–500 karakter.
+
+\- phone: teks 1–100 karakter.
+
+\- mapsUrl: URL HTTP/HTTPS, maksimal 2048 karakter.
+
+\- type: induk, pembantu, cepat, drive-thru,
+
+&#x20; keliling, mpp, gerai, atau paten.
+
+
+
+Field opsional:
+
+\- mapsEmbedUrl: URL HTTP/HTTPS maksimal 2048 karakter,
+
+&#x20; null, atau string kosong untuk mengosongkan.
+
+\- description: teks maksimal 5000 karakter atau null.
+
+\- isMain: boolean, default false.
+
+\- isDriveThru: boolean, default false.
+
+
+
+Batas panjang teks dihitung setelah trim.
+
+Field tambahan ditolak.
+
+isPublished ditentukan server dan selalu false saat dibuat.
+
+type pada request dan respons menggunakan drive-thru.
+
+
+
+Respons 201: { "message": "...", "location": {...} }
+
+
+
+\### PATCH /locations/:id
+
+
+
+Menerima satu atau beberapa field yang diizinkan saat POST.
+
+Hanya lokasi dengan isPublished false yang dapat diubah.
+
+isPublished tidak boleh dikirim.
+
+
+
+Respons 200: { "message": "Lokasi layanan berhasil diperbarui" }
+
+Lokasi tidak ditemukan atau sudah terbit: 404.
+
+
+
+\### DELETE /locations/:id
+
+
+
+Hanya menghapus lokasi yang belum terbit.
+
+Respons 200: { "message": "Lokasi layanan berhasil dihapus" }
+
+Lokasi tidak ditemukan atau sudah terbit: 404.
+
+
+
+\### GET /public/locations
+
+
+
+Tidak memerlukan login.
+
+Hanya menampilkan isPublished true, maksimal 100 lokasi.
+
+Lokasi utama didahulukan, lalu nama dan ID.
+
+
+
+Respons 200: { "locations": \[...] }
+
+
+
+Field publik:
+
+id, name, address, operatingHours, phone, mapsUrl,
+
+mapsEmbedUrl, isMain, isDriveThru, type, description.
+
+
+
+mapsEmbedUrl dan description yang null tidak disertakan
+
+dalam respons publik.
+
+
+
+Penerbitan lokasi belum tersedia.
+
+
+
+\## FAQ
+
+
+
+Pengelolaan sementara khusus ADMINISTRATOR.
+
+
+
+\### GET /faqs
+
+
+
+Respons 200: { "faqs": \[...] }
+
+Maksimal 100 FAQ, urutan pembuatan terbaru.
+
+Mencakup FAQ aktif dan nonaktif.
+
+
+
+\### POST /faqs
+
+
+
+Field wajib:
+
+\- question: teks 1–500 karakter.
+
+\- answer: teks 1–20000 karakter.
+
+\- category: teks 1–100 karakter.
+
+
+
+Field opsional:
+
+\- isPopular: boolean, default false.
+
+
+
+Batas panjang teks dihitung setelah trim.
+
+Field tambahan ditolak.
+
+isEnabled selalu false dan viewCount selalu 0 saat dibuat.
+
+
+
+Respons 201: { "message": "...", "faq": {...} }
+
+
+
+\### PATCH /faqs/:id
+
+
+
+Menerima satu atau beberapa field:
+
+question, answer, category, isPopular.
+
+
+
+Hanya FAQ nonaktif yang dapat diubah.
+
+isEnabled dan viewCount tidak boleh dikirim.
+
+
+
+Respons 200: { "message": "FAQ berhasil diperbarui" }
+
+FAQ tidak ditemukan atau sudah aktif: 404.
+
+
+
+\### DELETE /faqs/:id
+
+
+
+Hanya menghapus FAQ nonaktif.
+
+Respons 200: { "message": "FAQ berhasil dihapus" }
+
+FAQ tidak ditemukan atau sudah aktif: 404.
+
+
+
+\### GET /public/faqs
+
+
+
+Tidak memerlukan login.
+
+Hanya menampilkan isEnabled true.
+
+Maksimal 100 FAQ; FAQ populer didahulukan,
+
+lalu pertanyaan dan ID.
+
+
+
+Respons 200: { "faqs": \[...] }
+
+
+
+Field publik:
+
+id, question, answer, category, viewCount,
+
+isPopular, isEnabled.
+
+
+
+Pengaktifan FAQ belum tersedia.
+
+viewCount belum otomatis bertambah.
+
+
+
+\## Pesan Kontak
+
+
+
+\### POST /contact
+
+
+
+Tidak memerlukan login.
+
+
+
+Field wajib:
+
+\- name: teks 1–100 karakter.
+
+\- email: format email, maksimal 254 karakter.
+
+\- subject: teks 1–200 karakter.
+
+\- message: teks 1–10000 karakter.
+
+
+
+Field opsional:
+
+\- phone: teks maksimal 30 karakter; boleh string kosong.
+
+
+
+Batas panjang dihitung setelah trim.
+
+Field tambahan ditolak.
+
+Status awal ditentukan server: New.
+
+
+
+Respons 201:
+
+{ "message": "Pesan berhasil disimpan" }
+
+
+
+Respons tidak mengembalikan data pribadi pengirim.
+
+Pesan disimpan ke database, belum dikirim melalui email.
+
+
+
+Batas pengiriman: 5 request per 15 menit per IP.
+
+Request tidak valid juga dihitung dalam batas tersebut.
+
+Jika batas terlampaui: 429.
+
+Pembatasan memakai penyimpanan memori proses server.
+
+
+
+\### GET /messages
+
+
+
+Sementara khusus ADMINISTRATOR.
+
+Respons 200: { "messages": \[...] }
+
+
+
+Maksimal 100 pesan, urutan pembuatan terbaru.
+
+Berisi identitas pengirim, isi pesan, status,
+
+ID, createdAt, dan updatedAt.
+
+Jangan tampilkan data ini pada halaman publik.
+
+
+
+\### PATCH /messages/:id
+
+
+
+Sementara khusus ADMINISTRATOR.
+
+Hanya menerima field status.
+
+
+
+Pilihan status:
+
+\- New
+
+\- In Progress
+
+\- Completed
+
+
+
+Contoh request:
+
+{ "status": "In Progress" }
+
+
+
+Respons 200:
+
+{ "message": "...", "contactMessage": {...} }
+
+
+
+Pesan tidak ditemukan: 404.
+
+Status atau field tidak valid: 400.
+
+
+
+\### DELETE /messages/:id
+
+
+
+Sementara khusus ADMINISTRATOR.
+
+Menghapus pesan secara permanen.
+
+
+
+Respons 200: { "message": "Pesan berhasil dihapus" }
+
+Pesan tidak ditemukan: 404.
+
+
+
+\## Catatan Integrasi Tambahan
+
+
+
+Seluruh endpoint pengelolaan memerlukan:
+
+credentials: 'include'
+
+
+
+Untuk POST/PATCH JSON, gunakan:
+
+Content-Type: application/json
+
+
+
+Jangan menganggap respons 200 dengan daftar kosong sebagai error.
+
+Jangan mengganti data kosong dengan informasi contoh seolah resmi.
+
+
+
+Endpoint baru:
+
+\- /api/v1/public/locations
+
+\- /api/v1/public/faqs
+
+\- /api/v1/contact
+
+\- /api/v1/messages
+
+
+
+Endpoint tersebut belum otomatis menggantikan endpoint lama
+
+pada SamsatContext.tsx. Frontend perlu disesuaikan per modul.
+
+
+
+Sebelum pengujian keseluruhan:
+
+\- Konfirmasi jabatan dan penugasan pengelola website ke UPPD.
+
+\- Tetapkan kewenangan persetujuan dan publikasi.
+
+\- Sesuaikan hak akses serta akun demonstrasi.
+
+\- Uji konten terbit dan integrasi frontend.
+
+\- Uji pembatasan request pesan kontak.
+
