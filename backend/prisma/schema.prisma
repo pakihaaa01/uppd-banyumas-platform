@@ -146,3 +146,17 @@ model ContactMessage {
 
   @@index([status, createdAt])
 }
+
+model ChatbotFAQ {
+  id         String   @id @default(uuid())
+  question   String
+  answer     String
+  keywords   String[]
+  category   String
+  isEnabled  Boolean  @default(false)
+  clickCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isEnabled, category])
+}

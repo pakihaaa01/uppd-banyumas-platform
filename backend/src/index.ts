@@ -10,6 +10,7 @@ import { publicRouter } from './routes/public';
 import { locationsRouter } from './routes/locations';
 import { faqsRouter } from './routes/faqs';
 import { contactRouter, messagesRouter } from './routes/contact';
+import { chatbotRouter } from './routes/chatbot';
 
 const app = express();
 const PORT = 4000;
@@ -58,6 +59,7 @@ app.use('/api/v1/locations', locationsRouter);
 app.use('/api/v1/faqs', faqsRouter);
 app.use('/api/v1/contact', contactRouter);
 app.use('/api/v1/messages', messagesRouter);
+app.use('/api/v1/chatbot', chatbotRouter);
 
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);

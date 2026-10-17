@@ -116,3 +116,33 @@ publicRouter.get('/faqs', async (_req, res) => {
     });
   }
 });
+
+// Jawaban chatbot yang sudah diaktifkan.
+publicRouter.get('/chatbot', async (_req, res) => {
+  try {
+    const chatbot = await prisma.chatbotFAQ.findMany({
+      where: { isEnabled: true },
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+        keywords: true,
+        category: true,
+        isEnabled: true,
+        clickCount: true
+      },
+      orderBy: [
+        { question: 'asc' },
+        { id: 'asc' }
+      ],
+      take: 100
+    });
+
+    res.json({ chatbot });
+  } catch (error) {
+    console.error('Public chatbot error:', error);
+    res.status(500).json({
+      message: 'Gagal mengambil jawaban chatbot'
+    });
+  }
+});
