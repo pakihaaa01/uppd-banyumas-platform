@@ -81,3 +81,34 @@ model Announcement {
   @@index([createdById])
   @@index([reviewedById])
 }
+
+enum ServiceLocationType {
+  induk
+  pembantu
+  cepat
+  drive_thru
+  keliling
+  mpp
+  gerai
+  paten
+}
+
+model ServiceLocation {
+  id             String              @id @default(uuid())
+  name           String
+  address        String
+  operatingHours String
+  phone          String
+  mapsUrl        String
+  mapsEmbedUrl   String?
+  isMain         Boolean             @default(false)
+  isDriveThru    Boolean             @default(false)
+  type           ServiceLocationType
+  description    String?
+
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, type])
+}

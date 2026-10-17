@@ -3,7 +3,7 @@ import { prisma } from '../lib/prisma';
 
 export const publicRouter = Router();
 
-// Hanya pengumuman terbit yang boleh dibaca masyarakat.
+// Pengumuman yang sudah diterbitkan.
 publicRouter.get('/announcements', async (_req, res) => {
   try {
     const announcements = await prisma.announcement.findMany({
@@ -38,6 +38,50 @@ publicRouter.get('/announcements', async (_req, res) => {
     console.error('Public announcements error:', error);
     res.status(500).json({
       message: 'Gagal mengambil pengumuman'
+    });
+  }
+});
+
+// Lokasi layanan yang sudah diterbitkan.
+publicRouter.get('/locations', async (_req, res) => {
+  try {
+    const locations = await prisma.serviceLocation.findMany({
+      where: { isPublished: true },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        operatingHours: true,
+        phone: true,
+        mapsUrl: true,
+        mapsEmbedUrl: true,
+        isMain: true,
+        isDriveThru: true,
+        type: true,
+        description: true
+      },
+      orderBy: [
+        { isMain: 'desc' },
+        { name: 'asc' },
+        { id: 'asc' }
+      ],
+      take: 100
+    });
+
+    res.json({
+      locations: locations.map(item => ({
+        ...item,
+        type: item.type === 'drive_thru'
+          ? 'drive-thru'
+          : item.type,
+        mapsEmbedUrl: item.mapsEmbedUrl ?? undefined,
+        description: item.description ?? undefined
+      }))
+    });
+  } catch (error) {
+    console.error('Public locations error:', error);
+    res.status(500).json({
+      message: 'Gagal mengambil lokasi layanan'
     });
   }
 });
