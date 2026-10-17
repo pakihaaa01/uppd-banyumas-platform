@@ -1,0 +1,58 @@
+# Dependencies
+**/node_modules/
+
+# Build
+**/dist/
+**/build/
+
+# Environment dan rahasia
+**/.env
+**/.env.*
+!**/.env.example
+
+# Database lokal
+**/*.db
+**/*.db-journal
+**/*.sqlite
+**/*.sqlite3
+**/server/data/
+
+# Berkas unggahan lokal
+backend/storage/
+
+# Prisma Client hasil generate
+backend/generated/
+
+# Log
+**/*.log
+npm-debug.log*
+
+# Editor dan sistem
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db# Backend SQLite lama dari ZIP
+/apps/website-publik/server/
+
+# Rahasia konfigurasi
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependensi dan build
+**/node_modules/
+**/dist/
+
+# File database lokal
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# File hasil generate dan penyimpanan lokal
+/backend/generated/
+/backend/storage/
+
+# Kredensial dan kunci
+**/KREDENSIAL*
+**/*.pem
+**/*.key

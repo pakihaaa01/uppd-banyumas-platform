@@ -1,0 +1,6 @@
+{
+  "name": "SAMSAT Kabupaten Banyumas",
+  "description": "Website Resmi Layanan Publik SAMSAT Kabupaten Banyumas - Pelayanan Pajak Kendaraan Bermotor, Informasi Titik Layanan, BUMDes, dan Asisten Virtual",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
