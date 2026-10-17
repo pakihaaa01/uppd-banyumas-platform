@@ -112,3 +112,17 @@ model ServiceLocation {
 
   @@index([isPublished, type])
 }
+
+model FAQ {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  category  String
+  viewCount Int      @default(0)
+  isPopular Boolean  @default(false)
+  isEnabled Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isEnabled, category])
+}

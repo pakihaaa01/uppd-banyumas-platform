@@ -85,3 +85,34 @@ publicRouter.get('/locations', async (_req, res) => {
     });
   }
 });
+
+// FAQ yang sudah diaktifkan.
+publicRouter.get('/faqs', async (_req, res) => {
+  try {
+    const faqs = await prisma.fAQ.findMany({
+      where: { isEnabled: true },
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+        category: true,
+        viewCount: true,
+        isPopular: true,
+        isEnabled: true
+      },
+      orderBy: [
+        { isPopular: 'desc' },
+        { question: 'asc' },
+        { id: 'asc' }
+      ],
+      take: 100
+    });
+
+    res.json({ faqs });
+  } catch (error) {
+    console.error('Public FAQs error:', error);
+    res.status(500).json({
+      message: 'Gagal mengambil FAQ'
+    });
+  }
+});
