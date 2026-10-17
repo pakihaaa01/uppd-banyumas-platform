@@ -160,3 +160,27 @@ model ChatbotFAQ {
 
   @@index([isEnabled, category])
 }
+
+enum PublicDocumentCategory {
+  sop
+  wbk
+  sipp
+  pad
+  evaluasi
+}
+
+model PublicDocument {
+  id          String                 @id @default(uuid())
+  title       String
+  category    PublicDocumentCategory
+  fileType    String
+  fileSize    String
+  downloadUrl String
+  updateDate  DateTime               @db.Date
+  description String?
+  isPublished Boolean                @default(false)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([isPublished, category])
+}
