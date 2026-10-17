@@ -21,7 +21,127 @@ const announcementFields = {
   updatedAt: true
 } as const;
 
-// Semua pegawai hanya melihat draf miliknya sendiri.
+const textLimits = {
+  title: 200,
+  category: 100,
+  shortDescription: 500,
+  content: 50000
+} as const;
+
+type DraftData = {
+  title?: string;
+  category?: string;
+  shortDescription?: string;
+  content?: string;
+  date?: Date;
+  isNew?: boolean;
+  isImportant?: boolean;
+};
+
+type ValidationResult =
+  | { valid: true; data: DraftData }
+  | { valid: false; message: string };
+
+// Validasi bersama untuk pembuatan dan perubahan draf.
+function validateDraft(
+  input: unknown,
+  partial: boolean
+): ValidationResult {
+  if (
+    !input ||
+    typeof input !== 'object' ||
+    Array.isArray(input)
+  ) {
+    return { valid: false, message: 'Input tidak valid' };
+  }
+
+  const values = input as Record<string, unknown>;
+  const keys = Object.keys(values);
+  const allowed = [
+    ...Object.keys(textLimits),
+    'date',
+    'isNew',
+    'isImportant'
+  ];
+
+  if (
+    keys.length === 0 ||
+    keys.some(key => !allowed.includes(key))
+  ) {
+    return {
+      valid: false,
+      message: 'Input kosong atau mengandung field yang tidak diizinkan'
+    };
+  }
+
+  const data: DraftData = {};
+
+  for (
+    const field of Object.keys(textLimits) as Array<keyof typeof textLimits>
+  ) {
+    if (partial && !Object.hasOwn(values, field)) continue;
+
+    const value = values[field];
+
+    if (
+      typeof value !== 'string' ||
+      value.trim().length === 0 ||
+      value.trim().length > textLimits[field]
+    ) {
+      return {
+        valid: false,
+        message: `${field} wajib diisi, maksimal ${textLimits[field]} karakter`
+      };
+    }
+
+    data[field] = value.trim();
+  }
+
+  if (!partial || Object.hasOwn(values, 'date')) {
+    const value = values.date;
+
+    if (
+      typeof value !== 'string' ||
+      !/^\d{4}-\d{2}-\d{2}$/.test(value)
+    ) {
+      return {
+        valid: false,
+        message: 'Tanggal harus menggunakan format YYYY-MM-DD'
+      };
+    }
+
+    const date = new Date(`${value}T00:00:00.000Z`);
+
+    if (
+      Number.isNaN(date.getTime()) ||
+      date.toISOString().slice(0, 10) !== value
+    ) {
+      return { valid: false, message: 'Tanggal tidak valid' };
+    }
+
+    data.date = date;
+  }
+
+  for (const field of ['isNew', 'isImportant'] as const) {
+    if (!Object.hasOwn(values, field)) continue;
+
+    const value = values[field];
+
+    if (typeof value !== 'boolean') {
+      return {
+        valid: false,
+        message: `${field} harus berupa boolean`
+      };
+    }
+
+    data[field] = value;
+  }
+
+  return { valid: true, data };
+}
+
+// GET /api/v1/announcements
+// Membaca maksimal 100 draf milik sendiri.
 announcementsRouter.get('/', async (_req, res) => {
   try {
     const announcements = await prisma.announcement.findMany({
@@ -30,7 +150,10 @@ announcementsRouter.get('/', async (_req, res) => {
         status: 'DRAFT'
       },
       select: announcementFields,
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { createdAt: 'desc' },
+        { id: 'desc' }
+      ],
       take: 100
     });
 
@@ -41,94 +164,42 @@ announcementsRouter.get('/', async (_req, res) => {
   }
 });
 
-// Membuat draf. Status dan pembuat ditentukan server.
+// POST /api/v1/announcements
+// Membuat draf dengan pembuat dan status dari server.
 announcementsRouter.post('/', async (req, res) => {
   try {
-    const input = req.body;
+    const result = validateDraft(req.body, false);
 
-    if (
-      !input ||
-      typeof input !== 'object' ||
-      Array.isArray(input)
-    ) {
-      res.status(400).json({ message: 'Input tidak valid' });
+    if (!result.valid) {
+      res.status(400).json({ message: result.message });
       return;
     }
 
-    const allowed = [
-      'title', 'date', 'category', 'shortDescription',
-      'content', 'isNew', 'isImportant'
-    ];
+    const data = result.data;
 
-    if (Object.keys(input).some(key => !allowed.includes(key))) {
-      res.status(400).json({
-        message: 'Ada field yang tidak diizinkan'
-      });
-      return;
-    }
-
-    const limits = {
-      title: 200,
-      category: 100,
-      shortDescription: 500,
-      content: 50000
-    } as const;
-
-    for (const [field, max] of Object.entries(limits)) {
-      const value = input[field];
-
-      if (
-        typeof value !== 'string' ||
-        value.trim().length === 0 ||
-        value.trim().length > max
-      ) {
-        res.status(400).json({
-          message: `${field} wajib diisi, maksimal ${max} karakter`
-        });
-        return;
-      }
-    }
-
+    // Semua field ini wajib pada pembuatan draf.
     if (
-      typeof input.date !== 'string' ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(input.date)
+      data.title === undefined ||
+      data.date === undefined ||
+      data.category === undefined ||
+      data.shortDescription === undefined ||
+      data.content === undefined
     ) {
       res.status(400).json({
-        message: 'Tanggal harus menggunakan format YYYY-MM-DD'
-      });
-      return;
-    }
-
-    const date = new Date(`${input.date}T00:00:00.000Z`);
-
-    if (
-      Number.isNaN(date.getTime()) ||
-      date.toISOString().slice(0, 10) !== input.date
-    ) {
-      res.status(400).json({ message: 'Tanggal tidak valid' });
-      return;
-    }
-
-    if (
-      ('isNew' in input && typeof input.isNew !== 'boolean') ||
-      ('isImportant' in input &&
-        typeof input.isImportant !== 'boolean')
-    ) {
-      res.status(400).json({
-        message: 'isNew dan isImportant harus berupa boolean'
+        message: 'Data pengumuman belum lengkap'
       });
       return;
     }
 
     const announcement = await prisma.announcement.create({
       data: {
-        title: input.title.trim(),
-        date,
-        category: input.category.trim(),
-        shortDescription: input.shortDescription.trim(),
-        content: input.content.trim(),
-        isNew: input.isNew ?? true,
-        isImportant: input.isImportant ?? false,
+        title: data.title,
+        date: data.date,
+        category: data.category,
+        shortDescription: data.shortDescription,
+        content: data.content,
+        isNew: data.isNew ?? true,
+        isImportant: data.isImportant ?? false,
         status: 'DRAFT',
         createdById: res.locals.currentUser.id
       },
@@ -145,74 +216,24 @@ announcementsRouter.post('/', async (req, res) => {
   }
 });
 
-// Mengubah isi draf milik sendiri.
+// PATCH /api/v1/announcements/:id
+// Mengubah draf milik sendiri, termasuk tanggal dan penanda.
 announcementsRouter.patch('/:id', async (req, res) => {
   try {
-    const input = req.body;
+    const validation = validateDraft(req.body, true);
 
-    if (
-      !input ||
-      typeof input !== 'object' ||
-      Array.isArray(input)
-    ) {
-      res.status(400).json({ message: 'Input tidak valid' });
+    if (!validation.valid) {
+      res.status(400).json({ message: validation.message });
       return;
     }
 
-    const limits = {
-      title: 200,
-      category: 100,
-      shortDescription: 500,
-      content: 50000
-    } as const;
-
-    const keys = Object.keys(input);
-
-    if (
-      keys.length === 0 ||
-      keys.some(key => !Object.hasOwn(limits, key))
-    ) {
-      res.status(400).json({
-        message:
-          'Hanya title, category, shortDescription, dan content yang dapat diubah melalui endpoint ini'
-      });
-      return;
-    }
-
-    const data: {
-      title?: string;
-      category?: string;
-      shortDescription?: string;
-      content?: string;
-    } = {};
-
-    for (const field of Object.keys(limits) as Array<keyof typeof limits>) {
-      if (!Object.hasOwn(input, field)) continue;
-
-      const value = input[field];
-
-      if (
-        typeof value !== 'string' ||
-        value.trim().length === 0 ||
-        value.trim().length > limits[field]
-      ) {
-        res.status(400).json({
-          message: `${field} wajib diisi, maksimal ${limits[field]} karakter`
-        });
-        return;
-      }
-
-      data[field] = value.trim();
-    }
-
-    // Kepemilikan dan status diperiksa saat pembaruan dilakukan.
     const result = await prisma.announcement.updateMany({
       where: {
         id: req.params.id,
         createdById: res.locals.currentUser.id,
         status: 'DRAFT'
       },
-      data
+      data: validation.data
     });
 
     if (result.count === 0) {
@@ -229,6 +250,7 @@ announcementsRouter.patch('/:id', async (req, res) => {
   }
 });
 
+// DELETE /api/v1/announcements/:id
 // Menghapus draf milik sendiri.
 announcementsRouter.delete('/:id', async (req, res) => {
   try {
