@@ -126,3 +126,23 @@ model FAQ {
 
   @@index([isEnabled, category])
 }
+
+enum ContactMessageStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+}
+
+model ContactMessage {
+  id        String               @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    ContactMessageStatus @default(NEW)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([status, createdAt])
+}
