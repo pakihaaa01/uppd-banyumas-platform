@@ -5,10 +5,10 @@ import { requireAdministrator } from '../middleware/auth';
 
 export const usersRouter = Router();
 
-// Semua endpoint dalam router ini khusus Administrator.
+// Seluruh endpoint hanya dapat diakses Administrator.
 usersRouter.use(requireAdministrator);
 
-// Hanya field aman yang dikirim ke frontend.
+// Password hash tidak dikirim ke frontend.
 const publicFields = {
   id: true,
   username: true,
@@ -19,7 +19,7 @@ const publicFields = {
   updatedAt: true
 } as const;
 
-// Daftar pegawai.
+// GET /api/v1/users — daftar pegawai.
 usersRouter.get('/', async (_req, res) => {
   try {
     const users = await prisma.user.findMany({
@@ -34,7 +34,7 @@ usersRouter.get('/', async (_req, res) => {
   }
 });
 
-// Tambah akun pegawai.
+// POST /api/v1/users — tambah akun pegawai.
 usersRouter.post('/', async (req, res) => {
   try {
     const { username, displayName, password, role } = req.body ?? {};
@@ -91,6 +91,113 @@ usersRouter.post('/', async (req, res) => {
     }
 
     console.error('Create user error:', error);
+    res.status(500).json({ message: 'Kesalahan server' });
+  }
+});
+
+// PATCH /api/v1/users/:id — ubah nama atau status aktif.
+usersRouter.patch('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = req.body;
+
+    if (
+      !input ||
+      typeof input !== 'object' ||
+      Array.isArray(input)
+    ) {
+      res.status(400).json({ message: 'Input tidak valid' });
+      return;
+    }
+
+    const keys = Object.keys(input);
+
+    if (
+      keys.length === 0 ||
+      keys.some(key => !['displayName', 'isActive'].includes(key))
+    ) {
+      res.status(400).json({
+        message: 'Hanya displayName dan isActive yang dapat diubah'
+      });
+      return;
+    }
+
+    const data: {
+      displayName?: string;
+      isActive?: boolean;
+    } = {};
+
+    if ('displayName' in input) {
+      if (
+        typeof input.displayName !== 'string' ||
+        input.displayName.trim().length < 2 ||
+        input.displayName.trim().length > 100
+      ) {
+        res.status(400).json({
+          message: 'Nama harus berisi 2–100 karakter'
+        });
+        return;
+      }
+
+      data.displayName = input.displayName.trim();
+    }
+
+    if ('isActive' in input) {
+      if (typeof input.isActive !== 'boolean') {
+        res.status(400).json({
+          message: 'isActive harus berupa boolean'
+        });
+        return;
+      }
+
+      data.isActive = input.isActive;
+    }
+
+    // Administrator tidak dapat menonaktifkan dirinya sendiri.
+    if (
+      id === res.locals.currentUser.id &&
+      data.isActive === false
+    ) {
+      res.status(400).json({
+        message: 'Tidak dapat menonaktifkan akun sendiri'
+      });
+      return;
+    }
+
+    // Perubahan akun dan pencabutan sesi dilakukan bersama.
+    const user = await prisma.$transaction(async tx => {
+      const updated = await tx.user.update({
+        where: { id },
+        data,
+        select: publicFields
+      });
+
+      if (data.isActive === false) {
+        await tx.session.deleteMany({
+          where: { userId: id }
+        });
+      }
+
+      return updated;
+    });
+
+    res.json({
+      message: 'Data pegawai berhasil diperbarui',
+      user
+    });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      'code' in error &&
+      error.code === 'P2025'
+    ) {
+      res.status(404).json({
+        message: 'Pegawai tidak ditemukan'
+      });
+      return;
+    }
+
+    console.error('Update user error:', error);
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
