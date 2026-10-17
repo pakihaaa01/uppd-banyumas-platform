@@ -2,7 +2,8 @@ import type { Request, Response, NextFunction } from 'express';
 import { createHash } from 'node:crypto';
 import { prisma } from '../lib/prisma';
 
-export async function requireAdministrator(
+// Memeriksa sesi untuk seluruh peran pegawai.
+export async function requireAuth(
   req: Request,
   res: Response,
   next: NextFunction
@@ -33,13 +34,6 @@ export async function requireAdministrator(
       return;
     }
 
-    if (session.user.role !== 'ADMINISTRATOR') {
-      res.status(403).json({
-        message: 'Akses khusus Administrator'
-      });
-      return;
-    }
-
     res.locals.currentUser = {
       id: session.user.id,
       username: session.user.username,
@@ -51,4 +45,22 @@ export async function requireAdministrator(
     console.error('Authorization error:', error);
     res.status(500).json({ message: 'Kesalahan server' });
   }
+}
+
+// Tetap digunakan oleh router manajemen pegawai.
+export function requireAdministrator(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  return requireAuth(req, res, () => {
+    if (res.locals.currentUser.role !== 'ADMINISTRATOR') {
+      res.status(403).json({
+        message: 'Akses khusus Administrator'
+      });
+      return;
+    }
+
+    next();
+  });
 }
