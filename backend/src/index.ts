@@ -4,6 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { authRouter } from './routes/auth';
+import { usersRouter } from './routes/users';
 
 const app = express();
 const PORT = 4000;
@@ -45,6 +46,7 @@ app.get('/api/v1/health/db', async (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', usersRouter);
 
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);
