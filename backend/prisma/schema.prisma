@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum UserRole {
   ADMINISTRATOR
   OPERATOR
@@ -28,7 +27,11 @@ model User {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
   sessions Session[]
+
+  authoredAnnouncements Announcement[] @relation("AnnouncementAuthor")
+  reviewedAnnouncements Announcement[] @relation("AnnouncementReviewer")
 }
 
 model Session {
@@ -44,3 +47,37 @@ model Session {
   @@index([expiresAt])
 }
 
+enum AnnouncementStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+}
+
+model Announcement {
+  id               String             @id @default(uuid())
+  title            String
+  date             DateTime           @db.Date
+  category         String
+  shortDescription String
+  content          String
+  isNew            Boolean            @default(true)
+  isImportant      Boolean            @default(false)
+  status           AnnouncementStatus @default(DRAFT)
+
+  createdById String
+  createdBy   User   @relation("AnnouncementAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+
+  reviewedById String?
+  reviewedBy   User?     @relation("AnnouncementReviewer", fields: [reviewedById], references: [id], onDelete: Restrict)
+  reviewedAt   DateTime?
+  reviewNote   String?
+  publishedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, date])
+  @@index([createdById])
+  @@index([reviewedById])
+}
