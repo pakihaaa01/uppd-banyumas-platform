@@ -13,6 +13,8 @@ import { contactRouter, messagesRouter } from './routes/contact';
 import { chatbotRouter } from './routes/chatbot';
 import { documentsRouter } from './routes/documents';
 import { publicDocumentsRouter } from './routes/publicDocuments';
+import { archivesRouter } from './routes/archives';
+import { publicArchivesRouter } from './routes/publicArchives';
 
 const app = express();
 const PORT = 4000;
@@ -64,6 +66,8 @@ app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/chatbot', chatbotRouter);
 app.use('/api/v1/documents', documentsRouter);
 app.use('/api/v1/public/documents', publicDocumentsRouter);
+app.use('/api/v1/archives', archivesRouter);
+app.use('/api/v1/public/archives', publicArchivesRouter);
 
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);
