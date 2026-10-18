@@ -4,6 +4,15 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { authRouter } from './routes/auth';
+import { usersRouter } from './routes/users';
+import { announcementsRouter } from './routes/announcements';
+import { publicRouter } from './routes/public';
+import { locationsRouter } from './routes/locations';
+import { faqsRouter } from './routes/faqs';
+import { contactRouter, messagesRouter } from './routes/contact';
+import { chatbotRouter } from './routes/chatbot';
+import { documentsRouter } from './routes/documents';
+import { publicDocumentsRouter } from './routes/publicDocuments';
 
 const app = express();
 const PORT = 4000;
@@ -45,6 +54,16 @@ app.get('/api/v1/health/db', async (_req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/announcements', announcementsRouter);
+app.use('/api/v1/public', publicRouter);
+app.use('/api/v1/locations', locationsRouter);
+app.use('/api/v1/faqs', faqsRouter);
+app.use('/api/v1/contact', contactRouter);
+app.use('/api/v1/messages', messagesRouter);
+app.use('/api/v1/chatbot', chatbotRouter);
+app.use('/api/v1/documents', documentsRouter);
+app.use('/api/v1/public/documents', publicDocumentsRouter);
 
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);

@@ -12,7 +12,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum UserRole {
   ADMINISTRATOR
   OPERATOR
@@ -28,7 +27,11 @@ model User {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
   sessions Session[]
+
+  authoredAnnouncements Announcement[] @relation("AnnouncementAuthor")
+  reviewedAnnouncements Announcement[] @relation("AnnouncementReviewer")
 }
 
 model Session {
@@ -44,3 +47,140 @@ model Session {
   @@index([expiresAt])
 }
 
+enum AnnouncementStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+}
+
+model Announcement {
+  id               String             @id @default(uuid())
+  title            String
+  date             DateTime           @db.Date
+  category         String
+  shortDescription String
+  content          String
+  isNew            Boolean            @default(true)
+  isImportant      Boolean            @default(false)
+  status           AnnouncementStatus @default(DRAFT)
+
+  createdById String
+  createdBy   User   @relation("AnnouncementAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+
+  reviewedById String?
+  reviewedBy   User?     @relation("AnnouncementReviewer", fields: [reviewedById], references: [id], onDelete: Restrict)
+  reviewedAt   DateTime?
+  reviewNote   String?
+  publishedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, date])
+  @@index([createdById])
+  @@index([reviewedById])
+}
+
+enum ServiceLocationType {
+  induk
+  pembantu
+  cepat
+  drive_thru
+  keliling
+  mpp
+  gerai
+  paten
+}
+
+model ServiceLocation {
+  id             String              @id @default(uuid())
+  name           String
+  address        String
+  operatingHours String
+  phone          String
+  mapsUrl        String
+  mapsEmbedUrl   String?
+  isMain         Boolean             @default(false)
+  isDriveThru    Boolean             @default(false)
+  type           ServiceLocationType
+  description    String?
+
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, type])
+}
+
+model FAQ {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  category  String
+  viewCount Int      @default(0)
+  isPopular Boolean  @default(false)
+  isEnabled Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isEnabled, category])
+}
+
+enum ContactMessageStatus {
+  NEW
+  IN_PROGRESS
+  COMPLETED
+}
+
+model ContactMessage {
+  id        String               @id @default(uuid())
+  name      String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  status    ContactMessageStatus @default(NEW)
+  createdAt DateTime             @default(now())
+  updatedAt DateTime             @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model ChatbotFAQ {
+  id         String   @id @default(uuid())
+  question   String
+  answer     String
+  keywords   String[]
+  category   String
+  isEnabled  Boolean  @default(false)
+  clickCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isEnabled, category])
+}
+
+enum PublicDocumentCategory {
+  sop
+  wbk
+  sipp
+  pad
+  evaluasi
+}
+
+model PublicDocument {
+  id          String                 @id @default(uuid())
+  title       String
+  category    PublicDocumentCategory
+  fileType    String
+  fileSize    String
+  downloadUrl String
+  updateDate  DateTime               @db.Date
+  description String?
+  isPublished Boolean                @default(false)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  @@index([isPublished, category])
+}
