@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { OperatorFAQ } from './OperatorFAQ';
 import {
   BarChart3, Megaphone, MapPin, Images, FileText, CircleHelp, MessageSquare,
   Bot, Settings, Plus, Pencil, Trash2, ExternalLink, X, Search,
@@ -262,10 +263,14 @@ export const AdminDashboard: React.FC = () => {
         <main className="min-w-0">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div><h2 className="text-[22px] font-bold text-[#1c3c53]">{pageInfo[activeTab].title}</h2><p className="mt-1 max-w-[700px] text-[13px] leading-6 text-[#607688]">{pageInfo[activeTab].desc}</p></div>
-            {['announcements', 'locations', 'posters', 'documents', 'archive', 'faq', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
+            {['announcements', 'locations', 'posters', 'documents', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
           </div>
 
-          {activeTab === 'overview' ? (
+          {activeTab === 'faq' ? (
+              <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
+                <OperatorFAQ />
+              </section>
+            ) : activeTab === 'overview' ? (
             <div className="space-y-7">
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
