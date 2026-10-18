@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { PortalUser } from './AdminGate';
 import { OperatorAnnouncements } from './OperatorAnnouncements';
+import { OperatorFAQ } from './OperatorFAQ';
 
 type Props = {
   user: PortalUser;
@@ -128,6 +129,8 @@ export function RoleWorkspace({ user }: Props) {
           <section className="border border-[#dce5eb] bg-white p-6">
             {isOperator && activeTab === 'announcements' ? (
               <OperatorAnnouncements />
+            ) : isOperator && activeTab === 'faq' ? (
+              <OperatorFAQ />
             ) : activeTab === 'overview' ? (
               <>
                 <h2 className="text-lg font-semibold text-[#193a52]">
