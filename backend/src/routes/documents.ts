@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { prisma } from '../lib/prisma';
-import { requireAdministrator } from '../middleware/auth';
-import type { PublicDocumentCategory } from '../../generated/prisma/enums';
+import { prisma } from '../lib/prisma.js';
+import { requireAdministrator } from '../middleware/auth.js';
+import type { PublicDocumentCategory } from '../../generated/prisma/enums.js';
 
 export const documentsRouter = Router();
 
@@ -232,7 +232,7 @@ documentsRouter.post('/', async (req, res) => {
         fileSize: data.fileSize,
         downloadUrl: data.downloadUrl,
         updateDate: data.updateDate,
-        description: data.description,
+        description: data.description ?? null,
         isPublished: false
       }
     });

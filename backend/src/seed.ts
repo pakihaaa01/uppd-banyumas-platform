@@ -1,7 +1,7 @@
 
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { prisma } from './lib/prisma';
+import { prisma } from './lib/prisma.js';
 
 const accounts = [
   {

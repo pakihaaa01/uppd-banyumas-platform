@@ -3,7 +3,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { randomBytes, createHash } from 'node:crypto';
 import { rateLimit } from 'express-rate-limit';
-import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma.js';
 
 export const authRouter = Router();
 

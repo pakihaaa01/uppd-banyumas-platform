@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { prisma } from '../lib/prisma';
-import { requireAdministrator } from '../middleware/auth';
-import type { ServiceLocationType } from '../../generated/prisma/enums';
+import { prisma } from '../lib/prisma.js';
+import { requireAdministrator } from '../middleware/auth.js';
+import type { ServiceLocationType } from '../../generated/prisma/enums.js';
 
 export const locationsRouter = Router();
 
@@ -258,8 +258,8 @@ locationsRouter.post('/', async (req, res) => {
         phone: data.phone,
         mapsUrl: data.mapsUrl,
         type: data.type,
-        mapsEmbedUrl: data.mapsEmbedUrl,
-        description: data.description,
+        mapsEmbedUrl: data.mapsEmbedUrl ?? null,
+	description: data.description ?? null,
         isMain: data.isMain ?? false,
         isDriveThru: data.isDriveThru ?? false,
         isPublished: false

@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { rateLimit } from 'express-rate-limit';
-import { prisma } from '../lib/prisma';
-import { requireAdministrator } from '../middleware/auth';
-import type { ContactMessageStatus } from '../../generated/prisma/enums';
+import { prisma } from '../lib/prisma.js';
+import { requireAdministrator } from '../middleware/auth.js';
+import type { ContactMessageStatus } from '../../generated/prisma/enums.js';
 
 export const contactRouter = Router();
 export const messagesRouter = Router();
@@ -118,7 +118,7 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
       data: {
         ...data,
         email: values.email.trim(),
-        phone,
+        phone: phone ?? null,
         status: 'NEW'
       }
     });
