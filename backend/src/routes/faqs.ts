@@ -1,10 +1,25 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAdministrator } from '../middleware/auth';
+import { requireAuth } from '../middleware/auth';
 
 export const faqsRouter = Router();
 
-faqsRouter.use(requireAdministrator);
+// Seluruh pengelolaan FAQ memerlukan sesi aktif.
+faqsRouter.use(requireAuth);
+
+// Administrator dan Operator boleh mengelola FAQ.
+faqsRouter.use((_req, res, next) => {
+  const role = res.locals.currentUser.role;
+
+  if (role !== 'ADMINISTRATOR' && role !== 'OPERATOR') {
+    res.status(403).json({
+      message: 'Akses khusus Administrator dan Operator'
+    });
+    return;
+  }
+
+  next();
+});
 
 const textLimits = {
   question: 500,
