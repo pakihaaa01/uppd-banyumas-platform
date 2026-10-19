@@ -1,13 +1,14 @@
+
 import { useState } from 'react';
 import {
   LayoutDashboard,
   Megaphone,
-  MapPin,
   CircleHelp,
   Images,
   ClipboardCheck,
   History,
 } from 'lucide-react';
+
 import type { PortalUser } from './AdminGate';
 import { OperatorAnnouncements } from './OperatorAnnouncements';
 import { OperatorFAQ } from './OperatorFAQ';
@@ -19,6 +20,7 @@ type Props = {
 export function RoleWorkspace({ user }: Props) {
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Menu yang hanya tersedia untuk Operator.
   const operatorMenus = [
     {
       id: 'overview',
@@ -31,12 +33,6 @@ export function RoleWorkspace({ user }: Props) {
       label: 'Pengumuman',
       icon: Megaphone,
       description: 'Pengelolaan pengumuman dan berita.'
-    },
-    {
-      id: 'locations',
-      label: 'Titik Layanan',
-      icon: MapPin,
-      description: 'Informasi lokasi dan jadwal pelayanan.'
     },
     {
       id: 'faq',
@@ -52,6 +48,7 @@ export function RoleWorkspace({ user }: Props) {
     }
   ];
 
+  // Menu khusus Penanggung Jawab.
   const reviewerMenus = [
     {
       id: 'overview',
@@ -74,20 +71,28 @@ export function RoleWorkspace({ user }: Props) {
   ];
 
   const isOperator = user.role === 'OPERATOR';
+
+  // Menentukan menu berdasarkan peran pengguna.
   const menus = isOperator ? operatorMenus : reviewerMenus;
-  const selected = menus.find(item => item.id === activeTab) ?? menus[0];
+
+  const selected =
+    menus.find((item) => item.id === activeTab) ?? menus[0];
 
   return (
     <div className="mx-auto max-w-[1320px] px-4 py-7 sm:px-8 lg:px-10">
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
 
+        {/* Sidebar menu pegawai */}
         <aside className="self-start border border-[#dce5eb] bg-white p-4">
           <p className="mb-4 px-3 text-[11px] font-bold uppercase tracking-wide text-[#647b8d]">
             Menu Pegawai
           </p>
 
-          <nav aria-label="Navigasi Portal Pegawai" className="space-y-1">
-            {menus.map(item => {
+          <nav
+            aria-label="Navigasi Portal Pegawai"
+            className="space-y-1"
+          >
+            {menus.map((item) => {
               const Icon = item.icon;
               const selectedTab = activeTab === item.id;
 
@@ -96,7 +101,9 @@ export function RoleWorkspace({ user }: Props) {
                   key={item.id}
                   type="button"
                   onClick={() => setActiveTab(item.id)}
-                  aria-current={selectedTab ? 'page' : undefined}
+                  aria-current={
+                    selectedTab ? 'page' : undefined
+                  }
                   className={`flex w-full items-center gap-3 rounded px-3 py-3 text-left text-[13px] font-medium transition-colors ${
                     selectedTab
                       ? 'bg-[#e8f1f9] text-[#005BAC]'
@@ -111,7 +118,10 @@ export function RoleWorkspace({ user }: Props) {
           </nav>
         </aside>
 
+        {/* Konten utama */}
         <main className="min-w-0 space-y-5">
+
+          {/* Header halaman */}
           <section className="border border-[#dce5eb] bg-white p-6">
             <p className="text-xs font-semibold text-[#005BAC]">
               PORTAL PEGAWAI UPPD BANYUMAS
@@ -126,30 +136,43 @@ export function RoleWorkspace({ user }: Props) {
             </p>
           </section>
 
+          {/* Konten berdasarkan menu dan peran */}
           <section className="border border-[#dce5eb] bg-white p-6">
+
+            {/* Pengumuman Operator */}
             {isOperator && activeTab === 'announcements' ? (
               <OperatorAnnouncements />
+
+            /* FAQ Operator */
             ) : isOperator && activeTab === 'faq' ? (
               <OperatorFAQ />
+
+            /* Dashboard */
             ) : activeTab === 'overview' ? (
               <>
                 <h2 className="text-lg font-semibold text-[#193a52]">
                   Selamat datang, {user.displayName}
                 </h2>
+
                 <p className="mt-3 text-sm text-[#61798a]">
-                  Anda masuk sebagai {
-                    isOperator ? 'Operator' : 'Penanggung Jawab'
-                  }.
+                  Anda masuk sebagai{' '}
+                  {isOperator
+                    ? 'Operator'
+                    : 'Penanggung Jawab'}.
                 </p>
               </>
+
+            /* Modul yang belum terintegrasi */
             ) : (
               <>
                 <h2 className="text-lg font-semibold text-[#193a52]">
                   {selected.label}
                 </h2>
+
                 <p className="mt-3 text-sm text-[#61798a]">
                   Tampilan modul ini sedang disiapkan.
-                  Integrasi data akan dilakukan setelah API tersedia.
+                  Integrasi data akan dilakukan setelah
+                  API tersedia.
                 </p>
               </>
             )}
