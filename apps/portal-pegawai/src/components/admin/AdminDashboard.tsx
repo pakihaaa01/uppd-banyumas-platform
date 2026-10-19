@@ -1,3 +1,4 @@
+import { AdminDocuments } from './AdminDocuments';
 import { AdminLocations } from './AdminLocations';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { OperatorFAQ } from './OperatorFAQ';
@@ -264,10 +265,14 @@ export const AdminDashboard: React.FC = () => {
         <main className="min-w-0">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div><h2 className="text-[22px] font-bold text-[#1c3c53]">{pageInfo[activeTab].title}</h2><p className="mt-1 max-w-[700px] text-[13px] leading-6 text-[#607688]">{pageInfo[activeTab].desc}</p></div>
-            {['announcements', 'posters', 'documents', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
+            {['announcements', 'posters', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
           </div>
 
-          {activeTab === 'locations' ? (
+          {activeTab === 'documents' ? (
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
+              <AdminDocuments />
+            </section>
+          ) : activeTab === 'locations' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <AdminLocations />
               </section>
@@ -298,7 +303,6 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex flex-col justify-between gap-3 border-b border-[#e4ebef] pb-5 sm:flex-row sm:items-center"><p className="text-xs text-[#657a8c]">{rows.length} entri ditampilkan</p><div className="relative w-full sm:max-w-[280px]"><Search size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8ba0ae]"/><label className="sr-only" htmlFor="admin-search">Cari data</label><input id="admin-search" type="search" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Cari dalam daftar..." className={`${field} pl-9`} /></div></div>
               <div className="divide-y divide-[#e7edf1]">{rows.length ? rows.map(item => <article key={item.id} className="py-5">{renderRow(item)}</article>) : <p className="py-12 text-center text-sm text-[#6c8192]">Belum ada data yang cocok dengan pencarian.</p>}</div>
               {activeTab === 'posters' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Poster dapat menggunakan URL atau file JPG/PNG/WEBP yang diunggah ke server lokal.</p>}
-              {activeTab === 'documents' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Dokumen dapat menggunakan URL atau PDF yang diunggah ke server lokal.</p>}
               {activeTab === 'messages' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Pesan demonstrasi berasal dari formulir publik, tersimpan di database lokal, dan tidak dikirim ke instansi.</p>}
             </section>
           )}
