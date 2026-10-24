@@ -83,9 +83,17 @@ export const AdminDashboard: React.FC = () => {
   const [archiveForm,setArchiveForm]=useState(initialArchive);
   const [uploading,setUploading]=useState(false);
   const [saving,setSaving]=useState(false);
+  const [dbAnnouncements, setDbAnnouncements] = useState<Announcement[] | null>(null);
+  useEffect(() => {
+    let active = true;
+    apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
+      .then((data) => { if (active) setDbAnnouncements(data.announcements); })
+      .catch((error) => { console.error('Gagal memuat ringkasan pengumuman:', error); });
+    return () => { active = false; };
+  }, []);
 
   const counts: Partial<Record<Tab, number>> = {
-    announcements: announcementCount, locations: serviceLocations.length,
+    announcements: dbAnnouncements?.length, locations: serviceLocations.length,
     posters: bumdesPosters.length, documents: documents.length,
     faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
     chatbot: chatbotFaqs.length, archive: visualArchive.length,
@@ -269,7 +277,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {activeTab === 'announcements' ? (
-            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onCountChange={setAnnouncementCount} /></section>
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onAnnouncementsChange={setDbAnnouncements} /></section>
           ) : activeTab === 'locations' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <AdminLocations />
@@ -282,14 +290,14 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-7">
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
-                  { label: 'Pengumuman', value: announcements.length, tab: 'announcements' as Tab },
+                  { label: 'Pengumuman', value: dbAnnouncements?.length ?? '—', tab: 'announcements' as Tab },
                   { label: 'Titik Layanan', value: serviceLocations.length, tab: 'locations' as Tab },
                   { label: 'Dokumen', value: documents.length, tab: 'documents' as Tab },
                   { label: 'Pesan Baru', value: contactMessages.filter(m => m.status === 'New').length, tab: 'messages' as Tab },
                 ].map(metric => <button key={metric.tab} type="button" onClick={() => chooseTab(metric.tab)} className="border border-[#dce5eb] bg-white px-5 py-5 text-left transition-colors hover:border-[#8fb9d7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"><p className="text-[12px] font-medium text-[#617688]">{metric.label}</p><p className="mt-3 text-[29px] font-bold tabular-nums text-[#1b3a52]">{metric.value}</p><span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#005BAC]">Lihat data <ArrowRight size={13}/></span></button>)}
               </div>
               <div className="grid gap-5 xl:grid-cols-[1.3fr_1fr]">
-                <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pengumuman terbaru</h3><p className="mt-1 text-xs text-[#6b8090]">Pengumuman yang disimpan pada database lokal</p><div className="mt-5 divide-y divide-[#e7edf1]">{announcements.length ? announcements.slice(0, 5).map(a => <div key={a.id} className="py-3"><p className="text-[11px] text-[#6b8191]">{a.date} · {a.category}</p><p className="mt-1 text-[13px] font-semibold leading-5 text-[#2a465a]">{a.title}</p></div>) : <p className="py-4 text-sm text-[#708392]">Belum ada pengumuman.</p>}</div></section>
+                <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pengumuman terbaru</h3><p className="mt-1 text-xs text-[#6b8090]">Pengumuman yang disimpan pada database lokal</p><div className="mt-5 divide-y divide-[#e7edf1]">{dbAnnouncements === null ? <p className="py-4 text-sm text-[#708392]">Memuat pengumuman...</p> : dbAnnouncements.length ? dbAnnouncements.slice(0, 5).map(a => <div key={a.id} className="py-3"><p className="text-[11px] text-[#6b8191]">{a.date} · {a.category}</p><p className="mt-1 text-[13px] font-semibold leading-5 text-[#2a465a]">{a.title}</p></div>) : <p className="py-4 text-sm text-[#708392]">Belum ada pengumuman.</p>}</div></section>
                 <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pekerjaan pengelolaan</h3><p className="mt-1 text-xs text-[#6b8090]">Akses cepat ke modul yang paling sering diperbarui</p><div className="mt-5 divide-y divide-[#e7edf1]">{[{ tab: 'announcements' as Tab, text: 'Perbarui pengumuman' },{ tab: 'locations' as Tab, text: 'Periksa jadwal dan lokasi' },{ tab: 'documents' as Tab, text: 'Kelola dokumen publik' },{ tab: 'faq' as Tab, text: 'Perbarui pertanyaan umum' }].map(task => <button key={task.tab} type="button" onClick={() => chooseTab(task.tab)} className="flex w-full items-center justify-between gap-3 py-3 text-left text-[13px] font-medium text-[#3e5b70] hover:text-[#005BAC]">{task.text}<ArrowRight size={15} aria-hidden="true" /></button>)}</div></section>
               </div>
               <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-[12px] leading-6 text-[#536f83]"><strong className="font-semibold text-[#23485f]">Catatan prototipe:</strong> Menggunakan API dan autentikasi pada server lokal dengan database SQLite; bukan sistem resmi instansi. Perubahan dapat dilihat pada browser yang membuka server yang sama.</div>
