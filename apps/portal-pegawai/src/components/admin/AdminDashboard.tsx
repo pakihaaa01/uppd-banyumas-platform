@@ -1,3 +1,4 @@
+import { AdminDocuments } from './AdminDocuments';
 import { AdminLocations } from './AdminLocations';
 import { AdminAnnouncements } from './AdminAnnouncements';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -85,6 +86,7 @@ export const AdminDashboard: React.FC = () => {
   const [saving,setSaving]=useState(false);
   const [dbAnnouncements, setDbAnnouncements] = useState<Announcement[] | null>(null);
   const [locationCount, setLocationCount] = useState<number | undefined>(undefined);
+  const [documentCount, setDocumentCount] = useState<number | undefined>(undefined);
   useEffect(() => {
     let active = true;
     apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
@@ -101,9 +103,16 @@ export const AdminDashboard: React.FC = () => {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    apiRequest<{ documents: { id: string }[] }>('/api/v1/documents')
+      .then(data => { if (active) setDocumentCount(data.documents.length); })
+      .catch(error => console.error('Gagal memuat jumlah dokumen:', error));
+    return () => { active = false; };
+  }, []);
   const counts: Partial<Record<Tab, number>> = {
     announcements: dbAnnouncements?.length, locations: locationCount,
-    posters: bumdesPosters.length, documents: documents.length,
+    posters: bumdesPosters.length, documents: documentCount,
     faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
     chatbot: chatbotFaqs.length, archive: visualArchive.length,
   };
@@ -282,11 +291,13 @@ export const AdminDashboard: React.FC = () => {
         <main className="min-w-0">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div><h2 className="text-[22px] font-bold text-[#1c3c53]">{pageInfo[activeTab].title}</h2><p className="mt-1 max-w-[700px] text-[13px] leading-6 text-[#607688]">{pageInfo[activeTab].desc}</p></div>
-            {['posters', 'documents', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
+            {['posters', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
           </div>
 
           {activeTab === 'announcements' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onAnnouncementsChange={setDbAnnouncements} /></section>
+          ) : activeTab === 'documents' ? (
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminDocuments onDocumentsChange={setDocumentCount} /></section>
           ) : activeTab === 'locations' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <AdminLocations onLocationsChange={setLocationCount} />
@@ -301,7 +312,7 @@ export const AdminDashboard: React.FC = () => {
                 {[
                   { label: 'Pengumuman', value: dbAnnouncements?.length ?? '—', tab: 'announcements' as Tab },
                   { label: 'Titik Layanan', value: locationCount ?? '—', tab: 'locations' as Tab },
-                  { label: 'Dokumen', value: documents.length, tab: 'documents' as Tab },
+                  { label: 'Dokumen', value: documentCount ?? '—', tab: 'documents' as Tab },
                   { label: 'Pesan Baru', value: contactMessages.filter(m => m.status === 'New').length, tab: 'messages' as Tab },
                 ].map(metric => <button key={metric.tab} type="button" onClick={() => chooseTab(metric.tab)} className="border border-[#dce5eb] bg-white px-5 py-5 text-left transition-colors hover:border-[#8fb9d7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"><p className="text-[12px] font-medium text-[#617688]">{metric.label}</p><p className="mt-3 text-[29px] font-bold tabular-nums text-[#1b3a52]">{metric.value}</p><span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#005BAC]">Lihat data <ArrowRight size={13}/></span></button>)}
               </div>
