@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useSamsat } from '../../context/SamsatContext';
 import type { ArchiveItem } from '../../context/SamsatContext';
-import { uploadFile } from '../../lib/api';
+import { apiRequest, uploadFile } from '../../lib/api';
 import type { Announcement, ServiceLocation, PublicDocument, FAQItem, ChatbotFAQ, BUMDesPoster } from '../../types';
 
 type Tab = 'overview' | 'announcements' | 'locations' | 'posters' | 'documents' | 'archive' | 'faq' | 'messages' | 'chatbot' | 'settings';
@@ -85,7 +85,7 @@ export const AdminDashboard: React.FC = () => {
   const [saving,setSaving]=useState(false);
 
   const counts: Partial<Record<Tab, number>> = {
-    announcements: announcements.length, locations: serviceLocations.length,
+    announcements: announcementCount, locations: serviceLocations.length,
     posters: bumdesPosters.length, documents: documents.length,
     faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
     chatbot: chatbotFaqs.length, archive: visualArchive.length,
@@ -269,7 +269,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {activeTab === 'announcements' ? (
-            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements /></section>
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onCountChange={setAnnouncementCount} /></section>
           ) : activeTab === 'locations' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <AdminLocations />
