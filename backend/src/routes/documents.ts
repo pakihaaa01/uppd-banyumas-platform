@@ -10,6 +10,19 @@ export const documentsRouter = Router();
 const pdfDir = join(process.cwd(), 'storage', 'documents');
 const internalUrl = (id: string) => `/api/v1/public/documents/${id}/file`;
 const pdfPath = (id: string) => join(pdfDir, `${id}.pdf`);
+
+// Hapus berkas lokal hanya jika dokumen memang menggunakan penyimpanan internal.
+async function cleanupLocalPdf(id: string): Promise<void> {
+  const refPath = join(pdfDir, id + '.ref');
+  let ref: string;
+  try { ref = (await readFile(refPath, 'utf8')).trim(); }
+  catch { return; }
+  if (/^[0-9a-f-]{36}$/.test(ref)) {
+    await unlink(pdfPath(ref)).catch(error => console.error('Gagal menghapus berkas lama:', error));
+  }
+  await unlink(refPath).catch(error => console.error('Gagal menghapus referensi berkas:', error));
+}
+
 const isInternalUrl = (value: string) => /^\/api\/v1\/public\/documents\/[0-9a-f-]{36}\/file$/.test(value);
 
 
@@ -287,6 +300,7 @@ documentsRouter.delete('/:id', async (req, res) => {
       return;
     }
 
+    await cleanupLocalPdf(req.params.id);
     res.json({ message: 'Dokumen berhasil dihapus' });
   } catch (error) {
     console.error('Delete document error:', error);
@@ -369,7 +383,15 @@ documentsRouter.post('/:id/upload', async (req, res) => {
       });
       if (!updated.count) throw new Error('Draft sudah berubah');
       // Simpan relasi berkas ke ID dokumen agar akses tidak mengekspos nama fisik.
-      await writeFile(join(pdfDir, id + '.ref'), storageId, { flag: 'w' });
+      const refPath = join(pdfDir, id + '.ref');
+      let previousRef = '';
+      try { previousRef = (await readFile(refPath, 'utf8')).trim(); } catch {}
+      await writeFile(refPath, storageId, { flag: 'w' });
+      if (/^[0-9a-f-]{36}$/.test(previousRef) && previousRef !== storageId) {
+        await unlink(pdfPath(previousRef)).catch(error =>
+          console.error('Gagal menghapus PDF sebelumnya:', error)
+        );
+      }
     } catch (error) {
       await unlink(target).catch(() => {});
       throw error;
