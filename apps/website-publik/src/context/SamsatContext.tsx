@@ -175,7 +175,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const updateFaq=(id:string,data:Partial<FAQItem>)=>change('faq','PUT',id,data,'FAQ diperbarui');
   const deleteFaq=(id:string)=>change('faq','DELETE',id,undefined,'FAQ dihapus');
   const addContactMessage=async(data:Omit<ContactMessage,'id'|'createdAt'|'status'>):AsyncAction=>{
-    try { await apiRequest('/api/contact','POST',data);showToast('Pesan contoh tersimpan pada server lokal (bukan dikirim ke instansi).');return true; }
+    try { await apiRequest('/api/v1/contact','POST',data);showToast('Pesan contoh tersimpan pada server lokal (bukan dikirim ke instansi).');return true; }
     catch(e){showToast(e instanceof Error?e.message:'Gagal mengirim pesan','error');return false;}
   };
   const updateMessageStatus=(id:string,status:ContactMessage['status'])=>change('messages','PUT',id,{status},'Status pesan diperbarui');
