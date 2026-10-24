@@ -89,6 +89,7 @@ export const AdminDashboard: React.FC = () => {
   const [locationCount, setLocationCount] = useState<number | undefined>(undefined);
   const [documentCount, setDocumentCount] = useState<number | undefined>(undefined);
   const [archiveCount,setArchiveCount] = useState<number | undefined>(undefined);
+  const [faqCount,setFaqCount] = useState<number | undefined>(undefined);
   useEffect(() => {
     let active = true;
     apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
@@ -113,10 +114,11 @@ export const AdminDashboard: React.FC = () => {
     return () => { active = false; };
   }, []);
   useEffect(() => { let active = true; apiRequest<{archive:{id:string}[]}>('/api/v1/archive').then(r=>{if(active)setArchiveCount(r.archive.length)}).catch(console.error);return()=>{active=false}; }, []);
+  useEffect(() => { let active=true; apiRequest<{faqs:{id:string}[]}>('/api/v1/faqs').then(r=>{if(active)setFaqCount(r.faqs.length)}).catch(console.error);return()=>{active=false}; }, []);
   const counts: Partial<Record<Tab, number>> = {
     announcements: dbAnnouncements?.length, locations: locationCount,
     posters: bumdesPosters.length, documents: documentCount,
-    faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
+    faq: faqCount, messages: contactMessages.filter(m => m.status === 'New').length,
     chatbot: chatbotFaqs.length, archive: archiveCount,
   };
 
@@ -309,7 +311,7 @@ export const AdminDashboard: React.FC = () => {
               </section>
           ) : activeTab === 'faq' ? (
               <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
-                <OperatorFAQ />
+                <OperatorFAQ onChange={setFaqCount} />
               </section>
             ) : activeTab === 'overview' ? (
             <div className="space-y-7">
