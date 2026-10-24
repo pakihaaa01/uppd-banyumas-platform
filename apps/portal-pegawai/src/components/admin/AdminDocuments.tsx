@@ -31,6 +31,7 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
   const [filter, setFilter] = useState<'ALL' | 'DRAFT' | 'PUBLISHED'>('ALL');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [uploadingId, setUploadingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
   useEffect(() => { onDocumentsChange?.(documents.length); }, [documents, onDocumentsChange]);
@@ -81,6 +82,26 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
       setInfo(item.isPublished ? 'Dokumen ditarik dari website publik.' : 'Dokumen diterbitkan ke website publik.');
     } catch (err) { setError(err instanceof Error ? err.message : 'Gagal mengubah publikasi'); }
     finally { setBusy(false); }
+  }
+  async function upload(item: DocumentItem, file: File | undefined) {
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024 || file.size < 8 ||
+        (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf')) {
+      setError('Pilih berkas PDF maksimal 10 MB.'); return;
+    }
+    setUploadingId(item.id); setError(''); setInfo('');
+    try {
+      const response = await fetch(`${API}/${encodeURIComponent(item.id)}/upload`, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/pdf', 'X-Requested-With': 'UPPD-Portal' },
+        body: file
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || 'Unggah PDF gagal');
+      await refresh();
+      setInfo('PDF berhasil diunggah. Periksa dokumen sebelum publikasi.');
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unggah gagal'); }
+    finally { setUploadingId(null); }
   }
   async function remove(item: DocumentItem) {
     if (item.isPublished || busy || !window.confirm(`Hapus Draft "${item.title}"?`)) return;
@@ -148,8 +169,9 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
           {item.description && <p className="mt-2 line-clamp-2 text-xs leading-5 text-[#667e8c]">{item.description}</p>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {item.downloadUrl && <a href={item.downloadUrl} target="_blank" rel="noopener noreferrer" className={buttonStyle + ' inline-flex items-center gap-1'}><ExternalLink size={13}/> Lihat</a>}
-          <button type="button" disabled={busy || (!item.isPublished && !item.downloadUrl)} title={!item.isPublished && !item.downloadUrl ? "Isi tautan dokumen sebelum publikasi" : undefined} onClick={() => void toggle(item)} className={buttonStyle}>{item.isPublished ? 'Tarik Publikasi' : 'Publikasikan'}</button>
+          {item.downloadUrl && <a href={item.downloadUrl.startsWith("/api/v1/public/documents/") ? `${API}/${encodeURIComponent(item.id)}/file` : item.downloadUrl} target="_blank" rel="noopener noreferrer" className={buttonStyle + ' inline-flex items-center gap-1'}><ExternalLink size={13}/> Lihat</a>}
+          <button type="button" disabled={busy || uploadingId !== null || (!item.isPublished && !item.downloadUrl)} title={!item.isPublished && !item.downloadUrl ? "Isi tautan dokumen sebelum publikasi" : undefined} onClick={() => void toggle(item)} className={buttonStyle}>{item.isPublished ? 'Tarik Publikasi' : 'Publikasikan'}</button>
+          {!item.isPublished && <label className={buttonStyle + ' inline-flex cursor-pointer items-center gap-1'}>{uploadingId === item.id ? 'Mengunggah...' : 'Unggah PDF'}<input type="file" accept=".pdf,application/pdf" disabled={busy || uploadingId !== null} className="sr-only" onChange={event => { const file=event.target.files?.[0]; void upload(item,file); event.target.value=''; }}/></label>}
           {!item.isPublished && <><button type="button" disabled={busy} onClick={() => edit(item)} className={buttonStyle + ' inline-flex items-center gap-1'}><Pencil size={13}/> Edit</button>
           <button type="button" disabled={busy} onClick={() => void remove(item)} className={buttonStyle + ' inline-flex items-center gap-1 text-red-700'}><Trash2 size={13}/> Hapus</button></>}
         </div>
