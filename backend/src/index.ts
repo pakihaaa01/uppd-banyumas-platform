@@ -13,6 +13,7 @@ import { contactRouter, messagesRouter } from './routes/contact';
 import { chatbotRouter } from './routes/chatbot';
 import { documentsRouter } from './routes/documents';
 import { publicDocumentsRouter } from './routes/publicDocuments';
+import { archiveRouter } from './routes/archive';
 
 const app = express();
 const PORT = 4000;
@@ -63,6 +64,7 @@ app.use('/api/v1/contact', contactRouter);
 app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/chatbot', chatbotRouter);
 app.use('/api/v1/documents', documentsRouter);
+app.use('/api/v1/archive', archiveRouter);
 app.use('/api/v1/public/documents', publicDocumentsRouter);
 
 app.listen(PORT, '127.0.0.1', () => {
