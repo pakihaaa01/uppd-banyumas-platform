@@ -83,11 +83,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [documents,setDocuments]=useState<PublicDocument[]>([]);
   const [faqs,setFaqs]=useState<FAQItem[]>(INITIAL_FAQS);
   const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>(INITIAL_CHATBOT_FAQS);
-  const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([
-    { id: 'arc-1', title: 'Maklumat Pelayanan', description: 'Gambar dokumentasi maklumat pelayanan yang disertakan pada project.', image: '/images/maklumat.jpeg' },
-    { id: 'arc-2', title: 'Standar Operasional Prosedur', description: 'Gambar prosedur pelayanan yang tersedia dalam aset website.', image: '/images/sop1.jpg' },
-    { id: 'arc-3', title: 'Sistem Informasi Pelayanan Publik', description: 'Dokumentasi pelayanan publik yang tersedia di project.', image: '/images/sipp2.jpg' },
-  ]);
+  const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([]);
   const [contactMessages,setContactMessages]=useState<ContactMessage[]>(INITIAL_CONTACT_MESSAGES);
   const [stats,setStats]=useState<DashboardStats>(INITIAL_DASHBOARD_STATS);
   const [padTargets]=useState<PADTarget[]>(PAD_TARGETS);
@@ -125,6 +121,13 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
     } catch (error) {
       console.error('Gagal mengambil dokumen publik:', error);
       setDocuments([]);
+    }
+    try {
+      const result = await apiRequest<{archive: ArchiveItem[]}>('/api/v1/public/archive');
+      setVisualArchive(result.archive);
+    } catch (error) {
+      console.error('Gagal mengambil dokumentasi publik:', error);
+      setVisualArchive([]);
     }
   },[]);
   useEffect(()=>{
