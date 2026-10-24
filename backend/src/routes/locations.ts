@@ -332,3 +332,38 @@ locationsRouter.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+// Administrator dapat menerbitkan lokasi yang masih berstatus Draft.
+locationsRouter.post('/:id/publish', async (req, res) => {
+  try {
+    const result = await prisma.serviceLocation.updateMany({
+      where: { id: req.params.id, isPublished: false },
+      data: { isPublished: true }
+    });
+    if (!result.count) {
+      res.status(404).json({ message: 'Lokasi Draft tidak ditemukan atau sudah diterbitkan' });
+      return;
+    }
+    res.json({ message: 'Titik layanan berhasil dipublikasikan' });
+  } catch (error) {
+    console.error('Publish location error:', error);
+    res.status(500).json({ message: 'Gagal menerbitkan lokasi' });
+  }
+});
+
+// Penarikan publikasi tidak menghapus data lokasi dari PostgreSQL.
+locationsRouter.post('/:id/unpublish', async (req, res) => {
+  try {
+    const result = await prisma.serviceLocation.updateMany({
+      where: { id: req.params.id, isPublished: true },
+      data: { isPublished: false }
+    });
+    if (!result.count) {
+      res.status(404).json({ message: 'Lokasi terbit tidak ditemukan atau sudah ditarik' });
+      return;
+    }
+    res.json({ message: 'Publikasi titik layanan berhasil ditarik' });
+  } catch (error) {
+    console.error('Unpublish location error:', error);
+    res.status(500).json({ message: 'Gagal menarik publikasi lokasi' });
+  }
+});
