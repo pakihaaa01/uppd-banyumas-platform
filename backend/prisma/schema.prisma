@@ -184,3 +184,15 @@ model PublicDocument {
 
   @@index([isPublished, category])
 }
+
+model VisualArchive {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  image       String
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, createdAt])
+}
