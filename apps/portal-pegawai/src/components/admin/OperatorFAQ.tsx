@@ -44,7 +44,7 @@ function emptyForm(): FAQForm {
   };
 }
 
-export function OperatorFAQ() {
+export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [form, setForm] = useState<FAQForm>(emptyForm);
 
@@ -57,6 +57,7 @@ export function OperatorFAQ() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [changingId, setChangingId] = useState<string | null>(null);
 
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
@@ -87,6 +88,7 @@ export function OperatorFAQ() {
     };
   }, []);
 
+  useEffect(() => { onChange?.(faqs.length); }, [faqs, onChange]);
   const filtered = faqs.filter((item) =>
     `${item.question} ${item.answer} ${item.category}`
       .toLowerCase()
@@ -195,6 +197,22 @@ export function OperatorFAQ() {
     }
   }
 
+  async function toggleFAQ(item: FAQ) {
+    if (changingId) return;
+    setChangingId(item.id);
+    setError('');
+    setInfo('');
+    try {
+      await apiRequest(`${API}/${encodeURIComponent(item.id)}/${item.isEnabled ? 'disable' : 'enable'}`, 'POST');
+      const data = await apiRequest<{faqs:FAQ[]}>(API);
+      setFaqs(data.faqs);
+      setInfo(item.isEnabled ? 'FAQ disembunyikan dari website publik.' : 'FAQ ditampilkan di website publik.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memperbarui status FAQ.');
+    } finally {
+      setChangingId(null);
+    }
+  }
   return (
     <div className="space-y-5">
       {/* Header */}
@@ -429,8 +447,13 @@ export function OperatorFAQ() {
                     </p>
                   </div>
 
-                  {!item.isEnabled && (
-                    <div className="flex shrink-0 items-center gap-2">
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    <button type="button" disabled={changingId !== null || deletingId !== null}
+                      onClick={() => void toggleFAQ(item)}
+                      className="rounded border border-[#cbd9e2] px-3 py-2 text-xs font-semibold text-[#36546b] disabled:opacity-50">
+                      {changingId === item.id ? 'Memproses...' : item.isEnabled ? 'Sembunyikan' : 'Tampilkan'}
+                    </button>
+                    {!item.isEnabled && <>
                       <button
                         type="button"
                         disabled={deletingId !== null}
@@ -452,8 +475,8 @@ export function OperatorFAQ() {
                           ? 'Menghapus...'
                           : 'Hapus'}
                       </button>
-                    </div>
-                  )}
+                    </>}
+                  </div>
                 </div>
               ))}
             </div>
@@ -463,8 +486,7 @@ export function OperatorFAQ() {
 
       <p className="text-xs text-[#647b8d]">
         FAQ baru tersimpan dengan status nonaktif.
-        Pengaktifan FAQ pada website publik belum tersedia
-        dalam API backend saat ini.
+        Gunakan Tampilkan untuk menerbitkan FAQ dan Sembunyikan untuk menariknya.
       </p>
     </div>
   );
