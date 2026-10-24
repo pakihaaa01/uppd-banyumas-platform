@@ -81,8 +81,9 @@ function emptyForm(): LocationForm {
   };
 }
 
-export function AdminLocations() {
+export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (count: number) => void }) {
   const [locations, setLocations] = useState<ServiceLocation[]>([]);
+  useEffect(() => { onLocationsChange?.(locations.length); }, [locations, onLocationsChange]);
   const [form, setForm] = useState<LocationForm>(emptyForm);
 
   const [showForm, setShowForm] = useState(false);
