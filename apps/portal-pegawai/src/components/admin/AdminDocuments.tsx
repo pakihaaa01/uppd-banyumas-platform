@@ -121,9 +121,9 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
         <label className="text-xs font-semibold text-[#385469]">Tanggal Pembaruan<input type="date" required className={inputStyle + ' mt-2'} value={form.updateDate} onChange={e => setForm({...form,updateDate:e.target.value})}/></label>
         <label className="text-xs font-semibold text-[#385469]">Jenis Berkas<input required maxLength={30} className={inputStyle + ' mt-2'} value={form.fileType} onChange={e => setForm({...form,fileType:e.target.value})}/></label>
         <label className="text-xs font-semibold text-[#385469]">Ukuran Berkas<input required maxLength={50} placeholder="Contoh: 2 MB" className={inputStyle + ' mt-2'} value={form.fileSize} onChange={e => setForm({...form,fileSize:e.target.value})}/></label>
-        <label className="sm:col-span-2 text-xs font-semibold text-[#385469]">Tautan Dokumen (HTTPS/HTTP)<input type="url" required maxLength={2048} placeholder="https://..." className={inputStyle + ' mt-2'} value={form.downloadUrl} onChange={e => setForm({...form,downloadUrl:e.target.value})}/></label>
+        <label className="sm:col-span-2 text-xs font-semibold text-[#385469]">Tautan Dokumen (HTTPS/HTTP)<input type="url" maxLength={2048} placeholder="https://..." className={inputStyle + ' mt-2'} value={form.downloadUrl} onChange={e => setForm({...form,downloadUrl:e.target.value})}/></label>
         <label className="sm:col-span-2 text-xs font-semibold text-[#385469]">Keterangan<textarea rows={4} maxLength={5000} className={inputStyle + ' mt-2'} value={form.description ?? ''} onChange={e => setForm({...form,description:e.target.value})}/></label>
-        <p className="sm:col-span-2 text-xs leading-5 text-[#728697]">Tahap ini menggunakan tautan dokumen yang sudah tersedia secara online. Fitur unggah PDF langsung belum tersedia di backend baru.</p>
+        <p className="sm:col-span-2 text-xs leading-5 text-[#728697]">Tautan dokumen boleh dikosongkan saat menyimpan Draft. Publikasi hanya tersedia setelah tautan HTTP/HTTPS terisi. Unggah PDF langsung belum tersedia.</p>
       </div>
       <div className="flex justify-end gap-2 border-t border-[#e6edf2] p-5">
         <button type="button" className={buttonStyle} disabled={busy} onClick={() => setShowForm(false)}>Batal</button>
@@ -148,8 +148,8 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
           {item.description && <p className="mt-2 line-clamp-2 text-xs leading-5 text-[#667e8c]">{item.description}</p>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <a href={item.downloadUrl} target="_blank" rel="noopener noreferrer" className={buttonStyle + ' inline-flex items-center gap-1'}><ExternalLink size={13}/> Lihat</a>
-          <button type="button" disabled={busy} onClick={() => void toggle(item)} className={buttonStyle}>{item.isPublished ? 'Tarik Publikasi' : 'Publikasikan'}</button>
+          {item.downloadUrl && <a href={item.downloadUrl} target="_blank" rel="noopener noreferrer" className={buttonStyle + ' inline-flex items-center gap-1'}><ExternalLink size={13}/> Lihat</a>}
+          <button type="button" disabled={busy || (!item.isPublished && !item.downloadUrl)} title={!item.isPublished && !item.downloadUrl ? "Isi tautan dokumen sebelum publikasi" : undefined} onClick={() => void toggle(item)} className={buttonStyle}>{item.isPublished ? 'Tarik Publikasi' : 'Publikasikan'}</button>
           {!item.isPublished && <><button type="button" disabled={busy} onClick={() => edit(item)} className={buttonStyle + ' inline-flex items-center gap-1'}><Pencil size={13}/> Edit</button>
           <button type="button" disabled={busy} onClick={() => void remove(item)} className={buttonStyle + ' inline-flex items-center gap-1 text-red-700'}><Trash2 size={13}/> Hapus</button></>}
         </div>
