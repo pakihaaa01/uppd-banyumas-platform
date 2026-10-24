@@ -58,8 +58,9 @@ const label =
 
 const API = '/api/v1/announcements';
 
-export function AdminAnnouncements() {
+export function AdminAnnouncements({ onCountChange }: { onCountChange?: (count: number) => void }) {
   const [drafts, setDrafts] = useState<Draft[]>([]);
+  useEffect(() => { onCountChange?.(drafts.length); }, [drafts, onCountChange]);
   const [form, setForm] = useState<DraftForm>(emptyForm);
 
   const [editingId, setEditingId] = useState<string | null>(null);
