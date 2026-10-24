@@ -99,41 +99,21 @@ function validateDocument(
 
   if (!partial || Object.hasOwn(values, 'downloadUrl')) {
     const value = values.downloadUrl;
-
-    if (
-      typeof value !== 'string' ||
-      value.trim().length === 0 ||
-      value.trim().length > 2048
-    ) {
-      return {
-        valid: false,
-        message: 'downloadUrl wajib diisi, maksimal 2048 karakter'
-      };
+    if (typeof value !== 'string' || value.trim().length > 2048) {
+      return { valid: false, message: 'downloadUrl maksimal 2048 karakter' };
     }
-
-    let url: URL;
-
-    try {
-      url = new URL(value.trim());
-    } catch {
-      return {
-        valid: false,
-        message: 'downloadUrl harus berupa URL HTTP/HTTPS lengkap'
-      };
+    const trimmed = value.trim();
+    if (!trimmed) {
+      data.downloadUrl = '';
+    } else {
+      let url: URL;
+      try { url = new URL(trimmed); }
+      catch { return { valid: false, message: 'URL dokumen harus HTTP/HTTPS lengkap' }; }
+      if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) {
+        return { valid: false, message: 'URL dokumen harus HTTP/HTTPS tanpa kredensial' };
+      }
+      data.downloadUrl = url.href;
     }
-
-    if (
-      !['https:', 'http:'].includes(url.protocol) ||
-      url.username ||
-      url.password
-    ) {
-      return {
-        valid: false,
-        message: 'downloadUrl harus HTTP/HTTPS tanpa kredensial'
-      };
-    }
-
-    data.downloadUrl = url.href;
   }
 
   if (!partial || Object.hasOwn(values, 'updateDate')) {
@@ -306,11 +286,15 @@ documentsRouter.delete('/:id', async (req, res) => {
 documentsRouter.post('/:id/publish', async (req, res) => {
   try {
     const updated = await prisma.publicDocument.updateMany({
-      where: { id: req.params.id, isPublished: false },
+      where: {
+        id: req.params.id,
+        isPublished: false,
+        downloadUrl: { startsWith: 'http' }
+      },
       data: { isPublished: true }
     });
     if (!updated.count) {
-      res.status(404).json({ message: 'Draft dokumen tidak ditemukan atau sudah diterbitkan' });
+      res.status(404).json({ message: 'Dokumen tidak ditemukan, sudah terbit, atau belum memiliki tautan HTTP/HTTPS' });
       return;
     }
     res.json({ message: 'Dokumen diterbitkan' });
