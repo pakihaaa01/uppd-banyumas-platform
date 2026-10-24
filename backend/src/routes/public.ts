@@ -146,3 +146,16 @@ publicRouter.get('/chatbot', async (_req, res) => {
     });
   }
 });
+publicRouter.get('/archive', async (_req, res) => {
+  try {
+    const archive = await prisma.visualArchive.findMany({
+      where: { isPublished: true },
+      select: { id: true, title: true, description: true, image: true },
+      orderBy: { createdAt: 'asc' }
+    });
+    res.json({ archive });
+  } catch (error) {
+    console.error('Public archive error:', error);
+    res.status(500).json({ message: 'Gagal memuat dokumentasi publik' });
+  }
+});
