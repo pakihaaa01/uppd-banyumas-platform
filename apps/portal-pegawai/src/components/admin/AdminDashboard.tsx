@@ -1,3 +1,4 @@
+import { AdminArchive } from './AdminArchive';
 import { AdminDocuments } from './AdminDocuments';
 import { AdminLocations } from './AdminLocations';
 import { AdminAnnouncements } from './AdminAnnouncements';
@@ -87,6 +88,7 @@ export const AdminDashboard: React.FC = () => {
   const [dbAnnouncements, setDbAnnouncements] = useState<Announcement[] | null>(null);
   const [locationCount, setLocationCount] = useState<number | undefined>(undefined);
   const [documentCount, setDocumentCount] = useState<number | undefined>(undefined);
+  const [archiveCount,setArchiveCount] = useState<number | undefined>(undefined);
   useEffect(() => {
     let active = true;
     apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
@@ -110,11 +112,12 @@ export const AdminDashboard: React.FC = () => {
       .catch(error => console.error('Gagal memuat jumlah dokumen:', error));
     return () => { active = false; };
   }, []);
+  useEffect(() => { let active = true; apiRequest<{archive:{id:string}[]}>('/api/v1/archive').then(r=>{if(active)setArchiveCount(r.archive.length)}).catch(console.error);return()=>{active=false}; }, []);
   const counts: Partial<Record<Tab, number>> = {
     announcements: dbAnnouncements?.length, locations: locationCount,
     posters: bumdesPosters.length, documents: documentCount,
     faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
-    chatbot: chatbotFaqs.length, archive: visualArchive.length,
+    chatbot: chatbotFaqs.length, archive: archiveCount,
   };
 
   const allRows = useMemo(() => {
@@ -291,11 +294,13 @@ export const AdminDashboard: React.FC = () => {
         <main className="min-w-0">
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div><h2 className="text-[22px] font-bold text-[#1c3c53]">{pageInfo[activeTab].title}</h2><p className="mt-1 max-w-[700px] text-[13px] leading-6 text-[#607688]">{pageInfo[activeTab].desc}</p></div>
-            {['posters', 'archive', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
+            {['posters', 'chatbot'].includes(activeTab) && <button type="button" onClick={() => startForm()} className={action}><Plus size={16} aria-hidden="true" /> Tambah Data</button>}
           </div>
 
           {activeTab === 'announcements' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onAnnouncementsChange={setDbAnnouncements} /></section>
+          ) : activeTab === 'archive' ? (
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminArchive onChange={setArchiveCount}/></section>
           ) : activeTab === 'documents' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminDocuments onDocumentsChange={setDocumentCount} /></section>
           ) : activeTab === 'locations' ? (
