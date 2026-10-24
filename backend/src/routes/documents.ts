@@ -303,3 +303,36 @@ documentsRouter.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+documentsRouter.post('/:id/publish', async (req, res) => {
+  try {
+    const updated = await prisma.publicDocument.updateMany({
+      where: { id: req.params.id, isPublished: false },
+      data: { isPublished: true }
+    });
+    if (!updated.count) {
+      res.status(404).json({ message: 'Draft dokumen tidak ditemukan atau sudah diterbitkan' });
+      return;
+    }
+    res.json({ message: 'Dokumen diterbitkan' });
+  } catch (error) {
+    console.error('Publish document error:', error);
+    res.status(500).json({ message: 'Gagal menerbitkan dokumen' });
+  }
+});
+
+documentsRouter.post('/:id/unpublish', async (req, res) => {
+  try {
+    const updated = await prisma.publicDocument.updateMany({
+      where: { id: req.params.id, isPublished: true },
+      data: { isPublished: false }
+    });
+    if (!updated.count) {
+      res.status(404).json({ message: 'Dokumen terbit tidak ditemukan atau sudah ditarik' });
+      return;
+    }
+    res.json({ message: 'Publikasi dokumen ditarik' });
+  } catch (error) {
+    console.error('Unpublish document error:', error);
+    res.status(500).json({ message: 'Gagal menarik dokumen' });
+  }
+});
