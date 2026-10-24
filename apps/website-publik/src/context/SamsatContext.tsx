@@ -77,7 +77,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [backendReady,setBackendReady]=useState(false);
   const [hasNewNotification,setHasNewNotification]=useState(true);
   const [sakpoleModalOpen,setSakpoleModalOpen]=useState(false);
-  const [announcements,setAnnouncements]=useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
+  const [announcements,setAnnouncements]=useState<Announcement[]>([]);
   const [serviceLocations,setServiceLocations]=useState<ServiceLocation[]>(INITIAL_SERVICE_LOCATIONS);
   const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>(INITIAL_BUMDES_POSTERS);
   const [documents,setDocuments]=useState<PublicDocument[]>(INITIAL_DOCUMENTS);
@@ -95,7 +95,6 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const refreshData=useCallback(async()=>{
     try {
       const publicData=await apiRequest<Content>('/api/content');
-      setAnnouncements(publicData.announcements);
       setServiceLocations(publicData.locations);
       setBumdesPosters(publicData.posters);
       setDocuments(publicData.documents);
@@ -108,6 +107,13 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
         setContactMessages(privateData.messages||[]);
       } catch { setContactMessages([]); }
     } catch { setBackendReady(false); }
+    try {
+      const response = await apiRequest<{announcements: Announcement[]}>('/api/v1/public/announcements');
+      setAnnouncements(response.announcements);
+    } catch (error) {
+      console.error('Gagal mengambil pengumuman publik:', error);
+      setAnnouncements([]);
+    }
   },[]);
   useEffect(()=>{
     void refreshData();
