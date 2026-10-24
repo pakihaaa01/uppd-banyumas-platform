@@ -18,7 +18,8 @@ const announcementFields = {
   status: true,
   createdById: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
+  publishedAt: true
 } as const;
 
 const textLimits = {
@@ -146,8 +147,9 @@ announcementsRouter.get('/', async (_req, res) => {
   try {
     const announcements = await prisma.announcement.findMany({
       where: {
-        createdById: res.locals.currentUser.id,
-        status: 'DRAFT'
+        ...(res.locals.currentUser.role === 'ADMINISTRATOR'
+          ? { status: { in: ['DRAFT', 'PUBLISHED'] as ('DRAFT' | 'PUBLISHED')[] } }
+          : { createdById: res.locals.currentUser.id, status: 'DRAFT' as const })
       },
       select: announcementFields,
       orderBy: [
@@ -272,6 +274,52 @@ announcementsRouter.delete('/:id', async (req, res) => {
     res.json({ message: 'Draf berhasil dihapus' });
   } catch (error) {
     console.error('Delete draft error:', error);
+    res.status(500).json({ message: 'Kesalahan server' });
+  }
+});
+
+// POST /api/v1/announcements/:id/publish
+// Hanya Administrator yang dapat langsung menerbitkan draft.
+announcementsRouter.post('/:id/publish', async (req, res) => {
+  if (res.locals.currentUser.role !== 'ADMINISTRATOR') {
+    res.status(403).json({ message: 'Akses khusus Administrator' });
+    return;
+  }
+  try {
+    const result = await prisma.announcement.updateMany({
+      where: { id: req.params.id, status: 'DRAFT' },
+      data: { status: 'PUBLISHED', publishedAt: new Date(), reviewedById: null, reviewedAt: null, reviewNote: null }
+    });
+    if (!result.count) {
+      res.status(404).json({ message: 'Draft tidak ditemukan atau sudah diterbitkan' });
+      return;
+    }
+    res.json({ message: 'Pengumuman berhasil dipublikasikan' });
+  } catch (error) {
+    console.error('Publish announcement error:', error);
+    res.status(500).json({ message: 'Kesalahan server' });
+  }
+});
+
+// POST /api/v1/announcements/:id/unpublish
+// Tarik pengumuman dari website publik tanpa menghapus konten.
+announcementsRouter.post('/:id/unpublish', async (req, res) => {
+  if (res.locals.currentUser.role !== 'ADMINISTRATOR') {
+    res.status(403).json({ message: 'Akses khusus Administrator' });
+    return;
+  }
+  try {
+    const result = await prisma.announcement.updateMany({
+      where: { id: req.params.id, status: 'PUBLISHED' },
+      data: { status: 'DRAFT', publishedAt: null }
+    });
+    if (!result.count) {
+      res.status(404).json({ message: 'Pengumuman terbit tidak ditemukan' });
+      return;
+    }
+    res.json({ message: 'Publikasi berhasil ditarik menjadi Draft' });
+  } catch (error) {
+    console.error('Unpublish announcement error:', error);
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
