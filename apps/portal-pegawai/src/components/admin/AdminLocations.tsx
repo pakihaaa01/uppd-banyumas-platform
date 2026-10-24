@@ -229,6 +229,24 @@ export function AdminLocations() {
     }
   }
 
+  async function changePublication(item: ServiceLocation) {
+    if (saving || deletingId !== null) return;
+    setSaving(true);
+    setError('');
+    setInfo('');
+    const action = item.isPublished ? 'unpublish' : 'publish';
+    try {
+      await apiRequest(`${API}/${encodeURIComponent(item.id)}/${action}`, 'POST');
+      const result = await apiRequest<{ locations: ServiceLocation[] }>(API);
+      setLocations(result.locations);
+      setInfo(action === 'publish' ? 'Titik layanan tampil di website publik.' : 'Lokasi ditarik dari website publik.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Gagal memperbarui status publikasi.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
   // Menghapus lokasi yang belum diterbitkan.
   async function deleteLocation(item: ServiceLocation) {
     if (item.isPublished || deletingId !== null) {
@@ -694,6 +712,13 @@ export function AdminLocations() {
                     </a>
                   </div>
 
+                  <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    <button type="button" disabled={saving || deletingId !== null}
+                      onClick={() => void changePublication(item)}
+                      className="min-h-9 rounded-lg border border-[#005BAC] px-3 text-xs font-semibold text-[#005BAC] hover:bg-[#eff6fb] disabled:opacity-50">
+                      {item.isPublished ? 'Tarik Publikasi' : 'Publikasikan'}
+                    </button>
+                  </div>
                   {/* Edit dan Hapus */}
                   {!item.isPublished && (
                     <div className="flex shrink-0 items-center gap-2">
@@ -730,8 +755,7 @@ export function AdminLocations() {
       {/* Keterangan */}
       <p className="text-xs text-[#647b8d]">
         Lokasi baru tersimpan sebagai belum terbit.
-        Fitur penerbitan ke website publik belum tersedia
-        di backend.
+        Administrator dapat menerbitkan atau menarik lokasi tanpa menghapus datanya.
       </p>
     </div>
   );
