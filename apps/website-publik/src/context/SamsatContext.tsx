@@ -81,7 +81,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [serviceLocations,setServiceLocations]=useState<ServiceLocation[]>([]);
   const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>(INITIAL_BUMDES_POSTERS);
   const [documents,setDocuments]=useState<PublicDocument[]>([]);
-  const [faqs,setFaqs]=useState<FAQItem[]>(INITIAL_FAQS);
+  const [faqs,setFaqs]=useState<FAQItem[]>([]);
   const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>(INITIAL_CHATBOT_FAQS);
   const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([]);
   const [contactMessages,setContactMessages]=useState<ContactMessage[]>(INITIAL_CONTACT_MESSAGES);
@@ -92,7 +92,6 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
     try {
       const publicData=await apiRequest<Content>('/api/content');
       setBumdesPosters(publicData.posters);
-      setFaqs(publicData.faq);
       setChatbotFaqs(publicData.chatbot);
       setVisualArchive(publicData.archive);
       setBackendReady(true);
@@ -121,6 +120,13 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
     } catch (error) {
       console.error('Gagal mengambil dokumen publik:', error);
       setDocuments([]);
+    }
+    try {
+      const response = await apiRequest<{faqs: FAQItem[]}>('/api/v1/public/faqs');
+      setFaqs(response.faqs);
+    } catch (error) {
+      console.error('Gagal mengambil FAQ publik:', error);
+      setFaqs([]);
     }
     try {
       const result = await apiRequest<{archive: ArchiveItem[]}>('/api/v1/public/archive');
