@@ -1,3 +1,4 @@
+import { AdminMessages } from './AdminMessages';
 import { AdminArchive } from './AdminArchive';
 import { AdminDocuments } from './AdminDocuments';
 import { AdminLocations } from './AdminLocations';
@@ -90,6 +91,7 @@ export const AdminDashboard: React.FC = () => {
   const [documentCount, setDocumentCount] = useState<number | undefined>(undefined);
   const [archiveCount,setArchiveCount] = useState<number | undefined>(undefined);
   const [faqCount,setFaqCount] = useState<number | undefined>(undefined);
+  const [newMessageCount,setNewMessageCount] = useState<number | undefined>(undefined);
   useEffect(() => {
     let active = true;
     apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
@@ -115,10 +117,11 @@ export const AdminDashboard: React.FC = () => {
   }, []);
   useEffect(() => { let active = true; apiRequest<{archive:{id:string}[]}>('/api/v1/archive').then(r=>{if(active)setArchiveCount(r.archive.length)}).catch(console.error);return()=>{active=false}; }, []);
   useEffect(() => { let active=true; apiRequest<{faqs:{id:string}[]}>('/api/v1/faqs').then(r=>{if(active)setFaqCount(r.faqs.length)}).catch(console.error);return()=>{active=false}; }, []);
+  useEffect(() => { let active=true; apiRequest<{messages:{status:string}[]}>('/api/v1/messages').then(r=>{if(active)setNewMessageCount(r.messages.filter(m=>m.status==='New').length)}).catch(console.error);return()=>{active=false}; }, []);
   const counts: Partial<Record<Tab, number>> = {
     announcements: dbAnnouncements?.length, locations: locationCount,
     posters: bumdesPosters.length, documents: documentCount,
-    faq: faqCount, messages: contactMessages.filter(m => m.status === 'New').length,
+    faq: faqCount, messages: newMessageCount,
     chatbot: chatbotFaqs.length, archive: archiveCount,
   };
 
@@ -309,6 +312,8 @@ export const AdminDashboard: React.FC = () => {
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <AdminLocations onLocationsChange={setLocationCount} />
               </section>
+          ) : activeTab === 'messages' ? (
+            <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminMessages onChange={setNewMessageCount}/></section>
           ) : activeTab === 'faq' ? (
               <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
                 <OperatorFAQ onChange={setFaqCount} />
@@ -320,7 +325,7 @@ export const AdminDashboard: React.FC = () => {
                   { label: 'Pengumuman', value: dbAnnouncements?.length ?? '—', tab: 'announcements' as Tab },
                   { label: 'Titik Layanan', value: locationCount ?? '—', tab: 'locations' as Tab },
                   { label: 'Dokumen', value: documentCount ?? '—', tab: 'documents' as Tab },
-                  { label: 'Pesan Baru', value: contactMessages.filter(m => m.status === 'New').length, tab: 'messages' as Tab },
+                  { label: 'Pesan Baru', value: newMessageCount ?? '—', tab: 'messages' as Tab },
                 ].map(metric => <button key={metric.tab} type="button" onClick={() => chooseTab(metric.tab)} className="border border-[#dce5eb] bg-white px-5 py-5 text-left transition-colors hover:border-[#8fb9d7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"><p className="text-[12px] font-medium text-[#617688]">{metric.label}</p><p className="mt-3 text-[29px] font-bold tabular-nums text-[#1b3a52]">{metric.value}</p><span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#005BAC]">Lihat data <ArrowRight size={13}/></span></button>)}
               </div>
               <div className="grid gap-5 xl:grid-cols-[1.3fr_1fr]">
