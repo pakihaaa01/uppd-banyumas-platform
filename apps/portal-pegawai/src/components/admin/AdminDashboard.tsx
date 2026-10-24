@@ -84,6 +84,7 @@ export const AdminDashboard: React.FC = () => {
   const [uploading,setUploading]=useState(false);
   const [saving,setSaving]=useState(false);
   const [dbAnnouncements, setDbAnnouncements] = useState<Announcement[] | null>(null);
+  const [locationCount, setLocationCount] = useState<number | undefined>(undefined);
   useEffect(() => {
     let active = true;
     apiRequest<{ announcements: Announcement[] }>('/api/v1/announcements')
@@ -92,8 +93,16 @@ export const AdminDashboard: React.FC = () => {
     return () => { active = false; };
   }, []);
 
+  useEffect(() => {
+    let active = true;
+    apiRequest<{ locations: { id: string }[] }>('/api/v1/locations')
+      .then(data => { if (active) setLocationCount(data.locations.length); })
+      .catch(error => console.error('Gagal memuat jumlah titik layanan:', error));
+    return () => { active = false; };
+  }, []);
+
   const counts: Partial<Record<Tab, number>> = {
-    announcements: dbAnnouncements?.length, locations: serviceLocations.length,
+    announcements: dbAnnouncements?.length, locations: locationCount,
     posters: bumdesPosters.length, documents: documents.length,
     faq: faqs.length, messages: contactMessages.filter(m => m.status === 'New').length,
     chatbot: chatbotFaqs.length, archive: visualArchive.length,
@@ -280,7 +289,7 @@ export const AdminDashboard: React.FC = () => {
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><AdminAnnouncements onAnnouncementsChange={setDbAnnouncements} /></section>
           ) : activeTab === 'locations' ? (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
-              <AdminLocations />
+              <AdminLocations onLocationsChange={setLocationCount} />
               </section>
           ) : activeTab === 'faq' ? (
               <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
@@ -291,7 +300,7 @@ export const AdminDashboard: React.FC = () => {
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                 {[
                   { label: 'Pengumuman', value: dbAnnouncements?.length ?? '—', tab: 'announcements' as Tab },
-                  { label: 'Titik Layanan', value: serviceLocations.length, tab: 'locations' as Tab },
+                  { label: 'Titik Layanan', value: locationCount ?? '—', tab: 'locations' as Tab },
                   { label: 'Dokumen', value: documents.length, tab: 'documents' as Tab },
                   { label: 'Pesan Baru', value: contactMessages.filter(m => m.status === 'New').length, tab: 'messages' as Tab },
                 ].map(metric => <button key={metric.tab} type="button" onClick={() => chooseTab(metric.tab)} className="border border-[#dce5eb] bg-white px-5 py-5 text-left transition-colors hover:border-[#8fb9d7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"><p className="text-[12px] font-medium text-[#617688]">{metric.label}</p><p className="mt-3 text-[29px] font-bold tabular-nums text-[#1b3a52]">{metric.value}</p><span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#005BAC]">Lihat data <ArrowRight size={13}/></span></button>)}
