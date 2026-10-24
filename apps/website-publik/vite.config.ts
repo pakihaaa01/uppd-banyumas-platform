@@ -13,7 +13,7 @@ export default defineConfig(() => {
     },
     server: {
       proxy: {
-        "/api": "http://127.0.0.1:3001",
+        "/api": "http://127.0.0.1:4000",
         "/uploads": "http://127.0.0.1:3001",
       },
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
