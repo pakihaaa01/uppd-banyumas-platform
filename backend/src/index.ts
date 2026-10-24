@@ -23,6 +23,7 @@ app.use(cors({
   credentials: true
 }));
 
+app.use('/api/v1/documents/:id/upload', express.raw({ type: 'application/pdf', limit: '10mb' }));
 app.use(express.json());
 app.use(cookieParser());
 
