@@ -1,9 +1,17 @@
 import { Router } from 'express';
+import { randomUUID } from 'node:crypto';
+import { mkdir, writeFile, readFile, unlink } from 'node:fs/promises';
+import { join } from 'node:path';
 import { prisma } from '../lib/prisma';
 import { requireAdministrator } from '../middleware/auth';
 import type { PublicDocumentCategory } from '../../generated/prisma/enums';
 
 export const documentsRouter = Router();
+const pdfDir = join(process.cwd(), 'storage', 'documents');
+const internalUrl = (id: string) => `/api/v1/public/documents/${id}/file`;
+const pdfPath = (id: string) => join(pdfDir, `${id}.pdf`);
+const isInternalUrl = (value: string) => /^\/api\/v1\/public\/documents\/[0-9a-f-]{36}\/file$/.test(value);
+
 
 documentsRouter.use(requireAdministrator);
 
@@ -103,7 +111,9 @@ function validateDocument(
       return { valid: false, message: 'downloadUrl maksimal 2048 karakter' };
     }
     const trimmed = value.trim();
-    if (!trimmed) {
+    if (isInternalUrl(trimmed)) {
+      data.downloadUrl = trimmed;
+    } else if (!trimmed) {
       data.downloadUrl = '';
     } else {
       let url: URL;
@@ -289,7 +299,11 @@ documentsRouter.post('/:id/publish', async (req, res) => {
       where: {
         id: req.params.id,
         isPublished: false,
-        downloadUrl: { startsWith: 'http' }
+        OR: [
+          { downloadUrl: { startsWith: 'http://' } },
+          { downloadUrl: { startsWith: 'https://' } },
+          { downloadUrl: internalUrl(req.params.id) }
+        ]
       },
       data: { isPublished: true }
     });
@@ -319,4 +333,69 @@ documentsRouter.post('/:id/unpublish', async (req, res) => {
     console.error('Unpublish document error:', error);
     res.status(500).json({ message: 'Gagal menarik dokumen' });
   }
+});
+
+
+// Unggah PDF ke penyimpanan lokal. Draft harus dibuat terlebih dahulu.
+// Header Content-Type: application/pdf, maksimal 10 MiB.
+documentsRouter.post('/:id/upload', async (req, res) => {
+  const id = req.params.id;
+  const existing = await prisma.publicDocument.findFirst({
+    where: { id, isPublished: false },
+    select: { id: true, downloadUrl: true }
+  });
+  if (!existing) {
+    res.status(404).json({ message: 'Draft tidak ditemukan' });
+    return;
+  }
+  try {
+    const data = req.body;
+    if (!Buffer.isBuffer(data) || data.length < 8 ||
+      data.length > 10 * 1024 * 1024 ||
+      data.subarray(0, 5).toString('ascii') !== '%PDF-') {
+      res.status(400).json({ message: 'File harus PDF valid dan maksimal 10 MB' });
+      return;
+    }
+    const storageId = randomUUID();
+    await mkdir(pdfDir, { recursive: true });
+    const target = pdfPath(storageId);
+    await writeFile(target, data, { flag: 'wx' });
+    const url = internalUrl(id);
+    try {
+      const updated = await prisma.publicDocument.updateMany({
+        where: { id, isPublished: false },
+        data: { downloadUrl: url, fileType: 'PDF',
+          fileSize: (data.length / (1024 * 1024)).toFixed(2) + ' MB' }
+      });
+      if (!updated.count) throw new Error('Draft sudah berubah');
+      // Simpan relasi berkas ke ID dokumen agar akses tidak mengekspos nama fisik.
+      await writeFile(join(pdfDir, id + '.ref'), storageId, { flag: 'w' });
+    } catch (error) {
+      await unlink(target).catch(() => {});
+      throw error;
+    }
+    res.json({ message: 'PDF berhasil diunggah', downloadUrl: url });
+  } catch (error) {
+    console.error('Upload PDF error:', error);
+    res.status(500).json({ message: 'Gagal menyimpan PDF' });
+  }
+});
+
+documentsRouter.get('/:id/file', async (req, res) => {
+  const item = await prisma.publicDocument.findUnique({
+    where: { id: req.params.id },
+    select: { id: true, downloadUrl: true }
+  });
+  if (!item || item.downloadUrl !== internalUrl(item.id)) {
+    res.status(404).json({ message: 'PDF tidak ditemukan' }); return;
+  }
+  try {
+    const ref = (await readFile(join(pdfDir, item.id + '.ref'), 'utf8')).trim();
+    if (!/^[0-9a-f-]{36}$/.test(ref)) throw new Error('Referensi invalid');
+    const contents = await readFile(pdfPath(ref));
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="dokumen.pdf"');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.send(contents);
+  } catch { res.status(404).json({ message: 'PDF tidak tersedia' }); }
 });
