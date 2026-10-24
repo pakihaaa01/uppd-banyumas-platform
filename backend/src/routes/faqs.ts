@@ -214,3 +214,24 @@ faqsRouter.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+
+faqsRouter.post('/:id/enable', async (req, res) => {
+  try {
+    const result = await prisma.fAQ.updateMany({
+      where: { id: req.params.id, isEnabled: false },
+      data: { isEnabled: true }
+    });
+    if (!result.count) { res.status(404).json({message:'FAQ nonaktif tidak ditemukan'}); return; }
+    res.json({message:'FAQ ditampilkan di website publik'});
+  } catch(error) {console.error(error);res.status(500).json({message:'Gagal menampilkan FAQ'});}
+});
+faqsRouter.post('/:id/disable', async (req, res) => {
+  try {
+    const result = await prisma.fAQ.updateMany({
+      where: { id: req.params.id, isEnabled: true },
+      data: { isEnabled: false }
+    });
+    if (!result.count) { res.status(404).json({message:'FAQ aktif tidak ditemukan'}); return; }
+    res.json({message:'FAQ disembunyikan dari website publik'});
+  } catch(error) {console.error(error);res.status(500).json({message:'Gagal menyembunyikan FAQ'});}
+});
