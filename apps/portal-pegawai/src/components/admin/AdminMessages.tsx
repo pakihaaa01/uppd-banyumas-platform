@@ -108,7 +108,7 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
           <p className="mt-2 text-xs text-[#6d8090]">Simpan Draft terlebih dahulu. Status otomatis berubah saat Draft disimpan dan saat Gmail API menerima pesan.</p>
         </>}
       </div>
-      <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#edf1f4] pt-3"><label className="text-xs font-semibold text-[#385469]">Status penanganan<select value={item.status} disabled={busy!==null} onChange={e=>void changeStatus(item,e.target.value as Message['status'])} className="ml-2 rounded-lg border border-[#d5e1e9] bg-white px-3 py-2 font-normal">{statuses.map(s=><option key={s} value={s}>{s==='New'?'Baru':s==='In Progress'?'Dalam Proses':'Selesai'}</option>)}</select></label>
+      <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#edf1f4] pt-3"><p className="text-xs text-[#647b8d]">Status penanganan diubah otomatis berdasarkan Draft dan hasil pengiriman Gmail.</p>
       <button type="button" disabled={busy!==null} onClick={()=>void remove(item)} className="inline-flex items-center gap-2 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"><Trash2 size={14}/>Hapus</button></div>
     </article>)}</div>}
   </section>;
