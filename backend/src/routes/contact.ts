@@ -49,7 +49,7 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
     }
 
     const values = input as Record<string, unknown>;
-    const allowed = ['name', 'email', 'phone', 'subject', 'message'];
+    const allowed = ['name', 'email', 'phone', 'subject', 'message', 'whatsappOptIn'];
 
     if (Object.keys(values).some(key => !allowed.includes(key))) {
       res.status(400).json({
@@ -114,11 +114,21 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
       phone = values.phone.trim() || undefined;
     }
 
+    if (values.whatsappOptIn !== undefined && typeof values.whatsappOptIn !== 'boolean') {
+      res.status(400).json({ message: 'Persetujuan WhatsApp harus bernilai boolean' });
+      return;
+    }
+    if (values.whatsappOptIn === true && !phone) {
+      res.status(400).json({ message: 'Nomor WhatsApp wajib diisi jika memilih balasan WhatsApp' });
+      return;
+    }
+
     await prisma.contactMessage.create({
       data: {
         ...data,
         email: values.email.trim(),
         phone,
+        whatsappOptIn: values.whatsappOptIn === true,
         status: 'NEW'
       }
     });
