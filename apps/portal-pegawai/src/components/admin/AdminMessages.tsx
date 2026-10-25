@@ -63,13 +63,29 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
     }catch(e){setError(e instanceof Error?e.message:'Gagal mengirim balasan');}
     finally{setBusy(null);}
   }
-  async function sendWhatsApp(item:Message){
-    if(!item.whatsappOptIn || !item.phone || !window.confirm('Kirim template WhatsApp resmi ke '+item.phone+'?'))return;
+  const normalizeWhatsApp=(phone:string):string|null=>{
+    const clean=phone.replace(/[\s().-]/g,'');
+    const digits=clean.startsWith('+')?clean.slice(1):clean.startsWith('0')?'62'+clean.slice(1):clean;
+    return /^62\d{8,13}$/.test(digits)?digits:null;
+  };
+  function openWhatsApp(item:Message){
+    if(busy || !item.whatsappOptIn || !item.phone || item.whatsappSentAt)return;
+    const number=normalizeWhatsApp(item.phone);
+    if(!number){setError('Nomor WhatsApp tidak valid. Gunakan format 08xxxxxxxxxx.');return;}
+    const draft=(drafts[item.id] ?? item.replyDraft ?? '').trim();
+    const body=draft || ('Halo '+item.name+', kami menindaklanjuti pesan Anda mengenai: '+item.subject+'.');
+    const url='https://wa.me/'+number+'?text='+encodeURIComponent(body);
+    const popup=window.open(url,'_blank','noopener,noreferrer');
+    if(!popup){setError('Browser memblokir pembukaan WhatsApp. Izinkan pop-up untuk halaman ini.');return;}
+    setError('');setNotice('WhatsApp dibuka. Setelah menekan Kirim di WhatsApp, kembali dan klik Tandai sudah dikirim.');
+  }
+  async function confirmWhatsApp(item:Message){
+    if(busy || !item.whatsappOptIn || !item.phone || item.whatsappSentAt || !window.confirm('Pastikan pesan benar-benar sudah dikirim dari WhatsApp. Tandai selesai secara manual?'))return;
     setBusy(item.id);setError('');setNotice('');
     try{
-      await apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/send','POST');
-      await reload();setNotice('Template diterima WhatsApp Cloud API; tunggu konfirmasi penerimaan pada WhatsApp penerima.');
-    }catch(e){setError(e instanceof Error?e.message:'Gagal mengirim WhatsApp');}
+      await apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/confirm-sent','POST');
+      await reload();setNotice('Balasan WhatsApp ditandai terkirim secara manual. Status Selesai.');
+    }catch(e){setError(e instanceof Error?e.message:'Gagal mencatat konfirmasi WhatsApp');}
     finally{setBusy(null);}
   }
   const templates = [
@@ -118,11 +134,14 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
         </>}
       </div>
       <div className="rounded-lg border border-[#e3eaf0] bg-[#f8fafb] p-4">
-        <p className="text-xs font-semibold text-[#385469]">Balasan WhatsApp (template resmi Meta)</p>
-        {item.whatsappSentAt ? <p className="mt-2 text-xs text-green-800">Diterima API: {new Date(item.whatsappSentAt).toLocaleString('id-ID')} · ID: {item.whatsappMessageId}</p> : <>
-          <p className="mt-2 text-xs text-[#607486]">{!item.phone?'Nomor telepon tidak tersedia.':!item.whatsappOptIn?'Pengirim belum menyetujui balasan WhatsApp.':'Pengirim menyetujui balasan WhatsApp. Pesan akan menggunakan template yang disetujui Meta, bukan draft Gmail.'}</p>
-          <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>void sendWhatsApp(item)} className="mt-2 rounded bg-[#005BAC] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Kirim via WhatsApp</button>
-          {item.whatsappLastError && <p className="mt-2 text-xs text-red-700">Pengiriman sebelumnya: {item.whatsappLastError}</p>}
+        <p className="text-xs font-semibold text-[#385469]">Balasan lewat WhatsApp (tautan wa.me)</p>
+        {item.whatsappSentAt ? <p className="mt-2 text-xs text-green-800">Ditandai terkirim secara manual: {new Date(item.whatsappSentAt).toLocaleString('id-ID')}. Pengiriman tidak diverifikasi oleh API WhatsApp.</p> : <>
+          <p className="mt-2 text-xs text-[#607486]">{!item.phone?'Nomor telepon tidak tersedia.':!item.whatsappOptIn?'Belum ada persetujuan balasan WhatsApp pada formulir (pesan lama tidak otomatis dianggap setuju).':'Buka WhatsApp dengan pesan siap kirim, kemudian konfirmasi setelah benar-benar dikirim.'}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>openWhatsApp(item)} className="rounded bg-[#005BAC] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Buka WhatsApp</button>
+            <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>void confirmWhatsApp(item)} className="rounded bg-[#e4edf4] px-3 py-2 text-xs font-semibold text-[#1b527c] disabled:cursor-not-allowed disabled:opacity-40">Tandai sudah dikirim</button>
+          </div>
+          <p className="mt-2 text-xs text-[#6d8090]">Membuka tautan tidak mengirim pesan otomatis dan tidak mengubah status. Konfirmasi manual mengubah status menjadi Selesai.</p>
         </>}
       </div>
       <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#edf1f4] pt-3"><p className="text-xs text-[#647b8d]">Status penanganan diubah otomatis berdasarkan Draft dan hasil pengiriman Gmail.</p>
