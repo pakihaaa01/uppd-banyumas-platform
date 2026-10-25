@@ -94,7 +94,7 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
         {item.replySentAt ? <p className="text-xs text-green-800">Terkirim melalui Gmail API: {new Date(item.replySentAt).toLocaleString('id-ID')} · ID: {item.replyGmailId}</p> :
         <>
           <select aria-label="Template balasan" defaultValue="" className="mb-2 w-full rounded border border-[#cbd9e2] bg-white p-2 text-xs"
-          onChange={e=>{const t=templates[Number(e.target.value)];if(t)setDrafts(d=>({...d,[item.id]:t.body.replace('Bapak/Ibu '+(messages[0]?.name ?? ''),'Bapak/Ibu '+item.name).replaceAll('\\n','\n')}));}}>
+          onChange={e=>{const t=templates[Number(e.target.value)];if(t)setDrafts(d=>({...d,[item.id]:t.body.replace('Bapak/Ibu '+(messages[0]?.name ?? ''),'Bapak/Ibu '+item.name).replaceAll('\\n', String.fromCharCode(10))}));}}>
             <option value="" disabled>Pilih template balasan</option>
             {templates.map((t,i)=><option value={i} key={t.name}>{t.name}</option>)}
           </select>
