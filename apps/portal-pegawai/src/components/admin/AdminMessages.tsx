@@ -77,6 +77,7 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
     const url='https://wa.me/'+number+'?text='+encodeURIComponent(body);
     const popup=window.open(url,'_blank','noopener,noreferrer');
     if(!popup){setError('Browser memblokir pembukaan WhatsApp. Izinkan pop-up untuk halaman ini.');return;}
+    void apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/open','POST').then(reload).catch(e=>setError(e instanceof Error?e.message:'Gagal memperbarui status'));
     setError('');setNotice('WhatsApp dibuka. Setelah menekan Kirim di WhatsApp, kembali dan klik Tandai sudah dikirim.');
   }
   async function confirmWhatsApp(item:Message){
