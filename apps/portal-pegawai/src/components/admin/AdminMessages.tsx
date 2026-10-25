@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../../lib/api';
 import { Search, Trash2, Mail } from 'lucide-react';
 
-type Message = { id:string;name:string;email:string;phone:string|null;subject:string;message:string;createdAt:string;replyDraft?:string|null;replySentAt?:string|null;replyGmailId?:string|null;replyLastError?:string|null;status:'New'|'In Progress'|'Completed' };
+type Message = { id:string;name:string;email:string;phone:string|null;subject:string;message:string;createdAt:string;replyDraft?:string|null;replySentAt?:string|null;replyGmailId?:string|null;replyLastError?:string|null;whatsappOptIn?:boolean;whatsappSentAt?:string|null;whatsappMessageId?:string|null;whatsappLastError?:string|null;status:'New'|'In Progress'|'Completed' };
 const API='/api/v1/messages';
 const statuses: Message['status'][]=['New','In Progress','Completed'];
 export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
@@ -63,6 +63,15 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
     }catch(e){setError(e instanceof Error?e.message:'Gagal mengirim balasan');}
     finally{setBusy(null);}
   }
+  async function sendWhatsApp(item:Message){
+    if(!item.whatsappOptIn || !item.phone || !window.confirm('Kirim template WhatsApp resmi ke '+item.phone+'?'))return;
+    setBusy(item.id);setError('');setNotice('');
+    try{
+      await apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/send','POST');
+      await reload();setNotice('Template diterima WhatsApp Cloud API; tunggu konfirmasi penerimaan pada WhatsApp penerima.');
+    }catch(e){setError(e instanceof Error?e.message:'Gagal mengirim WhatsApp');}
+    finally{setBusy(null);}
+  }
   const templates = [
     {name:'Balasan umum',body:'Yth. Bapak/Ibu '+(messages[0]?.name ?? '')+',\\n\\nTerima kasih telah menghubungi layanan informasi UPPD Kabupaten Banyumas (prototipe).\\n\\n[Isi jawaban]\\n\\nHormat kami,\\nTim Demo Layanan Informasi UPPD Banyumas'},
     {name:'Memerlukan informasi tambahan',body:'Terima kasih atas pesan Anda. Untuk melanjutkan penanganan, mohon berikan informasi tambahan berikut: [rincian]. Jangan kirimkan OTP atau informasi sensitif.'},
@@ -106,6 +115,14 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
           </div>
           {item.replyLastError&&<p className="mt-2 text-xs text-red-700">Pengiriman sebelumnya: {item.replyLastError}</p>}
           <p className="mt-2 text-xs text-[#6d8090]">Simpan Draft terlebih dahulu. Status otomatis berubah saat Draft disimpan dan saat Gmail API menerima pesan.</p>
+        </>}
+      </div>
+      <div className="rounded-lg border border-[#e3eaf0] bg-[#f8fafb] p-4">
+        <p className="text-xs font-semibold text-[#385469]">Balasan WhatsApp (template resmi Meta)</p>
+        {item.whatsappSentAt ? <p className="mt-2 text-xs text-green-800">Diterima API: {new Date(item.whatsappSentAt).toLocaleString('id-ID')} · ID: {item.whatsappMessageId}</p> : <>
+          <p className="mt-2 text-xs text-[#607486]">{!item.phone?'Nomor telepon tidak tersedia.':!item.whatsappOptIn?'Pengirim belum menyetujui balasan WhatsApp.':'Pengirim menyetujui balasan WhatsApp. Pesan akan menggunakan template yang disetujui Meta, bukan draft Gmail.'}</p>
+          <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>void sendWhatsApp(item)} className="mt-2 rounded bg-[#005BAC] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Kirim via WhatsApp</button>
+          {item.whatsappLastError && <p className="mt-2 text-xs text-red-700">Pengiriman sebelumnya: {item.whatsappLastError}</p>}
         </>}
       </div>
       <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#edf1f4] pt-3"><p className="text-xs text-[#647b8d]">Status penanganan diubah otomatis berdasarkan Draft dan hasil pengiriman Gmail.</p>
