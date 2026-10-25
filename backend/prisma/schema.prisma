@@ -141,6 +141,10 @@ model ContactMessage {
   subject   String
   message   String
   status    ContactMessageStatus @default(NEW)
+  replyDraft String?
+  replySentAt DateTime?
+  replyGmailId String?
+  replyLastError String?
   createdAt DateTime             @default(now())
   updatedAt DateTime             @updatedAt
 
