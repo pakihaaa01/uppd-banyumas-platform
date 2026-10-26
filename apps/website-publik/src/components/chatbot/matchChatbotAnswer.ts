@@ -3,7 +3,7 @@ import type { ChatbotFAQ, FAQItem, ServiceLocation } from '../../types';
 type KnowledgeAnswer = { question: string; answer: string; keywords?: string[] };
 type AnswerSource = 'greeting' | 'chatbot' | 'faq' | 'locations' | 'unavailable';
 
-export type ChatAnswer = { text: string; source: AnswerSource };
+export type ChatAnswer = { text: string; source: AnswerSource; links?: { label: string; url: string }[]; choices?: string[] };
 
 // Deterministic matching of previously reviewed and published content.
 // Does not generate schedules, fees or contact information.
@@ -41,6 +41,59 @@ function matchScore(query: string, entry: KnowledgeAnswer): number {
   return score;
 }
 
+// Use only locations returned by the public API; never invent opening hours.
+function resolveLocationAnswer(query: string, locations: ServiceLocation[]): ChatAnswer | null {
+  const canonical = (value: string) => normalize(value)
+    .replace(/drive (through|thru|tru)/g, 'drivethru')
+    .replace(/super mall/g, 'supermall');
+  const q = canonical(query);
+  const generic = new Set(['samsat', 'banyumas', 'kabupaten', 'kantor', 'pelayanan', 'layanan', 'gerai']);
+  const nameWords = (name: string) => canonical(name).split(' ').filter(w => !generic.has(w));
+  const available = locations.filter(item => item.name?.trim());
+  const queryWords = q.split(' ');
+  const vocabulary = new Set(available.flatMap(item => nameWords(item.name)));
+  const identifiers = queryWords.filter(word => vocabulary.has(word));
+  const locationIntent = /\b(jam|jadwal|operasional|buka|bukanya|tutup|alamat|lokasi|maps|map|peta|kantor|titik)\b/.test(q);
+  const namedOffice = identifiers.length > 0 && (q.includes('samsat') || available.some(item => canonical(item.name) === q));
+  if (!locationIntent && !namedOffice) return null;
+
+  if (!available.length) return { source: 'locations', text: 'Data lokasi dan jam pelayanan belum tersedia. Silakan coba lagi atau hubungi petugas melalui halaman Kontak.' };
+  // Match all supplied identifiers: "Cepat Wangon" must not select Pembantu Wangon.
+  const matches = identifiers.length
+    ? available.filter(item => identifiers.every(word => nameWords(item.name).includes(word)))
+    : [];
+  if (matches.length !== 1) {
+    const candidates = matches.length ? matches : available;
+    return {
+      source: 'locations',
+      text: matches.length > 1
+        ? 'Ada beberapa titik pelayanan yang sesuai. Pilih lokasi untuk melihat jam pelayanan dan Google Maps:'
+        : 'Jam pelayanan berbeda pada setiap lokasi. Silakan pilih titik pelayanan yang dimaksud:',
+      choices: candidates.map(item => item.name),
+    };
+  }
+  const location = matches[0]!;
+  const mapsSearch = (name: string) => 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(name);
+  let mapsUrl = mapsSearch(location.name + ' ' + (location.address || 'Banyumas'));
+  try {
+    const url = new URL(location.mapsUrl);
+    if (url.protocol === 'https:' && ['maps.google.com', 'google.com', 'www.google.com', 'maps.app.goo.gl', 'goo.gl'].includes(url.hostname)) mapsUrl = url.href;
+  } catch { /* Fall back to a Google Maps place search. */ }
+  const links = /samsat\s+malam\s+minggu/i.test(location.name)
+    ? [
+      { label: 'Google Maps: Alun-Alun Banyumas', url: mapsSearch('Alun-Alun Banyumas, Kabupaten Banyumas, Jawa Tengah') },
+      { label: 'Google Maps: Taman Kebokura, Sumpiuh', url: mapsSearch('Taman Kebokura, Sumpiuh, Kabupaten Banyumas, Jawa Tengah') },
+    ]
+    : [{ label: 'Buka ' + location.name + ' di Google Maps', url: mapsUrl }];
+  return {
+    source: 'locations',
+    text: location.name + '\n\nAlamat: ' + (location.address?.trim() || 'Belum tersedia') +
+      '\n\nJam pelayanan:\n' + (location.operatingHours?.trim().replace(/\s*\|\s*/g, '\n') || 'Belum tersedia. Silakan konfirmasi kepada petugas.') +
+      (location.type === 'keliling' && location.description?.trim() ? '\n\n' + location.description.trim() : ''),
+    links,
+  };
+}
+
 export function resolveChatAnswer(
   userInput: string,
   chatbotFaqs: ChatbotFAQ[],
@@ -57,28 +110,14 @@ export function resolveChatAnswer(
   const activeChatbot = chatbotFaqs.filter(item => item.isEnabled);
   const activeFaq = publicFaqs.filter(item => item.isEnabled);
 
+  const locationAnswer = resolveLocationAnswer(query, serviceLocations);
+  if (locationAnswer) return locationAnswer;
+
   // Prioritize an exact FAQ or managed chatbot question over a broad keyword hit.
   const exactChatbot = activeChatbot.find(item => normalize(item.question) === query);
   if (exactChatbot) return { source: 'chatbot', text: exactChatbot.answer };
   const exactFaq = activeFaq.find(item => normalize(item.question) === query);
   if (exactFaq) return { source: 'faq', text: exactFaq.answer };
-
-  // Ambiguous requests about 'titik lokasi' should show real published locations
-  // instead of incorrectly selecting one individual SAMSAT office.
-  if (/\b(titik lokasi|titik layanan|daftar lokasi)\b/.test(query) && !query.includes('keliling')) {
-    const available = serviceLocations.filter(item => item.name?.trim());
-    if (available.length) {
-      return {
-        source: 'locations',
-        text: 'Berikut beberapa titik pelayanan SAMSAT yang tercantum di website:\n' +
-          available.slice(0, 6).map(item =>
-            '• ' + item.name + (item.address?.trim() ? ' — ' + item.address : '') +
-            (item.operatingHours?.trim() ? ' (' + item.operatingHours + ')' : '')
-          ).join('\n') + '\n\nLihat halaman Layanan untuk daftar dan Google Maps selengkapnya.',
-      };
-    }
-    return { source: 'locations', text: 'Informasi titik pelayanan tersedia pada halaman Layanan. Silakan buka bagian Lokasi Pelayanan untuk melihat daftar dan tautan Google Maps.' };
-  }
 
   const entries: { entry: KnowledgeAnswer; source: 'chatbot' | 'faq'; score: number }[] = [
     ...activeChatbot.map(entry => ({ entry, source: 'chatbot' as const, score: matchScore(query, entry) })),
@@ -92,3 +131,4 @@ export function resolveChatAnswer(
     text: 'Maaf, saya belum menemukan jawaban yang sesuai. Silakan lihat halaman FAQ atau hubungi petugas melalui halaman Kontak.',
   };
 }
+
