@@ -113,7 +113,7 @@ const SIGNAL_URL = 'https://play.google.com/store/apps/details?id=app.signal.id&
 function Field({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="min-w-0">
-      <dt className="text-[12px] leading-5 text-[#71808c]">{title}</dt>
+      <dt className="text-[12px] leading-5 text-black">{title}</dt>
       <dd className="mt-1 break-words text-[13px] font-semibold leading-5 text-[#172c3d]">{children}</dd>
     </div>
   );
@@ -179,7 +179,7 @@ export const VehicleTaxChecker: React.FC = () => {
             <h2 id="tax-result-heading" className="text-[22px] font-bold leading-tight text-[#1d2937]">Detail Kendaraan Anda</h2>
             <p className="mt-2 text-[12px] leading-5 text-[#8b5d22]">Data contoh (dummy) untuk pratinjau, bukan tagihan pajak atau data kendaraan resmi.</p>
           </div>
-          <span className="border border-[#d6e1ea] bg-[#f5f8fb] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#466175]">Simulasi</span>
+          <span className="border border-[#d6e1ea] bg-[#f5f8fb] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-black">Simulasi</span>
         </div>
 
         <div className="grid items-stretch gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -251,7 +251,7 @@ export const VehicleTaxChecker: React.FC = () => {
       <div className="mb-6 border-b border-[#e2e9ef] pb-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#005BAC]">Simulasi pengecekan</p>
         <h2 id="vehicle-tax-heading" className="mt-2 text-[25px] font-bold leading-tight text-[#1e3b51] sm:text-[30px]">Info Kendaraan Bermotor</h2>
-        <p className="mt-3 text-[14px] leading-7 text-[#5c7080]">Masukkan nomor polisi dan pilih warna TNKB. Pengecekan sementara menggunakan data contoh, bukan database pajak kendaraan sebenarnya.</p>
+        <p className="mt-3 text-[14px] leading-7 text-black">Masukkan nomor polisi dan pilih warna TNKB. Pengecekan sementara menggunakan data contoh, bukan database pajak kendaraan sebenarnya.</p>
       </div>
 
       <form onSubmit={findTax} noValidate>
@@ -279,7 +279,7 @@ export const VehicleTaxChecker: React.FC = () => {
           <legend className="text-[13px] font-semibold text-[#334e61]">Pilih warna TNKB</legend>
           <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label="Warna pelat kendaraan">
             {(['putih', 'merah', 'kuning'] as const).map((option) => (
-              <button key={option} type="button" aria-pressed={color === option} onClick={() => { setColor(option); setResult(null); }} className={`min-h-10 rounded-md border px-4 py-2 text-[13px] font-semibold capitalize transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] ${color === option ? 'border-[#005BAC] bg-[#e8f2fa] text-[#005BAC]' : 'border-[#d9e2ea] bg-[#f7f9fb] text-[#476073] hover:border-[#8fb3d0]'}`}>
+              <button key={option} type="button" aria-pressed={color === option} onClick={() => { setColor(option); setResult(null); }} className={`min-h-10 rounded-md border px-4 py-2 text-[13px] font-semibold capitalize transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] ${color === option ? 'border-[#005BAC] bg-[#e8f2fa] text-[#005BAC]' : 'border-[#d9e2ea] bg-[#f7f9fb] text-black hover:border-[#8fb3d0]'}`}>
                 {option}
               </button>
             ))}
@@ -288,12 +288,12 @@ export const VehicleTaxChecker: React.FC = () => {
 
         <div className="mt-6 border border-[#d9e3eb] bg-[#fafcfd] p-4 sm:p-5">
           <h3 className="text-[13px] font-semibold text-[#27455b]">Verifikasi bukan robot — demonstrasi</h3>
-          <p className="mt-1 text-[12px] leading-5 text-[#647889]">Ini hanya simulasi tampilan, bukan reCAPTCHA atau perlindungan bot yang sebenarnya.</p>
+          <p className="mt-1 text-[12px] leading-5 text-black">Ini hanya simulasi tampilan, bukan reCAPTCHA atau perlindungan bot yang sebenarnya.</p>
           <label className="mt-4 flex cursor-pointer items-center gap-3 text-sm font-medium text-[#304d62]">
             <input type="checkbox" checked={humanChecked} onChange={(event) => { setHumanChecked(event.target.checked); setResult(null); }} className="h-5 w-5 accent-[#005BAC]" />
             Saya bukan robot (simulasi)
           </label>
-          <label htmlFor="vehicle-human-answer" className="mt-4 block text-[12px] font-semibold text-[#435e71]">Untuk melanjutkan, berapa hasil 3 + 4?</label>
+          <label htmlFor="vehicle-human-answer" className="mt-4 block text-[12px] font-semibold text-black">Untuk melanjutkan, berapa hasil 3 + 4?</label>
           <input id="vehicle-human-answer" inputMode="numeric" type="text" autoComplete="off" value={challenge} maxLength={2} onChange={(event) => { setChallenge(event.target.value.replace(/\D/g, '')); setResult(null); }} placeholder="Jawaban" className="mt-2 w-28 rounded-md border border-[#cbd8e2] bg-white px-3 py-2 text-sm text-[#203b51] outline-none focus:border-[#005BAC] focus:ring-2 focus:ring-[#e5eff8]" />
         </div>
 
@@ -312,9 +312,10 @@ export const VehicleTaxChecker: React.FC = () => {
       {result === 'not-found' && (
         <div role="status" aria-live="polite" className="mt-6 border border-[#dce5eb] bg-[#f8fbfd] p-5 sm:p-6">
           <h3 className="text-[18px] font-bold text-[#213b51]">Tidak ditemukan dalam data contoh</h3>
-          <p className="mt-2 text-sm leading-7 text-[#5f7383]">Nomor yang dimasukkan tidak termasuk tiga data dummy. Ini tidak berarti kendaraan atau pajak sebenarnya tidak terdaftar.</p>
+          <p className="mt-2 text-sm leading-7 text-black">Nomor yang dimasukkan tidak termasuk tiga data dummy. Ini tidak berarti kendaraan atau pajak sebenarnya tidak terdaftar.</p>
         </div>
       )}
     </section>
   );
 };
+
