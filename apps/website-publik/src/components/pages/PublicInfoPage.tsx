@@ -133,10 +133,7 @@ export const PublicInfoPage: React.FC = () => {
             <div className="border border-[#dce5eb] bg-white px-6 py-10 text-sm text-[#647889]">Dokumen yang dicari tidak ditemukan.</div>
           )}
         </section>
-        <div className="mt-10 flex flex-col gap-5 border-l-4 border-[#005BAC] bg-[#edf4f9] p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div><h2 className="text-lg font-bold text-[#1c3c55]">Informasi Resmi Bapenda Jawa Tengah</h2><p className="mt-2 max-w-xl text-sm leading-6 text-[#526d80]">Untuk informasi dan kebijakan terbaru, periksa portal resmi pemerintah provinsi.</p></div>
-          <a href="https://website.bapenda.jatengprov.go.id/uppd-banyumas" target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#005BAC] px-5 py-3 text-sm font-semibold text-white hover:bg-[#004781]">Buka portal resmi <ArrowUpRight size={16} aria-hidden="true" /></a>
-        </div>
+
       </div>
       {selectedImage && createPortal(
         <div
