@@ -60,7 +60,7 @@ export const ProfileVision: React.FC = () => (
   <div className="space-y-9">
     <header className="border-b border-[#e2eaf0] pb-5">
       <h2 className="text-2xl font-semibold text-[#1d3b53]">Visi &amp; Misi UPPD Purwokerto</h2>
-      <p className="mt-2 text-sm leading-6 text-[#607586]">Landasan kerja operasional dalam melayani masyarakat Kabupaten Banyumas.</p>
+      <p className="mt-2 text-sm leading-6 text-black">Landasan kerja operasional dalam melayani masyarakat Kabupaten Banyumas.</p>
     </header>
 
     <section aria-labelledby="vision-title">
@@ -70,15 +70,15 @@ export const ProfileVision: React.FC = () => (
         style={{ backgroundImage: "url('/images/batik-visi.jpg')" }}
       >
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-r from-[#071d2f]/86 via-[#102d43]/72 to-[#071d2f]/84" />
-        <p className="text-sm font-semibold text-[#d3e4ef] sm:text-base">Visi Pembangunan Jawa Tengah 2018-2023</p>
+        <p className="text-sm font-semibold text-white sm:text-base">Visi Pembangunan Jawa Tengah 2018-2023</p>
         <h3 id="vision-title" className="mt-4 max-w-[680px] text-[26px] font-bold leading-[1.25] tracking-[-0.02em] text-white sm:text-[34px] lg:text-[38px]">
           “Menuju Jawa Tengah Sejahtera dan Berdikari”
         </h3>
-        <p className="mt-6 border-t border-white/35 pt-4 text-sm font-semibold italic text-[#f1f7fb] sm:text-base">
+        <p className="mt-6 border-t border-white/35 pt-4 text-sm font-semibold italic text-white sm:text-base">
           Tetep Mboten Korupsi, Mboten Ngapusi
         </p>
       </div>
-      <p className="mt-6 text-[14px] leading-7 text-[#526a7b]">
+      <p className="mt-6 text-[14px] leading-7 text-black">
         Visi pembangunan daerah Jawa Tengah tahun 2018-2023 merupakan keberlanjutan dari cita-cita pembangunan Jawa Tengah tahun 2013-2018. Makna yang terkandung dalam visi sebagai berikut:
       </p>
       <div className="mt-5">
@@ -93,14 +93,14 @@ export const ProfileVision: React.FC = () => (
           },
         ]} initialOpen="vision-sejahtera" />
       </div>
-      <p className="mt-5 border-l-[3px] border-[#005BAC] bg-[#f4f8fb] px-5 py-4 text-[14px] leading-7 text-[#526a7b]">
+      <p className="mt-5 border-l-[3px] border-[#005BAC] bg-[#f4f8fb] px-5 py-4 text-[14px] leading-7 text-black">
         Perwujudan masyarakat Jawa Tengah yang sejahtera dan berdikari dilandasi semangat dan nilai utama <strong className="font-semibold text-[#005BAC] italic">Mboten Korupsi, Mboten Ngapusi</strong>. Nilai ini dimanifestasi dalam sikap, tindakan, dan laku seluruh masyarakat Jawa Tengah untuk dapat bersama mencapai kesejahteraan yang berdikari.
       </p>
     </section>
 
     <section className={sectionClass} aria-labelledby="mission-title">
       <h3 id="mission-title" className="text-xl font-semibold text-[#1d3b53]">Misi Pembangunan</h3>
-      <p className="my-4 text-[14px] leading-7 text-[#526a7b]">Dalam rangka upaya menuju pencapaian visi pembangunan daerah Jawa Tengah tahun 2018-2023, ditetapkan misi pembangunan daerah yaitu:</p>
+      <p className="my-4 text-[14px] leading-7 text-black">Dalam rangka upaya menuju pencapaian visi pembangunan daerah Jawa Tengah tahun 2018-2023, ditetapkan misi pembangunan daerah yaitu:</p>
       <EditorialAccordion headingLevel="h4" items={missionItems.map((mission, index) => ({
         id: `mission-${index + 1}`,
         eyebrow: `Misi ${index + 1}`,
@@ -116,7 +116,7 @@ export const ProfileVision: React.FC = () => (
 
     <section className={sectionClass} aria-labelledby="flagship-title">
       <h3 id="flagship-title" className="text-xl font-semibold text-[#1d3b53]">Program Unggulan</h3>
-      <p className="my-4 text-[14px] leading-7 text-[#526a7b]">Program unggulan Gubernur dan Wakil Gubernur Jawa Tengah tahun 2018-2019 harus diimplementasikan yaitu:</p>
+      <p className="my-4 text-[14px] leading-7 text-black">Program unggulan Gubernur dan Wakil Gubernur Jawa Tengah tahun 2018-2019 harus diimplementasikan yaitu:</p>
       <EditorialAccordion headingLevel="h4" items={flagshipPrograms.map((program, index) => ({
         id: `program-${index + 1}`,
         eyebrow: `Program ${String(index + 1).padStart(2, '0')}`,
@@ -127,7 +127,7 @@ export const ProfileVision: React.FC = () => (
 
     <section className={sectionClass} aria-labelledby="targets-title">
       <h3 id="targets-title" className="text-xl font-semibold text-[#1d3b53]">Tujuan dan Sasaran Operasional</h3>
-      <p className="my-4 text-[14px] leading-7 text-[#526a7b]">Agar visi dan misi pembangunan daerah Jawa Tengah tahun 2018-2023 lebih terarah dalam implementasinya, misi tersebut dijabarkan secara operasional ke dalam <strong>6 Tujuan</strong> dan <strong>10 Sasaran</strong> beserta indikator kinerjanya sebagai berikut:</p>
+      <p className="my-4 text-[14px] leading-7 text-black">Agar visi dan misi pembangunan daerah Jawa Tengah tahun 2018-2023 lebih terarah dalam implementasinya, misi tersebut dijabarkan secara operasional ke dalam <strong>6 Tujuan</strong> dan <strong>10 Sasaran</strong> beserta indikator kinerjanya sebagai berikut:</p>
       <EditorialAccordion headingLevel="h4" items={operationalTargets.map((target, index) => ({
         id: `target-${index + 1}`,
         eyebrow: `Bagian ${index + 1}`,
@@ -146,3 +146,4 @@ export const ProfileVision: React.FC = () => (
     </figure>
   </div>
 );
+
