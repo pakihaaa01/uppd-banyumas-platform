@@ -91,6 +91,15 @@ export const ServicesPage: React.FC = () => {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.name} ${loc.address}`)}`;
   };
 
+  // Samsat Malam Minggu memiliki dua titik layanan; pengunjung memilih tujuan.
+  const isSamsatMalamMinggu = (loc: ServiceLocation) =>
+    /samsat\s+malam\s+minggu/i.test(loc.name);
+
+  const malamMingguLocations = [
+    { name: 'Alun-Alun Banyumas', query: 'Alun-Alun Banyumas, Kabupaten Banyumas, Jawa Tengah' },
+    { name: 'Taman Kebokura, Sumpiuh', query: 'Taman Kebokura, Sumpiuh, Kabupaten Banyumas, Jawa Tengah' },
+  ];
+
   return (
     <main className="min-h-screen bg-[#f7f9fb] pb-24 pt-[112px] md:pt-[140px]">
       <div className="mx-auto max-w-[1180px] px-5 sm:px-8 lg:px-10">
@@ -188,16 +197,38 @@ export const ServicesPage: React.FC = () => {
                               </div>
                             )}
                           </dl>
-                          <a
-                            href={getGoogleMapsUrl(loc)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => trackLocationClick(loc.name)}
-                            className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#005BAC] px-5 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-[#004781] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"
-                            aria-label={`Buka lokasi ${loc.name} di Google Maps`}
-                          >
-                            Buka lokasi di Google Maps
-                          </a>
+                          {isSamsatMalamMinggu(loc) ? (
+                            <div className="space-y-3">
+                              <p className="text-[13px] font-semibold text-[#28485e]">Pilih lokasi Samsat Malam Minggu</p>
+                              <div className="flex flex-wrap gap-3">
+                                {malamMingguLocations.map((place) => (
+                                  <a
+                                    key={place.name}
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.query)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    onClick={() => trackLocationClick(loc.name)}
+                                    className="inline-flex min-h-11 items-center justify-center rounded-md border border-[#005BAC] bg-white px-4 py-3 text-[13px] font-semibold text-[#005BAC] transition-colors hover:bg-[#ebf4fb] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"
+                                    aria-label={`Buka ${place.name} di Google Maps`}
+                                  >
+                                    Buka Maps: {place.name}
+                                  </a>
+                                ))}
+                              </div>
+                              <p className="text-xs leading-6 text-[#667b8b]">Pilih salah satu titik tujuan. Tautan membuka pencarian tempat di Google Maps; periksa pin sebelum berangkat.</p>
+                            </div>
+                          ) : (
+                            <a
+                              href={getGoogleMapsUrl(loc)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => trackLocationClick(loc.name)}
+                              className="inline-flex min-h-11 items-center justify-center rounded-md bg-[#005BAC] px-5 py-3 text-[13px] font-semibold text-white transition-colors hover:bg-[#004781] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"
+                              aria-label={`Buka lokasi ${loc.name} di Google Maps`}
+                            >
+                              Buka lokasi di Google Maps
+                            </a>
+                          )}
                         </div>
                       ),
                     }))}
