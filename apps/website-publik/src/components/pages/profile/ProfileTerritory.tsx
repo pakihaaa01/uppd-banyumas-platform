@@ -35,12 +35,12 @@ export const ProfileTerritory: React.FC<ProfileTerritoryProps> = ({ onOpenMap })
   <div className="space-y-8">
     <header className="border-b border-[#e2eaf0] pb-5">
       <h2 className="text-2xl font-semibold text-[#1d3b53]">Wilayah Kerja &amp; Jenis Pendapatan</h2>
-      <p className="mt-2 text-sm leading-6 text-[#607586]">Informasi lengkap cakupan wilayah operasional dan rincian jenis pendapatan yang dikelola oleh UPPD Purwokerto.</p>
+      <p className="mt-2 text-sm leading-6 text-black">Informasi lengkap cakupan wilayah operasional dan rincian jenis pendapatan yang dikelola oleh UPPD Purwokerto.</p>
     </header>
 
     <section aria-labelledby="income-title">
       <h3 id="income-title" className="mb-3 text-lg font-semibold text-[#1d3b53]">Jenis Pendapatan yang Dikelola UPPD Purwokerto</h3>
-      <p className="mb-5 text-[14px] leading-7 text-[#526a7b]">Rincian komponen pajak dan retribusi daerah yang dikelola.</p>
+      <p className="mb-5 text-[14px] leading-7 text-black">Rincian komponen pajak dan retribusi daerah yang dikelola.</p>
       <EditorialAccordion headingLevel="h4" items={incomeTypes.map((income, index) => ({
         id: `income-${index + 1}`,
         eyebrow: `Jenis pendapatan ${String(index + 1).padStart(2, '0')}`,
@@ -54,7 +54,7 @@ export const ProfileTerritory: React.FC<ProfileTerritoryProps> = ({ onOpenMap })
 
     <section className="border-t border-[#e2eaf0] pt-7" aria-labelledby="area-title">
       <h3 id="area-title" className="mb-3 text-lg font-semibold text-[#1d3b53]">Wilayah Kerja UPPD Purwokerto</h3>
-      <p className="mb-5 text-[14px] leading-7 text-[#526a7b]">Cakupan administratif wilayah pelayanan operasional.</p>
+      <p className="mb-5 text-[14px] leading-7 text-black">Cakupan administratif wilayah pelayanan operasional.</p>
       <EditorialAccordion headingLevel="h4" items={[{
         id: 'area-map',
         title: 'Lihat peta wilayah kerja',
@@ -69,10 +69,11 @@ export const ProfileTerritory: React.FC<ProfileTerritoryProps> = ({ onOpenMap })
             >
               <img src="/images/wilayah_kerja.jpeg" alt="Peta wilayah kerja UPPD Purwokerto" loading="lazy" className="mx-auto h-auto max-h-[530px] w-full object-contain" />
             </button>
-            <figcaption className="text-xs text-[#657c8c]">Pilih gambar untuk melihat peta dalam ukuran lebih besar.</figcaption>
+            <figcaption className="text-xs text-black">Pilih gambar untuk melihat peta dalam ukuran lebih besar.</figcaption>
           </figure>
         ),
       }]} />
     </section>
   </div>
 );
+
