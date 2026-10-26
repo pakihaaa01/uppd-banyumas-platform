@@ -228,3 +228,25 @@ chatbotRouter.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+// POST /api/v1/chatbot/:id/toggle - enable/disable answer visibility on public website.
+chatbotRouter.post('/:id/toggle', async (req, res) => {
+  try {
+    const isEnabled = req.body?.isEnabled;
+    if (typeof isEnabled !== 'boolean' || Object.keys(req.body ?? {}).some(key => key !== 'isEnabled')) {
+      res.status(400).json({ message: 'isEnabled harus boolean' });
+      return;
+    }
+    const updated = await prisma.chatbotFAQ.updateMany({
+      where: { id: req.params.id },
+      data: { isEnabled }
+    });
+    if (!updated.count) {
+      res.status(404).json({ message: 'Jawaban chatbot tidak ditemukan' });
+      return;
+    }
+    res.json({ message: isEnabled ? 'Jawaban chatbot diaktifkan' : 'Jawaban chatbot dinonaktifkan' });
+  } catch (error) {
+    console.error('Toggle chatbot FAQ error:', error);
+    res.status(500).json({ message: 'Gagal mengubah status jawaban chatbot' });
+  }
+});
