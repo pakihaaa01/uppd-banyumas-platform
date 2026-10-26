@@ -10,7 +10,14 @@ export async function apiRequest<T>(url: string, method = 'GET', data?: unknown)
     ...(data === undefined ? {} : { body: JSON.stringify(data) }),
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || `Permintaan gagal (${response.status}).`);
+  if (!response.ok) {
+    const serverMessage = typeof result.message === 'string' ? result.message
+      : typeof result.error === 'string' ? result.error : '';
+    const diagnostic = response.status === 404 && url.includes('/chatbot/')
+      ? 'Rute/entri chatbot tidak ditemukan (404). Periksa backend di port 4000 dan restart dari folder uppd-publishing/backend.'
+      : `Permintaan gagal (${response.status}).`;
+    throw new Error(serverMessage || diagnostic);
+  }
   return result as T;
 }
 export async function uploadFile(file: File): Promise<{url:string;fileSize:string;fileType:string}> {
