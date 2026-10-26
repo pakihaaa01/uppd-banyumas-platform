@@ -4,8 +4,6 @@ import type {
   FAQItem, ContactMessage, ChatbotFAQ, PADTarget, PerformanceReport, DashboardStats
 } from '../types';
 import {
-  INITIAL_ANNOUNCEMENTS, INITIAL_SERVICE_LOCATIONS, INITIAL_BUMDES_POSTERS,
-  INITIAL_DOCUMENTS, INITIAL_FAQS, INITIAL_CONTACT_MESSAGES,
   PAD_TARGETS, PERFORMANCE_REPORTS, INITIAL_DASHBOARD_STATS
 } from '../data/mockData';
 import { SakpoleModal } from '../components/shared/SakpoleModal';
@@ -77,43 +75,43 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [backendReady,setBackendReady]=useState(false);
   const [hasNewNotification,setHasNewNotification]=useState(true);
   const [sakpoleModalOpen,setSakpoleModalOpen]=useState(false);
-  const [announcements,setAnnouncements]=useState<Announcement[]>(INITIAL_ANNOUNCEMENTS);
-  const [serviceLocations,setServiceLocations]=useState<ServiceLocation[]>(INITIAL_SERVICE_LOCATIONS);
-  const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>(INITIAL_BUMDES_POSTERS);
-  const [documents,setDocuments]=useState<PublicDocument[]>(INITIAL_DOCUMENTS);
-  const [faqs,setFaqs]=useState<FAQItem[]>(INITIAL_FAQS);
+  const [announcements,setAnnouncements]=useState<Announcement[]>([]);
+  const [serviceLocations,setServiceLocations]=useState<ServiceLocation[]>([]);
+  const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>([]);
+  const [documents,setDocuments]=useState<PublicDocument[]>([]);
+  const [faqs,setFaqs]=useState<FAQItem[]>([]);
   const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>([]);
-  const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([
-    { id: 'arc-1', title: 'Maklumat Pelayanan', description: 'Gambar dokumentasi maklumat pelayanan yang disertakan pada project.', image: '/images/maklumat.jpeg' },
-    { id: 'arc-2', title: 'Standar Operasional Prosedur', description: 'Gambar prosedur pelayanan yang tersedia dalam aset website.', image: '/images/sop1.jpg' },
-    { id: 'arc-3', title: 'Sistem Informasi Pelayanan Publik', description: 'Dokumentasi pelayanan publik yang tersedia di project.', image: '/images/sipp2.jpg' },
-  ]);
-  const [contactMessages,setContactMessages]=useState<ContactMessage[]>(INITIAL_CONTACT_MESSAGES);
+  const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([]);
+  const [contactMessages,setContactMessages]=useState<ContactMessage[]>([]);
   const [stats,setStats]=useState<DashboardStats>(INITIAL_DASHBOARD_STATS);
   const [padTargets]=useState<PADTarget[]>(PAD_TARGETS);
   const [performanceReports]=useState<PerformanceReport[]>(PERFORMANCE_REPORTS);
   const refreshData=useCallback(async()=>{
     try {
-      const publicData=await apiRequest<Content>('/api/content');
-      setAnnouncements(publicData.announcements);
-      setServiceLocations(publicData.locations);
-      setBumdesPosters(publicData.posters);
-      setDocuments(publicData.documents);
-      setFaqs(publicData.faq);
-      setVisualArchive(publicData.archive);
-      setBackendReady(true);
-      try {
-        const privateData=await apiRequest<Content>('/api/admin/content');
-        setContactMessages(privateData.messages||[]);
-      } catch { setContactMessages([]); }
-    } catch { setBackendReady(false); }
-    try {
-      const response = await apiRequest<{chatbot:ChatbotFAQ[]}>('/api/v1/chatbot');
-      setChatbotFaqs(response.chatbot);
-      setBackendReady(true);
-    } catch (error) {
-      console.error('Gagal memuat jawaban chatbot dari PostgreSQL:', error);
+      const health = await apiRequest<{status:string;database:string}>('/api/v1/health/db');
+      setBackendReady(health.status === 'ok' && health.database === 'connected');
+    } catch {
+      setBackendReady(false);
     }
+
+    const requests = await Promise.allSettled([
+      apiRequest<{announcements: Announcement[]}>('/api/v1/announcements'),
+      apiRequest<{locations: ServiceLocation[]}>('/api/v1/locations'),
+      apiRequest<{documents: PublicDocument[]}>('/api/v1/documents'),
+      apiRequest<{faqs: FAQItem[]}>('/api/v1/faqs'),
+      apiRequest<{messages: ContactMessage[]}>('/api/v1/messages'),
+      apiRequest<{chatbot: ChatbotFAQ[]}>('/api/v1/chatbot'),
+      apiRequest<{archive: ArchiveItem[]}>('/api/v1/archive')
+    ]);
+
+    const [ann, loc, doc, faq, msg, bot, arc] = requests;
+    if (ann.status === 'fulfilled') setAnnouncements(ann.value.announcements);
+    if (loc.status === 'fulfilled') setServiceLocations(loc.value.locations);
+    if (doc.status === 'fulfilled') setDocuments(doc.value.documents);
+    if (faq.status === 'fulfilled') setFaqs(faq.value.faqs);
+    if (msg.status === 'fulfilled') setContactMessages(msg.value.messages);
+    if (bot.status === 'fulfilled') setChatbotFaqs(bot.value.chatbot);
+    if (arc.status === 'fulfilled') setVisualArchive(arc.value.archive);
   },[]);
   useEffect(()=>{
     void refreshData();
