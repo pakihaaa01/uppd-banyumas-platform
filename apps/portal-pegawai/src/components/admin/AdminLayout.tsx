@@ -23,7 +23,7 @@ export const AdminLayout: React.FC<Props> = ({ onLogout, user }) => {
             <span className="h-9 w-px shrink-0 bg-[#dce5eb]" aria-hidden="true" />
             <div className="min-w-0">
               <p className="text-[13px] font-bold leading-5 text-[#193a52] sm:text-[15px]">UPPD Kabupaten Banyumas</p>
-              <p className="text-[11px] leading-4 text-[#647b8d]">Panel pengelolaan website · Prototipe</p>
+              <p className="text-[11px] leading-4 text-[#647b8d]">Portal Pegawai UPPD Kabupaten Banyumas</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
