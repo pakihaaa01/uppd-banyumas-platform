@@ -4,8 +4,6 @@ import type {
   FAQItem, ContactMessage, ChatbotFAQ, PADTarget, PerformanceReport, DashboardStats
 } from '../types';
 import {
-  INITIAL_ANNOUNCEMENTS, INITIAL_SERVICE_LOCATIONS, INITIAL_BUMDES_POSTERS,
-  INITIAL_DOCUMENTS, INITIAL_FAQS, INITIAL_CONTACT_MESSAGES,
   PAD_TARGETS, PERFORMANCE_REPORTS, INITIAL_DASHBOARD_STATS
 } from '../data/mockData';
 import { SakpoleModal } from '../components/shared/SakpoleModal';
@@ -79,26 +77,22 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [sakpoleModalOpen,setSakpoleModalOpen]=useState(false);
   const [announcements,setAnnouncements]=useState<Announcement[]>([]);
   const [serviceLocations,setServiceLocations]=useState<ServiceLocation[]>([]);
-  const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>(INITIAL_BUMDES_POSTERS);
+  const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>([]);
   const [documents,setDocuments]=useState<PublicDocument[]>([]);
   const [faqs,setFaqs]=useState<FAQItem[]>([]);
   const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>([]);
   const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([]);
-  const [contactMessages,setContactMessages]=useState<ContactMessage[]>(INITIAL_CONTACT_MESSAGES);
+  const [contactMessages,setContactMessages]=useState<ContactMessage[]>([]);
   const [stats,setStats]=useState<DashboardStats>(INITIAL_DASHBOARD_STATS);
   const [padTargets]=useState<PADTarget[]>(PAD_TARGETS);
   const [performanceReports]=useState<PerformanceReport[]>(PERFORMANCE_REPORTS);
   const refreshData=useCallback(async()=>{
     try {
-      const publicData=await apiRequest<Content>('/api/content');
-      setBumdesPosters(publicData.posters);
-      setVisualArchive(publicData.archive);
-      setBackendReady(true);
-      try {
-        const privateData=await apiRequest<Content>('/api/admin/content');
-        setContactMessages(privateData.messages||[]);
-      } catch { setContactMessages([]); }
-    } catch { setBackendReady(false); }
+      const health = await apiRequest<{status:string;database:string}>('/api/v1/health/db');
+      setBackendReady(health.status === 'ok' && health.database === 'connected');
+    } catch {
+      setBackendReady(false);
+    }
     try {
       const response = await apiRequest<{announcements: Announcement[]}>('/api/v1/public/announcements');
       setAnnouncements(response.announcements);
