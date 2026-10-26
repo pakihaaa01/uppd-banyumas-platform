@@ -48,14 +48,14 @@ export const HeroSection: React.FC = () => {
         <div className="max-w-[690px]">
           <div className="mb-6 flex items-start gap-3">
             <span className="mt-[9px] h-[2px] w-7 shrink-0 bg-[#8fc2e5]" aria-hidden="true" />
-            <p className="max-w-[500px] text-[11px] font-semibold uppercase leading-5 tracking-[0.12em] text-[#d0e6f5] sm:text-xs">
+            <p className="max-w-[500px] text-[11px] font-semibold uppercase leading-5 tracking-[0.12em] text-white sm:text-xs">
               Unit Pengelolaan Pendapatan Daerah Kabupaten Banyumas
             </p>
           </div>
           <h1 id="hero-title" className="max-w-[670px] text-[clamp(2.2rem,4.4vw,4.05rem)] font-bold leading-[1.12] tracking-[-0.035em] text-white">
-            Informasi dan Pelayanan <span className="text-[#c5e6fc]">Pajak Kendaraan</span> di Banyumas
+            Informasi dan Pelayanan <span className="text-white">Pajak Kendaraan</span> di Banyumas
           </h1>
-          <p className="mt-6 max-w-[560px] text-[15px] leading-[1.9] text-[#e0eaf1] sm:text-[16px]">
+          <p className="mt-6 max-w-[560px] text-[15px] leading-[1.9] text-white sm:text-[16px]">
             Akses informasi persyaratan, prosedur, lokasi SAMSAT, dan layanan digital pajak kendaraan bermotor melalui satu halaman.
           </p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -74,7 +74,7 @@ export const HeroSection: React.FC = () => {
               Layanan Digital SAMSAT
             </button>
           </div>
-          <p className="mt-9 max-w-[560px] border-t border-white/30 pt-4 text-[12px] leading-5 text-[#d9e6ef]">
+          <p className="mt-9 max-w-[560px] border-t border-white/30 pt-4 text-[12px] leading-5 text-white">
             Pelayanan untuk masyarakat Kabupaten Banyumas dan sekitarnya, Provinsi Jawa Tengah.
           </p>
         </div>
@@ -84,3 +84,4 @@ export const HeroSection: React.FC = () => {
     </section>
   );
 };
+
