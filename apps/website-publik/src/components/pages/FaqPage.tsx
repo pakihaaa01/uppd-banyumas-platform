@@ -34,13 +34,13 @@ export const FaqPage: React.FC = () => {
           <aside className="space-y-5 lg:sticky lg:top-[132px]">
             <div className="border border-[#dce5eb] bg-white p-5">
               <h2 className="text-[14px] font-bold text-[#1d3b53]">Cari informasi</h2>
-              <label htmlFor="faq-search" className="mt-4 block text-xs font-semibold text-[#536879]">Kata kunci pertanyaan</label>
-              <input id="faq-search" type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Contoh: pajak tahunan" className="mt-2 w-full rounded-md border border-[#ccd9e2] bg-white px-3 py-3 text-sm outline-none placeholder:text-[#8898a5] focus:border-[#005BAC] focus:ring-2 focus:ring-[#e5f0f9]" />
-              <h3 className="mb-3 mt-6 text-xs font-bold uppercase tracking-[0.08em] text-[#526a7d]">Kategori</h3>
+              <label htmlFor="faq-search" className="mt-4 block text-xs font-semibold text-black">Kata kunci pertanyaan</label>
+              <input id="faq-search" type="search" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Contoh: pajak tahunan" className="mt-2 w-full rounded-md border border-[#ccd9e2] bg-white px-3 py-3 text-sm outline-none placeholder:text-black focus:border-[#005BAC] focus:ring-2 focus:ring-[#e5f0f9]" />
+              <h3 className="mb-3 mt-6 text-xs font-bold uppercase tracking-[0.08em] text-black">Kategori</h3>
               <div className="flex flex-wrap gap-2 lg:flex-col" role="group" aria-label="Filter kategori FAQ">
                 {categories.map((category) => (
                   <button key={category} type="button" aria-pressed={selectedCategory === category} onClick={() => setSelectedCategory(category)}
-                    className={`rounded-md border px-3 py-2.5 text-left text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] ${selectedCategory === category ? 'border-[#005BAC] bg-[#eaf3fa] text-[#005BAC]' : 'border-[#dce5eb] bg-white text-[#4d6475] hover:border-[#005BAC] hover:text-[#005BAC]'}`}>
+                    className={`rounded-md border px-3 py-2.5 text-left text-[13px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] ${selectedCategory === category ? 'border-[#005BAC] bg-[#eaf3fa] text-[#005BAC]' : 'border-[#dce5eb] bg-white text-black hover:border-[#005BAC] hover:text-[#005BAC]'}`}>
                     {category}
                   </button>
                 ))}
@@ -48,14 +48,14 @@ export const FaqPage: React.FC = () => {
             </div>
             <div className="border-l-[3px] border-[#005BAC] bg-[#edf4f9] p-5">
               <h2 className="text-sm font-bold text-[#1a3a53]">Belum menemukan jawaban?</h2>
-              <p className="mt-2 text-[13px] leading-6 text-[#566b7a]">Lihat kanal kontak untuk bertanya langsung kepada pihak layanan.</p>
+              <p className="mt-2 text-[13px] leading-6 text-black">Lihat kanal kontak untuk bertanya langsung kepada pihak layanan.</p>
               <button type="button" onClick={() => setCurrentPage('contact')} className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#005BAC] hover:underline">Lihat kontak</button>
             </div>
           </aside>
           <section aria-label="Daftar pertanyaan" className="min-w-0">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-[20px] font-bold text-[#1d3b53]">Daftar Tanya Jawab</h2>
-              <p aria-live="polite" className="text-xs text-[#607487]">{filteredFaqs.length} pertanyaan ditemukan</p>
+              <p aria-live="polite" className="text-xs text-black">{filteredFaqs.length} pertanyaan ditemukan</p>
             </div>
             {filteredFaqs.length ? (
               <EditorialAccordion
@@ -70,14 +70,15 @@ export const FaqPage: React.FC = () => {
             ) : (
               <div className="border border-[#dce5eb] bg-white px-7 py-10">
                 <h3 className="font-semibold text-[#1e3c53]">Pertanyaan tidak ditemukan</h3>
-                <p className="mt-2 text-sm text-[#5d7183]">Coba kata kunci lain atau pilih kategori berbeda.</p>
+                <p className="mt-2 text-sm text-black">Coba kata kunci lain atau pilih kategori berbeda.</p>
                 <button type="button" onClick={() => { setSearchQuery(''); setSelectedCategory('Semua'); }} className="mt-5 text-sm font-semibold text-[#005BAC] underline">Reset pencarian</button>
               </div>
             )}
-            <p className="mt-5 text-xs leading-6 text-[#697d8c]">Informasi dapat berubah mengikuti ketentuan yang berlaku. Konfirmasi syarat dan biaya melalui kanal resmi sebelum mengurus layanan.</p>
+            <p className="mt-5 text-xs leading-6 text-black">Informasi dapat berubah mengikuti ketentuan yang berlaku. Konfirmasi syarat dan biaya melalui kanal resmi sebelum mengurus layanan.</p>
           </section>
         </div>
       </div>
     </main>
   );
 };
+
