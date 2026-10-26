@@ -39,7 +39,7 @@ const pageInfo: Record<Tab, { title: string; desc: string }> = {
   documents: { title: 'Informasi Publik', desc: 'Kelola daftar metadata dan tautan dokumen publik.' },
   faq: { title: 'Pertanyaan Umum', desc: 'Ubah informasi tanya jawab yang ditampilkan pada halaman FAQ.' },
   messages: { title: 'Pesan Masyarakat', desc: 'Lihat pesan simulasi dari formulir kontak yang tersimpan di database lokal.' },
-  chatbot: { title: 'Jawaban Chatbot', desc: 'Kelola pasangan pertanyaan dan jawaban pada chatbot simulasi.' },
+  chatbot: { title: 'Jawaban Chatbot', desc: 'Kelola jawaban berbasis PostgreSQL. Hanya jawaban Aktif yang tampil pada chatbot website publik.' },
   settings: { title: 'Pengaturan Prototipe', desc: 'Informasi login backend lokal dan penyimpanan SQLite untuk demonstrasi.' },
   archive: { title: 'Dokumentasi Pelayanan', desc: 'Kelola tiga gambar dokumentasi yang ditampilkan pada halaman Informasi Publik.' },
 };
@@ -272,7 +272,7 @@ export const AdminDashboard: React.FC = () => {
     }
     if (activeTab === 'chatbot') {
       const b = item as ChatbotFAQ;
-      return <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div className="min-w-0"><p className="text-[11px] font-semibold text-[#005BAC]">{b.category}</p><h3 className="mt-1 text-sm font-semibold text-[#243f52]">{b.question}</h3><p className="mt-1 line-clamp-2 text-xs leading-5 text-[#687e8e]">{b.answer}</p></div><div className="flex flex-wrap gap-2"><button type="button" className={subtle} onClick={() => toggleChatbotFaqStatus(b.id)}>{b.isEnabled ? 'Aktif' : 'Nonaktif'}</button>{smallEdit(b)}{smallDelete(b.id)}</div></div>;
+      return <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div className="min-w-0"><p className="text-[11px] font-semibold text-[#005BAC]">{b.category}</p><h3 className="mt-1 text-sm font-semibold text-[#243f52]">{b.question}</h3><p className="mt-1 line-clamp-2 text-xs leading-5 text-[#687e8e]">{b.answer}</p></div><div className="flex flex-wrap gap-2"><button type="button" className={subtle} onClick={() => void toggleChatbotFaqStatus(b.id)}>{b.isEnabled ? 'Nonaktifkan' : 'Aktifkan'}</button>{!b.isEnabled && <>{smallEdit(b)}{smallDelete(b.id)}</>}</div></div>;
     }
     const m = item as { id: string; status: string; name: string; email: string; subject: string; message: string };
     return <div className="space-y-3"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="text-sm font-semibold text-[#243f52]">{m.subject}</h3><p className="mt-1 text-xs text-[#687e8e]">{m.name} · {m.email}</p></div><div className="flex items-center gap-2"><label className="sr-only" htmlFor={`status-${m.id}`}>Status pesan</label><select id={`status-${m.id}`} value={m.status} onChange={e => updateMessageStatus(m.id, e.target.value as 'New' | 'In Progress' | 'Completed')} className="rounded border border-[#d4e0e8] bg-white px-2 py-2 text-xs text-[#344d60]"><option value="New">Baru</option><option value="In Progress">Diproses</option><option value="Completed">Selesai</option></select>{smallDelete(m.id)}</div></div><p className="whitespace-pre-line text-[13px] leading-6 text-[#587081]">{m.message}</p></div>;
@@ -397,7 +397,7 @@ export const AdminDashboard: React.FC = () => {
                 <div><label className={label} htmlFor="bot-answer">Jawaban</label><textarea id="bot-answer" required rows={4} className={field} value={botForm.answer} onChange={e => setBotForm({ ...botForm, answer: e.target.value })}/></div>
                 <div><label className={label} htmlFor="bot-words">Kata Kunci (pisahkan dengan koma)</label><input id="bot-words" className={field} value={botForm.keywords} onChange={e => setBotForm({ ...botForm, keywords: e.target.value })}/></div>
                 <div><label className={label} htmlFor="bot-category">Kategori</label><input id="bot-category" required className={field} value={botForm.category} onChange={e => setBotForm({ ...botForm, category: e.target.value })}/></div>
-                <label className="flex items-center gap-2 text-xs text-[#385469]"><input type="checkbox" checked={botForm.isEnabled} onChange={e => setBotForm({ ...botForm, isEnabled: e.target.checked })}/> Respons aktif</label>
+                <p className="text-xs leading-5 text-[#647b8d]">Jawaban baru disimpan sebagai Nonaktif. Setelah dicek, klik Aktifkan pada daftar. Untuk mengedit atau menghapus jawaban aktif, nonaktifkan terlebih dahulu.</p>
               </>}
               <div className="flex flex-wrap justify-end gap-2 border-t border-[#e6edf2] pt-5"><button type="button" onClick={closeDialog} className={subtle}>Batal</button><button type="submit" disabled={saving||uploading||!backendReady} className={action}>{editId ? 'Simpan Perubahan' : 'Simpan Data'}</button></div>
             </form>
