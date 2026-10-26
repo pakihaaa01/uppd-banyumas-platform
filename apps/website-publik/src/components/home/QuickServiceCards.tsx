@@ -60,9 +60,9 @@ export const QuickServiceCards: React.FC = () => {
           <div className="max-w-[670px]">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.13em] text-[#005BAC]">Akses pelayanan</p>
             <h2 id="quick-services-title" className="text-[26px] font-bold leading-tight tracking-[-0.025em] text-[#172f43] sm:text-[34px]">Apa yang ingin Anda urus?</h2>
-            <p className="mt-3 text-sm leading-7 text-[#5a6d7b] sm:text-[15px]">Pilih informasi sesuai kebutuhan Anda sebelum datang ke kantor atau menggunakan layanan digital.</p>
+            <p className="mt-3 text-sm leading-7 text-black sm:text-[15px]">Pilih informasi sesuai kebutuhan Anda sebelum datang ke kantor atau menggunakan layanan digital.</p>
           </div>
-          <span className="border-l-2 border-[#005BAC] pl-3 text-xs leading-5 text-[#687985]">Layanan pajak kendaraan bermotor<br />di Kabupaten Banyumas</span>
+          <span className="border-l-2 border-[#005BAC] pl-3 text-xs leading-5 text-black">Layanan pajak kendaraan bermotor<br />di Kabupaten Banyumas</span>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
@@ -75,10 +75,10 @@ export const QuickServiceCards: React.FC = () => {
             >
               <div className="flex w-full items-start justify-between">
                 <Icon className="h-7 w-7 text-[#005BAC]" strokeWidth={1.6} aria-hidden="true" />
-                <span className="text-[12px] font-medium tracking-[0.09em] text-[#91a0ac]">{number} / 06</span>
+                <span className="text-[12px] font-medium tracking-[0.09em] text-black">{number} / 06</span>
               </div>
               <h3 className="mt-6 text-[20px] font-semibold tracking-[-0.015em] text-[#1b3348]">{title}</h3>
-              <p className="mt-2 max-w-[445px] text-[13px] leading-6 text-[#627584] sm:text-sm">{description}</p>
+              <p className="mt-2 max-w-[445px] text-[13px] leading-6 text-black sm:text-sm">{description}</p>
               <span className="mt-auto inline-flex items-center gap-2 pt-5 text-[12px] font-semibold text-[#005BAC]">{link}<ArrowRight size={15} className="transition-transform group-hover:translate-x-1" aria-hidden="true" /></span>
             </button>
           ))}
@@ -94,10 +94,10 @@ export const QuickServiceCards: React.FC = () => {
             >
               <div className="flex w-full items-center justify-between">
                 <Icon size={23} strokeWidth={1.6} className="text-[#005BAC]" aria-hidden="true" />
-                <ArrowUpRight size={17} className="text-[#8a9ba8] transition-colors group-hover:text-[#005BAC]" aria-hidden="true" />
+                <ArrowUpRight size={17} className="text-black transition-colors group-hover:text-[#005BAC]" aria-hidden="true" />
               </div>
               <h3 className="mt-6 text-[14px] font-semibold text-[#20394e]">{title}</h3>
-              <p className="mt-1 text-[12px] leading-5 text-[#687b88]">{desc}</p>
+              <p className="mt-1 text-[12px] leading-5 text-black">{desc}</p>
             </button>
           ))}
         </div>
@@ -105,3 +105,4 @@ export const QuickServiceCards: React.FC = () => {
     </section>
   );
 };
+
