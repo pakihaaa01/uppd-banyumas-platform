@@ -32,6 +32,8 @@ app.get('/api/v1/health', (_req, res) => {
   res.json({
     status: 'ok',
     service: 'UPPD Banyumas API',
+    chatbotToggle: true,
+    chatbotApiVersion: '2026-10-26',
     message: 'Backend berjalan dengan baik'
   });
 });
