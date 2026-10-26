@@ -15,7 +15,6 @@ import { documentsRouter } from './routes/documents';
 import { publicDocumentsRouter } from './routes/publicDocuments';
 import { archiveRouter } from './routes/archive';
 import { messageRepliesRouter } from './routes/messageReplies';
-import { whatsappRepliesRouter } from './routes/whatsappReplies';
 
 const app = express();
 const PORT = 4000;
@@ -66,7 +65,6 @@ app.use('/api/v1/faqs', faqsRouter);
 app.use('/api/v1/contact', contactRouter);
 app.use('/api/v1/messages', messagesRouter);
 app.use('/api/v1/message-replies', messageRepliesRouter);
-app.use('/api/v1/whatsapp-replies', whatsappRepliesRouter);
 app.use('/api/v1/chatbot', chatbotRouter);
 app.use('/api/v1/documents', documentsRouter);
 app.use('/api/v1/archive', archiveRouter);
