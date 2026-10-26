@@ -82,7 +82,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const [bumdesPosters,setBumdesPosters]=useState<BUMDesPoster[]>(INITIAL_BUMDES_POSTERS);
   const [documents,setDocuments]=useState<PublicDocument[]>(INITIAL_DOCUMENTS);
   const [faqs,setFaqs]=useState<FAQItem[]>(INITIAL_FAQS);
-  const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>(INITIAL_CHATBOT_FAQS);
+  const [chatbotFaqs,setChatbotFaqs]=useState<ChatbotFAQ[]>([]);
   const [visualArchive,setVisualArchive]=useState<ArchiveItem[]>([
     { id: 'arc-1', title: 'Maklumat Pelayanan', description: 'Gambar dokumentasi maklumat pelayanan yang disertakan pada project.', image: '/images/maklumat.jpeg' },
     { id: 'arc-2', title: 'Standar Operasional Prosedur', description: 'Gambar prosedur pelayanan yang tersedia dalam aset website.', image: '/images/sop1.jpg' },
@@ -100,7 +100,6 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
       setBumdesPosters(publicData.posters);
       setDocuments(publicData.documents);
       setFaqs(publicData.faq);
-      setChatbotFaqs(publicData.chatbot);
       setVisualArchive(publicData.archive);
       setBackendReady(true);
       try {
@@ -108,6 +107,13 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
         setContactMessages(privateData.messages||[]);
       } catch { setContactMessages([]); }
     } catch { setBackendReady(false); }
+    try {
+      const response = await apiRequest<{chatbot:ChatbotFAQ[]}>('/api/v1/chatbot');
+      setChatbotFaqs(response.chatbot);
+      setBackendReady(true);
+    } catch (error) {
+      console.error('Gagal memuat jawaban chatbot dari PostgreSQL:', error);
+    }
   },[]);
   useEffect(()=>{
     void refreshData();
@@ -153,13 +159,40 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   };
   const updateMessageStatus=(id:string,status:ContactMessage['status'])=>change('messages','PUT',id,{status},'Status pesan diperbarui');
   const deleteContactMessage=(id:string)=>change('messages','DELETE',id,undefined,'Pesan dihapus');
-  const addChatbotFaq=(data:Omit<ChatbotFAQ,'id'|'clickCount'>)=>change('chatbot','POST',undefined,{...data,clickCount:0},'Jawaban chatbot ditambahkan');
-  const updateChatbotFaq=(id:string,data:Partial<ChatbotFAQ>)=>change('chatbot','PUT',id,data,'Jawaban chatbot diperbarui');
-  const toggleChatbotFaqStatus=(id:string)=>{
-    const current=chatbotFaqs.find(f=>f.id===id);
-    return current?change('chatbot','PUT',id,{isEnabled:!current.isEnabled},'Status jawaban chatbot diperbarui'):Promise.resolve(false);
+  const updateChatbotList=async():Promise<void>=>{
+    const response=await apiRequest<{chatbot:ChatbotFAQ[]}>('/api/v1/chatbot');
+    setChatbotFaqs(response.chatbot);
   };
-  const deleteChatbotFaq=(id:string)=>change('chatbot','DELETE',id,undefined,'Jawaban chatbot dihapus');
+  const addChatbotFaq=async(data:Omit<ChatbotFAQ,'id'|'clickCount'>):AsyncAction=>{
+    try {
+      const {isEnabled: _ignored, ...payload}=data;
+      await apiRequest('/api/v1/chatbot','POST',payload);
+      await updateChatbotList();
+      showToast('Jawaban chatbot disimpan sebagai Nonaktif. Aktifkan untuk menampilkan di website.');
+      return true;
+    } catch(e){showToast(e instanceof Error?e.message:'Gagal menambah jawaban chatbot','error');return false;}
+  };
+  const updateChatbotFaq=async(id:string,data:Partial<ChatbotFAQ>):AsyncAction=>{
+    try {
+      const payload={question:data.question,answer:data.answer,keywords:data.keywords,category:data.category};
+      await apiRequest('/api/v1/chatbot/'+encodeURIComponent(id),'PATCH',payload);
+      await updateChatbotList();showToast('Jawaban chatbot diperbarui.');return true;
+    }catch(e){showToast(e instanceof Error?e.message:'Gagal memperbarui jawaban chatbot','error');return false;}
+  };
+  const toggleChatbotFaqStatus=async(id:string):AsyncAction=>{
+    const current=chatbotFaqs.find(f=>f.id===id);
+    if(!current)return false;
+    try {
+      await apiRequest('/api/v1/chatbot/'+encodeURIComponent(id)+'/toggle','POST',{isEnabled:!current.isEnabled});
+      await updateChatbotList();showToast(current.isEnabled?'Jawaban disembunyikan dari website.':'Jawaban diaktifkan di website.');return true;
+    }catch(e){showToast(e instanceof Error?e.message:'Gagal mengubah status chatbot','error');return false;}
+  };
+  const deleteChatbotFaq=async(id:string):AsyncAction=>{
+    try {
+      await apiRequest('/api/v1/chatbot/'+encodeURIComponent(id),'DELETE');
+      await updateChatbotList();showToast('Jawaban chatbot dihapus.');return true;
+    }catch(e){showToast(e instanceof Error?e.message:'Gagal menghapus jawaban chatbot','error');return false;}
+  };
   const addArchiveItem=(data:New<ArchiveItem>)=>change('archive','POST',undefined,data,'Dokumentasi ditambahkan');
   const updateArchiveItem=(id:string,data:Partial<ArchiveItem>)=>change('archive','PUT',id,data,'Dokumentasi diperbarui');
   const deleteArchiveItem=(id:string)=>change('archive','DELETE',id,undefined,'Dokumentasi dihapus');
