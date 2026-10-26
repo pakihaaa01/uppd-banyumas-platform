@@ -4,7 +4,7 @@ import { useSamsat } from '../../context/SamsatContext';
 import { PageHeading } from '../shared/PageHeading';
 
 const emptyForm = { name: '', email: '', subject: '', message: '' };
-const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-white px-3.5 py-3 text-sm text-[#203b51] outline-none placeholder:text-[#9aa7b2] focus:border-[#005BAC] focus:ring-2 focus:ring-[#e7f2fb]';
+const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-white px-3.5 py-3 text-sm text-[#203b51] outline-none placeholder:text-black focus:border-[#005BAC] focus:ring-2 focus:ring-[#e7f2fb]';
 const labelClass = 'block text-[13px] font-semibold text-[#354e60]';
 
 export const ContactPage: React.FC = () => {
@@ -41,25 +41,25 @@ export const ContactPage: React.FC = () => {
           <div className="space-y-6">
             <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-details">
               <h2 id="contact-details" className="text-xl font-bold text-[#1d3b53]">Informasi Kantor</h2>
-              <p className="mt-2 text-sm leading-6 text-[#607486]">UPPD Kabupaten Banyumas — SAMSAT Purwokerto</p>
+              <p className="mt-2 text-sm leading-6 text-black">UPPD Kabupaten Banyumas — SAMSAT Purwokerto</p>
               <dl className="mt-6 space-y-6 border-t border-[#e2e9ee] pt-6">
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-[#556c7d]">Jl. Prof. M. Yamin No.7, Karangklesem, Karangpucung, Kec. Purwokerto Selatan, Kabupaten Banyumas, Jawa Tengah 53142</dd></div>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-black">Jl. Prof. M. Yamin No.7, Karangklesem, Karangpucung, Kec. Purwokerto Selatan, Kabupaten Banyumas, Jawa Tengah 53142</dd></div>
                 <div>
                     <dt className="text-[13px] font-bold text-[#1f3b51]">Telepon dan WhatsApp</dt>
-                    <dd className="mt-1 space-y-1.5 text-sm text-[#556c7d]">
+                    <dd className="mt-1 space-y-1.5 text-sm text-black">
                       <p><a className="hover:underline" href="tel:+62281637801">(0281) 637801</a></p>
                       <p><a className="inline-flex items-center gap-1 font-semibold text-[#005BAC] hover:underline" href="https://wa.me/6285112680759" target="_blank" rel="noopener noreferrer">0851-12680759</a></p>
                     </dd>
                 </div>
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-[#556c7d]"><a href="mailto:Up3adbms@gmail.com" className="break-all hover:underline">Up3adbms@gmail.com</a></dd></div>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-black"><a href="mailto:Up3adbms@gmail.com" className="break-all hover:underline">Up3adbms@gmail.com</a></dd></div>
                 <div><dt className="text-[13px] font-bold text-[#1f3b51]">Jam pelayanan yang tercantum pada project</dt>
-                    <dd className="mt-1 text-sm leading-7 text-[#556c7d]">Senin–Kamis: 08.00–13.00 WIB<br />Jumat: 08.00–11.00 WIB<br />Sabtu: 08.00–12.00 WIB</dd>
-                    <p className="mt-2 text-xs leading-5 text-[#7b6b40]">Jadwal perlu dikonfirmasi kepada instansi sebelum berkunjung.</p>
+                    <dd className="mt-1 text-sm leading-7 text-black">Senin–Kamis: 08.00–13.00 WIB<br />Jumat: 08.00–11.00 WIB<br />Sabtu: 08.00–12.00 WIB</dd>
+                    <p className="mt-2 text-xs leading-5 text-black">Jadwal perlu dikonfirmasi kepada instansi sebelum berkunjung.</p>
                 </div>
               </dl>
             </section>
             <section className="overflow-hidden border border-[#dce5eb] bg-white" aria-labelledby="contact-map">
-              <div className="px-6 py-5"><h2 id="contact-map" className="text-lg font-bold text-[#1d3b53]">Peta Lokasi</h2><p className="mt-1 text-sm text-[#63798a]">Arah menuju SAMSAT Purwokerto</p></div>
+              <div className="px-6 py-5"><h2 id="contact-map" className="text-lg font-bold text-[#1d3b53]">Peta Lokasi</h2><p className="mt-1 text-sm text-black">Arah menuju SAMSAT Purwokerto</p></div>
               <iframe
                 title="Lokasi SAMSAT Purwokerto pada Google Maps"
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63299.38060169357!2d109.20501587910154!3d-7.441859599999992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e655c2b92579f25%3A0x42cc86a8369ade7a!2sSamsat%20Purwokerto!5e0!3m2!1sen!2sus!4v1787848499967!5m2!1sen!2sus"
@@ -83,7 +83,7 @@ export const ContactPage: React.FC = () => {
           <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-form-title">
             <div className="border-b border-[#e3eaf0] pb-6">
                 <h2 id="contact-form-title" className="text-xl font-bold text-[#1d3b53]">Formulir Pesan</h2>
-                <p className="mt-2 text-sm leading-6 text-[#5d7182]">Simulasi formulir masukan untuk kebutuhan pengembangan website.</p>
+                <p className="mt-2 text-sm leading-6 text-black">Simulasi formulir masukan untuk kebutuhan pengembangan website.</p>
             </div>
             <div className="mt-5 border-l-[3px] border-[#c08c33] bg-[#fff9ed] px-4 py-3 text-xs leading-6 text-[#715727]">
               <strong>Versi demonstrasi:</strong> Pesan demonstrasi disimpan di database lokal, bukan dikirim ke petugas UPPD. Jangan masukkan data pribadi sensitif atau pengaduan sebenarnya.
@@ -101,7 +101,7 @@ export const ContactPage: React.FC = () => {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div><label htmlFor="contact-subject" className={labelClass}>Subjek <span aria-hidden="true">*</span></label><input id="contact-subject" type="text" required maxLength={150} value={formData.subject} onChange={(event) => setFormData({ ...formData, subject: event.target.value })} placeholder="Topik pesan" className={fieldClass} /></div>
               </div>
-              <div><div className="flex items-center justify-between"><label htmlFor="contact-message" className={labelClass}>Isi pesan <span aria-hidden="true">*</span></label><span className="text-xs text-[#7a8c98]">{formData.message.length}/1000</span></div><textarea id="contact-message" required rows={6} maxLength={1000} value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Tuliskan contoh pertanyaan atau saran..." className={`${fieldClass} resize-y`} /></div>
+              <div><div className="flex items-center justify-between"><label htmlFor="contact-message" className={labelClass}>Isi pesan <span aria-hidden="true">*</span></label><span className="text-xs text-black">{formData.message.length}/1000</span></div><textarea id="contact-message" required rows={6} maxLength={1000} value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Tuliskan contoh pertanyaan atau saran..." className={`${fieldClass} resize-y`} /></div>
               <button type="submit" disabled={sending} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#005BAC] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#004a89] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">Simpan contoh pesan</button>
             </form>
           </section>
@@ -110,3 +110,4 @@ export const ContactPage: React.FC = () => {
     </main>
   );
 };
+
