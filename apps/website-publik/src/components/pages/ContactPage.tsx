@@ -3,7 +3,7 @@ import { EditorialAccordion } from '../shared/EditorialAccordion';
 import { useSamsat } from '../../context/SamsatContext';
 import { PageHeading } from '../shared/PageHeading';
 
-const emptyForm = { name: '', email: '', phone: '', subject: '', message: '', whatsappOptIn: false };
+const emptyForm = { name: '', email: '', subject: '', message: '' };
 const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-white px-3.5 py-3 text-sm text-[#203b51] outline-none placeholder:text-[#9aa7b2] focus:border-[#005BAC] focus:ring-2 focus:ring-[#e7f2fb]';
 const labelClass = 'block text-[13px] font-semibold text-[#354e60]';
 
@@ -20,10 +20,8 @@ export const ContactPage: React.FC = () => {
     const saved = await addContactMessage({
       name: formData.name.trim(),
       email: formData.email.trim(),
-      phone: formData.phone.trim(),
       subject: formData.subject.trim(),
       message: formData.message.trim(),
-      whatsappOptIn: formData.whatsappOptIn,
     });
     setSending(false);
     if (!saved) return;
@@ -101,11 +99,9 @@ export const ContactPage: React.FC = () => {
                 <div><label htmlFor="contact-email" className={labelClass}>Email <span aria-hidden="true">*</span></label><input id="contact-email" type="email" autoComplete="email" required maxLength={150} value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} placeholder="nama@email.com" className={fieldClass} /></div>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                <div><label htmlFor="contact-phone" className={labelClass}>Nomor telepon (opsional)</label><input id="contact-phone" type="tel" autoComplete="tel" maxLength={30} value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value, whatsappOptIn: event.target.value.trim() ? formData.whatsappOptIn : false })} placeholder="08xxxxxxxxxx" className={fieldClass} /></div>
                 <div><label htmlFor="contact-subject" className={labelClass}>Subjek <span aria-hidden="true">*</span></label><input id="contact-subject" type="text" required maxLength={150} value={formData.subject} onChange={(event) => setFormData({ ...formData, subject: event.target.value })} placeholder="Topik pesan" className={fieldClass} /></div>
               </div>
               <div><div className="flex items-center justify-between"><label htmlFor="contact-message" className={labelClass}>Isi pesan <span aria-hidden="true">*</span></label><span className="text-xs text-[#7a8c98]">{formData.message.length}/1000</span></div><textarea id="contact-message" required rows={6} maxLength={1000} value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Tuliskan contoh pertanyaan atau saran..." className={`${fieldClass} resize-y`} /></div>
-              <label className="flex items-start gap-3 text-sm leading-6 text-[#354e60]"><input type="checkbox" className="mt-1" disabled={!formData.phone.trim()} checked={formData.whatsappOptIn} onChange={event=>setFormData({...formData,whatsappOptIn:event.target.checked})}/><span>Saya bersedia menerima balasan terkait pesan ini melalui WhatsApp pada nomor yang saya isi. Persetujuan bersifat opsional dan tidak digunakan untuk promosi.</span></label>
               <button type="submit" disabled={sending} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#005BAC] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#004a89] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">Simpan contoh pesan</button>
             </form>
           </section>
