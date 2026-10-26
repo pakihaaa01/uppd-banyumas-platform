@@ -15,7 +15,7 @@ const PublicSite: React.FC = () => {
   const { currentPage } = useSamsat();
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 font-sans selection:bg-[#005BAC] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-black font-sans selection:bg-[#005BAC] selection:text-white">
       <Navbar />
 
       <main className="flex-grow">
@@ -57,3 +57,4 @@ export default function App() {
     </SamsatProvider>
   );
 }
+
