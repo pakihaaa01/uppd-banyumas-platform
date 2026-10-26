@@ -35,7 +35,10 @@ export const SamsatChatbot: React.FC = () => {
   }, [messages, isTyping]);
 
   // Saran cepat juga berasal dari jawaban yang diaktifkan petugas.
-  const quickSuggestions = chatbotFaqs.filter(f => f.isEnabled).slice(0, 6).map(f => f.question);
+  const quickSuggestions = [...new Set([
+    ...chatbotFaqs.filter(f => f.isEnabled).map(f => f.question),
+    ...faqs.filter(f => f.isEnabled).map(f => f.question),
+  ])].slice(0, 6);
 
   const handleSendMessage = (textToSend?: string) => {
     const query = (textToSend || inputText).trim();
