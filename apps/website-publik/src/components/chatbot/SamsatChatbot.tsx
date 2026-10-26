@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSamsat } from '../../context/SamsatContext';
-import { resolveChatAnswer } from './matchChatbotAnswer';
+import { resolveChatAnswer, type ChatAnswer } from './matchChatbotAnswer';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 
 
@@ -10,6 +10,8 @@ interface ChatMessage {
   sender: 'bot' | 'user';
   text: string;
   timestamp: string;
+  links?: ChatAnswer['links'];
+  choices?: string[];
 }
 
 export const SamsatChatbot: React.FC = () => {
@@ -36,6 +38,7 @@ export const SamsatChatbot: React.FC = () => {
 
   // Saran cepat juga berasal dari jawaban yang diaktifkan petugas.
   const quickSuggestions = [...new Set([
+    'Jam pelayanan SAMSAT',
     ...chatbotFaqs.filter(f => f.isEnabled).map(f => f.question),
     ...faqs.filter(f => f.isEnabled).map(f => f.question),
   ])].slice(0, 6);
@@ -58,12 +61,14 @@ export const SamsatChatbot: React.FC = () => {
 
     // Responses come only from active database records or a brief greeting.
     setTimeout(() => {
-      const botResponse = resolveChatAnswer(query, chatbotFaqs, faqs, serviceLocations).text;
+      const botResponse = resolveChatAnswer(query, chatbotFaqs, faqs, serviceLocations);
 
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
-        text: botResponse,
+        text: botResponse.text,
+        links: botResponse.links,
+        choices: botResponse.choices,
         timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
       };
 
@@ -88,7 +93,7 @@ export const SamsatChatbot: React.FC = () => {
           >
             <div className="relative mb-2 mr-6 w-[215px] rounded-2xl border border-[#d8e5ed] bg-white px-4 py-3 text-[#23465d] shadow-lg sm:w-[234px]" aria-hidden="true">
               <p className="text-[13px] font-bold leading-5">Hai, saya Mas Sajak!</p>
-              <p className="mt-1 text-[12px] leading-5 text-[#536c7d]">Butuh informasi SAMSAT? Klik saya untuk mulai chat.</p>
+              <p className="mt-1 text-[12px] leading-5 text-black">Butuh informasi SAMSAT? Klik saya untuk mulai chat.</p>
               <span className="absolute -bottom-[7px] right-7 h-3 w-3 rotate-45 border-b border-r border-[#d8e5ed] bg-white" />
             </div>
             <motion.button
@@ -150,7 +155,7 @@ export const SamsatChatbot: React.FC = () => {
                 type="button"
                 onClick={() => setIsOpen(false)}
                 aria-label="Tutup chat Mas Sajak"
-                className="p-1.5 rounded-full hover:bg-white/20 text-slate-300 hover:text-white transition-colors"
+                className="p-1.5 rounded-full hover:bg-white/20 text-white hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -173,13 +178,21 @@ export const SamsatChatbot: React.FC = () => {
                     className={`max-w-[80%] p-3.5 rounded-2xl text-xs leading-relaxed shadow-sm whitespace-pre-line ${
                       msg.sender === 'user'
                         ? 'bg-[#005BAC] text-white rounded-br-none'
-                        : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none'
+                        : 'bg-white text-black border border-slate-200/80 rounded-bl-none'
                     }`}
                   >
                     <p>{msg.text}</p>
+                    {msg.links && <div className="mt-3 space-y-2">
+                      {msg.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
+                        className="block rounded-md border border-[#005BAC] px-3 py-2 font-semibold text-[#005BAC] underline underline-offset-2 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">{link.label}</a>)}
+                    </div>}
+                    {msg.choices && <div className="mt-3 space-y-2">
+                      {msg.choices.map(name => <button key={name} type="button" onClick={() => handleSendMessage('Jam pelayanan ' + name)}
+                        className="block w-full rounded-md border border-slate-300 px-3 py-2 text-left font-semibold text-black hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">{name}</button>)}
+                    </div>}
                     <span
                       className={`block text-[9px] mt-1 text-right ${
-                        msg.sender === 'user' ? 'text-sky-200' : 'text-slate-400'
+                        msg.sender === 'user' ? 'text-sky-200' : 'text-black'
                       }`}
                     >
                       {msg.timestamp}
@@ -187,7 +200,7 @@ export const SamsatChatbot: React.FC = () => {
                   </div>
 
                   {msg.sender === 'user' && (
-                    <div className="w-7 h-7 rounded-xl bg-slate-200 text-slate-700 flex items-center justify-center shrink-0 text-xs">
+                    <div className="w-7 h-7 rounded-xl bg-slate-200 text-black flex items-center justify-center shrink-0 text-xs">
                       <User className="w-4 h-4" />
                     </div>
                   )}
@@ -196,7 +209,7 @@ export const SamsatChatbot: React.FC = () => {
 
               {/* Typing Animation Indicator */}
               {isTyping && (
-                <div className="flex items-center gap-2 text-slate-400 text-xs">
+                <div className="flex items-center gap-2 text-black text-xs">
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#e5eff8] text-[#005BAC]">
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
                     </div>
@@ -217,7 +230,7 @@ export const SamsatChatbot: React.FC = () => {
                 <button
                   key={sug}
                   onClick={() => handleSendMessage(sug)}
-                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#005BAC] text-[11px] font-bold shrink-0 border border-slate-200 transition-colors"
+                  className="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-blue-50 text-black hover:text-[#005BAC] text-[11px] font-bold shrink-0 border border-slate-200 transition-colors"
                 >
                   {sug}
                 </button>
@@ -263,3 +276,4 @@ export const SamsatChatbot: React.FC = () => {
     </div>
   );
 };
+
