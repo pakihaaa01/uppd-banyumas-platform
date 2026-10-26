@@ -75,7 +75,7 @@ export const SamsatChatbot: React.FC = () => {
         if (!f.isEnabled) return false;
         const title = f.question.toLowerCase().trim();
         const keywordMatch = f.keywords.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
-        return lowerQuery === title || lowerQuery.includes(title) || title.includes(lowerQuery) || keywordMatch;
+        return lowerQuery === title || lowerQuery.includes(title) || (lowerQuery.length >= 4 && title.includes(lowerQuery)) || keywordMatch;
       });
       if (match) {
         botResponse = match.answer;
@@ -225,6 +225,12 @@ export const SamsatChatbot: React.FC = () => {
               ))}
             </div>
 
+            <div className="px-3 py-2 bg-white text-right border-t border-slate-100">
+              <button type="button" onClick={() => { setIsOpen(false); setCurrentPage('faq'); }}
+                className="text-[11px] font-semibold text-[#005BAC] hover:underline">
+                Lihat semua FAQ
+              </button>
+            </div>
             {/* Chat Input Field */}
             <div className="p-3 bg-white border-t border-slate-200 shrink-0">
               <form
