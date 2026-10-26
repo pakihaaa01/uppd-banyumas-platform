@@ -27,7 +27,6 @@ interface ChatMessage {
 export const SamsatChatbot: React.FC = () => {
   const { chatbotFaqs, setCurrentPage } = useSamsat();
   const [isOpen, setIsOpen] = useState(false);
-  const [hasBadge, setHasBadge] = useState(true);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
@@ -97,7 +96,6 @@ export const SamsatChatbot: React.FC = () => {
 
   const handleToggleOpen = () => {
     setIsOpen(!isOpen);
-    if (hasBadge) setHasBadge(false);
   };
 
   return (
@@ -119,13 +117,6 @@ export const SamsatChatbot: React.FC = () => {
           <MascotAvatar size="large" />
         )}
 
-        {/* Notification Badge */}
-        {hasBadge && !isOpen && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-white text-[9px] font-bold text-slate-900 items-center justify-center">1</span>
-          </span>
-        )}
       </motion.button>
 
       {/* Panel percakapan dengan avatar karakter UPPD */}
