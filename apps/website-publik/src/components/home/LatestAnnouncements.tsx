@@ -91,10 +91,10 @@ export const LatestAnnouncements: React.FC = () => {
         <div className="lg:pt-1">
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.13em] text-[#005BAC]">Kabar UPPD Banyumas</p>
           <h2 id="announcements-title" className="max-w-[330px] text-[26px] font-bold leading-tight tracking-[-0.025em] text-[#172f43] sm:text-[34px]">Pengumuman dan informasi terbaru</h2>
-          <p className="mt-4 max-w-[365px] text-sm leading-7 text-[#5c6e7b]">
+          <p className="mt-4 max-w-[365px] text-sm leading-7 text-black">
             Ikuti pembaruan terkait jadwal pelayanan, kebijakan perpajakan, dan kegiatan SAMSAT Banyumas.
           </p>
-          <div className="mt-7 flex items-center gap-3 border-t border-[#e4eaef] pt-5 text-xs text-[#6b7e8b]">
+          <div className="mt-7 flex items-center gap-3 border-t border-[#e4eaef] pt-5 text-xs text-black">
             <FileText size={18} className="text-[#005BAC]" aria-hidden="true" />
             <span>{announcements.length} informasi tercantum di portal</span>
           </div>
@@ -110,14 +110,14 @@ export const LatestAnnouncements: React.FC = () => {
                 className="group block w-full border-b border-[#e4eaef] px-1 py-6 text-left transition-colors hover:bg-[#f8fbfd] focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#005BAC] sm:px-4 sm:py-7"
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
-                  <div className="shrink-0 text-[12px] leading-5 text-[#718492] sm:w-[112px]">{ann.date}</div>
+                  <div className="shrink-0 text-[12px] leading-5 text-black sm:w-[112px]">{ann.date}</div>
                   <div className="min-w-0 flex-1">
                     <div className="mb-2 flex flex-wrap items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.065em] text-[#005BAC]">
                       <span>{ann.category}</span>
-                      {ann.isNew && <span className="border-l border-[#d6e0e8] pl-3 text-[#537587]">Terbaru</span>}
+                      {ann.isNew && <span className="border-l border-[#d6e0e8] pl-3 text-black">Terbaru</span>}
                     </div>
                     <h3 className="max-w-[540px] text-[16px] font-semibold leading-[1.5] tracking-[-0.01em] text-[#1c3347] transition-colors group-hover:text-[#005BAC] sm:text-[17px]">{ann.title}</h3>
-                    <p className="mt-2 line-clamp-2 max-w-[560px] text-[13px] leading-[1.75] text-[#647785]">{ann.shortDescription}</p>
+                    <p className="mt-2 line-clamp-2 max-w-[560px] text-[13px] leading-[1.75] text-black">{ann.shortDescription}</p>
                     <span className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-[#005BAC]">Baca pengumuman <ArrowUpRight size={15} aria-hidden="true" /></span>
                   </div>
                 </div>
@@ -125,8 +125,8 @@ export const LatestAnnouncements: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="flex min-h-[200px] items-center gap-4 border-y border-[#dce5eb] text-[#5f7381]">
-            <FileText size={28} className="shrink-0 text-[#8b9aa6]" aria-hidden="true" />
+          <div className="flex min-h-[200px] items-center gap-4 border-y border-[#dce5eb] text-black">
+            <FileText size={28} className="shrink-0 text-black" aria-hidden="true" />
             <div><h3 className="font-semibold text-[#1c3347]">Belum ada pengumuman</h3><p className="mt-1 text-sm">Informasi terbaru akan ditampilkan di sini.</p></div>
           </div>
         )}
@@ -183,7 +183,7 @@ export const LatestAnnouncements: React.FC = () => {
                   {selectedAnn.category}
                 </span>
 
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-black">
                   {selectedAnn.date}
                 </span>
               </div>
@@ -196,10 +196,10 @@ export const LatestAnnouncements: React.FC = () => {
                 className="
                   flex h-9 w-9 shrink-0
                   items-center justify-center
-                  rounded-lg text-slate-500
+                  rounded-lg text-black
                   transition-colors duration-200
                   hover:bg-slate-100
-                  hover:text-slate-900
+                  hover:text-black
                   focus-visible:outline
                   focus-visible:outline-2
                   focus-visible:outline-[#005BAC]
@@ -218,7 +218,7 @@ export const LatestAnnouncements: React.FC = () => {
                 id="announcement-modal-title"
                 className="
                   text-xl font-bold
-                  leading-snug text-slate-900
+                  leading-snug text-black
                   sm:text-2xl
                 "
               >
@@ -227,9 +227,9 @@ export const LatestAnnouncements: React.FC = () => {
 
               <div
                 id="announcement-modal-description"
-                className="mt-6 space-y-5 text-sm leading-7 text-slate-700"
+                className="mt-6 space-y-5 text-sm leading-7 text-black"
               >
-                <p className="font-medium text-slate-900">
+                <p className="font-medium text-black">
                   {selectedAnn.shortDescription}
                 </p>
 
