@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { apiRequest } from '../../lib/api';
 import { Search, Trash2, Mail } from 'lucide-react';
 
-type Message = { id:string;name:string;email:string;phone:string|null;subject:string;message:string;createdAt:string;replyDraft?:string|null;replySentAt?:string|null;replyGmailId?:string|null;replyLastError?:string|null;whatsappOptIn?:boolean;whatsappSentAt?:string|null;whatsappMessageId?:string|null;whatsappLastError?:string|null;status:'New'|'In Progress'|'Completed' };
+type Message = { id:string;name:string;email:string;subject:string;message:string;createdAt:string;replyDraft?:string|null;replySentAt?:string|null;replyGmailId?:string|null;replyLastError?:string|null;status:'New'|'In Progress'|'Completed' };
 const API='/api/v1/messages';
 const statuses: Message['status'][]=['New','In Progress','Completed'];
 export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
@@ -63,32 +63,6 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
     }catch(e){setError(e instanceof Error?e.message:'Gagal mengirim balasan');}
     finally{setBusy(null);}
   }
-  const normalizeWhatsApp=(phone:string):string|null=>{
-    const clean=phone.replace(/[\s().-]/g,'');
-    const digits=clean.startsWith('+')?clean.slice(1):clean.startsWith('0')?'62'+clean.slice(1):clean;
-    return /^62\d{8,13}$/.test(digits)?digits:null;
-  };
-  function openWhatsApp(item:Message){
-    if(busy || !item.whatsappOptIn || !item.phone || item.whatsappSentAt)return;
-    const number=normalizeWhatsApp(item.phone);
-    if(!number){setError('Nomor WhatsApp tidak valid. Gunakan format 08xxxxxxxxxx.');return;}
-    const draft=(drafts[item.id] ?? item.replyDraft ?? '').trim();
-    const body=draft || ('Halo '+item.name+', kami menindaklanjuti pesan Anda mengenai: '+item.subject+'.');
-    const url='https://wa.me/'+number+'?text='+encodeURIComponent(body);
-    const popup=window.open(url,'_blank','noopener,noreferrer');
-    if(!popup){setError('Browser memblokir pembukaan WhatsApp. Izinkan pop-up untuk halaman ini.');return;}
-    void apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/open','POST').then(reload).catch(e=>setError(e instanceof Error?e.message:'Gagal memperbarui status'));
-    setError('');setNotice('WhatsApp dibuka. Setelah menekan Kirim di WhatsApp, kembali dan klik Tandai sudah dikirim.');
-  }
-  async function confirmWhatsApp(item:Message){
-    if(busy || !item.whatsappOptIn || !item.phone || item.whatsappSentAt || !window.confirm('Pastikan pesan benar-benar sudah dikirim dari WhatsApp. Tandai selesai secara manual?'))return;
-    setBusy(item.id);setError('');setNotice('');
-    try{
-      await apiRequest('/api/v1/whatsapp-replies/'+encodeURIComponent(item.id)+'/confirm-sent','POST');
-      await reload();setNotice('Balasan WhatsApp ditandai terkirim secara manual. Status Selesai.');
-    }catch(e){setError(e instanceof Error?e.message:'Gagal mencatat konfirmasi WhatsApp');}
-    finally{setBusy(null);}
-  }
   const templates = [
     {name:'Balasan umum',body:'Yth. Bapak/Ibu '+(messages[0]?.name ?? '')+',\\n\\nTerima kasih telah menghubungi layanan informasi UPPD Kabupaten Banyumas (prototipe).\\n\\n[Isi jawaban]\\n\\nHormat kami,\\nTim Demo Layanan Informasi UPPD Banyumas'},
     {name:'Memerlukan informasi tambahan',body:'Terima kasih atas pesan Anda. Untuk melanjutkan penanganan, mohon berikan informasi tambahan berikut: [rincian]. Jangan kirimkan OTP atau informasi sensitif.'},
@@ -114,7 +88,7 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
         <span className="rounded-full bg-[#edf3f8] px-3 py-1 text-[11px] font-semibold text-[#36546b]">{item.status==='New'?'Baru':item.status==='In Progress'?'Dalam Proses':'Selesai'}</span>
       </div>
       <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#385469]">{item.message}</p>
-      <p className="flex flex-wrap items-center gap-3 text-xs text-[#61798a]"><span className="inline-flex items-center gap-1"><Mail size={13}/>{item.email}</span>{item.phone&&<span>Telepon: {item.phone}</span>}</p>
+      <p className="flex flex-wrap items-center gap-3 text-xs text-[#61798a]"><span className="inline-flex items-center gap-1"><Mail size={13}/>{item.email}</span></p>
       <div className="rounded-lg border border-[#e3eaf0] bg-[#f8fafb] p-4">
         <label className="mb-2 block text-xs font-semibold text-[#385469]">Balasan melalui Gmail</label>
         {item.replySentAt ? <p className="text-xs text-green-800">Terkirim melalui Gmail API: {new Date(item.replySentAt).toLocaleString('id-ID')} · ID: {item.replyGmailId}</p> :
@@ -132,17 +106,6 @@ export function AdminMessages({onChange}:{onChange?:(newCount:number)=>void}) {
           </div>
           {item.replyLastError&&<p className="mt-2 text-xs text-red-700">Pengiriman sebelumnya: {item.replyLastError}</p>}
           <p className="mt-2 text-xs text-[#6d8090]">Simpan Draft terlebih dahulu. Status otomatis berubah saat Draft disimpan dan saat Gmail API menerima pesan.</p>
-        </>}
-      </div>
-      <div className="rounded-lg border border-[#e3eaf0] bg-[#f8fafb] p-4">
-        <p className="text-xs font-semibold text-[#385469]">Balasan lewat WhatsApp (tautan wa.me)</p>
-        {item.whatsappSentAt ? <p className="mt-2 text-xs text-green-800">Ditandai terkirim secara manual: {new Date(item.whatsappSentAt).toLocaleString('id-ID')}. Pengiriman tidak diverifikasi oleh API WhatsApp.</p> : <>
-          <p className="mt-2 text-xs text-[#607486]">{!item.phone?'Nomor telepon tidak tersedia.':!item.whatsappOptIn?'Belum ada persetujuan balasan WhatsApp pada formulir (pesan lama tidak otomatis dianggap setuju).':'Buka WhatsApp dengan pesan siap kirim, kemudian konfirmasi setelah benar-benar dikirim.'}</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>openWhatsApp(item)} className="rounded bg-[#005BAC] px-3 py-2 text-xs font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">Buka WhatsApp</button>
-            <button type="button" disabled={busy!==null || !item.phone || !item.whatsappOptIn} onClick={()=>void confirmWhatsApp(item)} className="rounded bg-[#e4edf4] px-3 py-2 text-xs font-semibold text-[#1b527c] disabled:cursor-not-allowed disabled:opacity-40">Tandai sudah dikirim</button>
-          </div>
-          <p className="mt-2 text-xs text-[#6d8090]">Membuka tautan tidak mengirim pesan otomatis dan tidak mengubah status. Konfirmasi manual mengubah status menjadi Selesai.</p>
         </>}
       </div>
       <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[#edf1f4] pt-3"><p className="text-xs text-[#647b8d]">Status penanganan diubah otomatis berdasarkan Draft dan hasil pengiriman Gmail.</p>
