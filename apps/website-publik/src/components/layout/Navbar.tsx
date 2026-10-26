@@ -95,7 +95,7 @@ export const Navbar: React.FC = () => {
           <span className="h-8 w-px bg-[#d8e0e7] sm:h-10" aria-hidden="true" />
           <span className="block max-w-[95px] sm:max-w-[170px]">
             <span className="block text-[11px] font-bold leading-[1.15] tracking-[-0.01em] sm:text-[14px]">UPPD Kabupaten Banyumas</span>
-            <span className="mt-0.5 hidden text-[10px] font-medium leading-tight text-[#617285] sm:block">SAMSAT Purwokerto</span>
+            <span className="mt-0.5 hidden text-[10px] font-medium leading-tight text-black sm:block">SAMSAT Purwokerto</span>
           </span>
         </button>
 
@@ -108,7 +108,7 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => navigate(route)}
                 aria-current={active ? 'page' : undefined}
-                className={`relative flex h-full items-center px-3 text-[12px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#005BAC] ${active ? 'text-[#005BAC]' : 'text-[#3d5062] hover:text-[#005BAC]'}`}
+                className={`relative flex h-full items-center px-3 text-[12px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#005BAC] ${active ? 'text-[#005BAC]' : 'text-black hover:text-[#005BAC]'}`}
               >
                 {label}
                 {active && <span aria-hidden="true" className="absolute inset-x-3 bottom-0 h-[3px] bg-[#005BAC]" />}
@@ -137,17 +137,17 @@ export const Navbar: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-[#e8edf1] px-5 py-4">
                   <div>
                     <h2 className="text-[14px] font-bold text-[#1b344b]">Pengumuman</h2>
-                    <p className="mt-0.5 text-xs text-[#647687]">Informasi terbaru UPPD Banyumas</p>
+                    <p className="mt-0.5 text-xs text-black">Informasi terbaru UPPD Banyumas</p>
                   </div>
-                  <span className="text-xs font-medium text-[#647687]">{announcements.length} informasi</span>
+                  <span className="text-xs font-medium text-black">{announcements.length} informasi</span>
                 </div>
                 <div className="max-h-[320px] divide-y divide-[#edf0f3] overflow-y-auto">
                   {announcements.length ? announcements.slice(0, 4).map((ann) => (
                     <button key={ann.id} type="button" onClick={() => navigate('home')} className="block w-full px-5 py-3.5 text-left transition-colors hover:bg-[#f5f8fb] focus-visible:bg-[#f5f8fb]">
-                      <p className="mb-1 text-[11px] text-[#667b8b]">{ann.date}{ann.isNew ? ' · Baru' : ''}</p>
+                      <p className="mb-1 text-[11px] text-black">{ann.date}{ann.isNew ? ' · Baru' : ''}</p>
                       <p className="line-clamp-2 text-[13px] font-semibold leading-5 text-[#23394d]">{ann.title}</p>
                     </button>
-                  )) : <p className="p-5 text-sm text-[#647687]">Belum ada pengumuman.</p>}
+                  )) : <p className="p-5 text-sm text-black">Belum ada pengumuman.</p>}
                 </div>
                 <button type="button" onClick={() => navigate('home')} className="flex w-full items-center justify-center gap-1 border-t border-[#e8edf1] bg-[#f8fafc] px-4 py-3 text-xs font-semibold text-[#005BAC] hover:bg-[#eef5fb]">
                   Kembali ke beranda <ChevronRight size={14} aria-hidden="true" />
@@ -188,7 +188,7 @@ export const Navbar: React.FC = () => {
                 aria-current={currentPage === route ? 'page' : undefined}
                 className={`flex w-full items-center justify-between border-b border-[#eff2f4] px-2 py-3.5 text-left text-sm font-medium ${currentPage === route ? 'text-[#005BAC]' : 'text-[#2c4356]'}`}
               >
-                {label} <ChevronRight size={16} className="text-[#8798a5]" aria-hidden="true" />
+                {label} <ChevronRight size={16} className="text-black" aria-hidden="true" />
               </button>
             ))}
             <button type="button" onClick={openTaxService} className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-[#005BAC] px-4 py-3 text-sm font-semibold text-white lg:hidden">
@@ -200,3 +200,4 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
+
