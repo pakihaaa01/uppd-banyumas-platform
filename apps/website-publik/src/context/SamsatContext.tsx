@@ -54,7 +54,7 @@ interface SamsatContextType {
   addFaq: (faq: Omit<FAQItem,'id' | 'viewCount'>) => AsyncAction;
   updateFaq: (id: string, faq: Partial<FAQItem>) => AsyncAction;
   deleteFaq: (id: string) => AsyncAction;
-  addContactMessage: (msg: Omit<ContactMessage,'id'|'createdAt'|'status'> & { whatsappOptIn?: boolean }) => AsyncAction;
+  addContactMessage: (msg: Omit<ContactMessage,'id'|'createdAt'|'status'|'phone'>) => AsyncAction;
   updateMessageStatus: (id: string, status: ContactMessage['status']) => AsyncAction;
   deleteContactMessage: (id: string) => AsyncAction;
   addChatbotFaq: (data: Omit<ChatbotFAQ,'id'|'clickCount'>) => AsyncAction;
@@ -174,7 +174,7 @@ export const SamsatProvider: React.FC<{children:ReactNode}> = ({children}) => {
   const addFaq=(data:Omit<FAQItem,'id'|'viewCount'>)=>change('faq','POST',undefined,{...data,viewCount:0},'FAQ ditambahkan');
   const updateFaq=(id:string,data:Partial<FAQItem>)=>change('faq','PUT',id,data,'FAQ diperbarui');
   const deleteFaq=(id:string)=>change('faq','DELETE',id,undefined,'FAQ dihapus');
-  const addContactMessage=async(data:Omit<ContactMessage,'id'|'createdAt'|'status'> & { whatsappOptIn?: boolean }):AsyncAction=>{
+  const addContactMessage=async(data:Omit<ContactMessage,'id'|'createdAt'|'status'|'phone'>):AsyncAction=>{
     try { await apiRequest('/api/v1/contact','POST',data);showToast('Pesan contoh tersimpan pada server lokal (bukan dikirim ke instansi).');return true; }
     catch(e){showToast(e instanceof Error?e.message:'Gagal mengirim pesan','error');return false;}
   };
