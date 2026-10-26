@@ -22,7 +22,6 @@ const menu: { id: Tab; label: string; icon: React.ComponentType<{ size?: number;
   { id: 'overview', label: 'Ringkasan', icon: BarChart3 },
   { id: 'announcements', label: 'Pengumuman', icon: Megaphone },
   { id: 'locations', label: 'Titik Layanan', icon: MapPin },
-  { id: 'posters', label: 'Poster BUMDes', icon: Images },
   { id: 'documents', label: 'Dokumen Publik', icon: FileText },
   { id: 'archive', label: 'Dokumentasi Pelayanan', icon: Images },
   { id: 'faq', label: 'Pertanyaan Umum', icon: CircleHelp },
@@ -40,7 +39,7 @@ const pageInfo: Record<Tab, { title: string; desc: string }> = {
   faq: { title: 'Pertanyaan Umum', desc: 'Ubah informasi tanya jawab yang ditampilkan pada halaman FAQ.' },
   messages: { title: 'Pesan Masyarakat', desc: 'Lihat pesan simulasi dari formulir kontak yang tersimpan di database lokal.' },
   chatbot: { title: 'Jawaban Chatbot', desc: 'Kelola jawaban berbasis PostgreSQL. Hanya jawaban Aktif yang tampil pada chatbot website publik.' },
-  settings: { title: 'Pengaturan Prototipe', desc: 'Informasi login backend lokal dan penyimpanan SQLite untuk demonstrasi.' },
+  settings: { title: 'Pengaturan Portal Pegawai', desc: 'Ringkasan lingkungan sistem, autentikasi, dan penyimpanan data Portal Pegawai.' },
   archive: { title: 'Dokumentasi Pelayanan', desc: 'Kelola tiga gambar dokumentasi yang ditampilkan pada halaman Informasi Publik.' },
 };
 
@@ -310,8 +309,8 @@ export const AdminDashboard: React.FC = () => {
   return (
     <div className="mx-auto max-w-[1320px] px-4 pb-20 pt-8 sm:px-8 lg:px-10">
       <div className="mb-8 flex flex-wrap items-start justify-between gap-4 border-b border-[#dce5eb] pb-7">
-        <div><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-[#005BAC]">Pengelolaan Konten</p><h1 className="text-[27px] font-bold tracking-[-0.025em] text-[#1b3b53] sm:text-[33px]">Dashboard Administrasi</h1><p className="mt-2 max-w-[720px] text-[13px] leading-6 text-[#62798b]">Kelola informasi website publik dalam lingkungan demonstrasi. Data tersimpan di database SQLite server lokal, bukan server resmi instansi.</p></div>
-        <span className="rounded border border-[#d3e2ea] bg-[#edf4f8] px-3 py-2 text-[11px] font-semibold text-[#335b73]">Mode Prototipe · SQLite</span>
+        <div><p className="mb-2 text-[11px] font-bold uppercase tracking-[0.09em] text-[#005BAC]">Pengelolaan Konten</p><h1 className="text-[27px] font-bold tracking-[-0.025em] text-[#1b3b53] sm:text-[33px]">Portal Pegawai UPPD Kabupaten Banyumas</h1><p className="mt-2 max-w-[720px] text-[13px] leading-6 text-[#62798b]">Kelola informasi website publik melalui Portal Pegawai UPPD Kabupaten Banyumas. Data dinamis tersimpan melalui backend API pada PostgreSQL.</p></div>
+        <span className="rounded border border-[#d3e2ea] bg-[#edf4f8] px-3 py-2 text-[11px] font-semibold text-[#335b73]">PostgreSQL · API Lokal</span>
       </div>
       <div className="grid items-start gap-7 lg:grid-cols-[252px_minmax(0,1fr)]">
         <aside className="min-w-0 border border-[#dce5eb] bg-white p-3 lg:sticky lg:top-[104px]">
@@ -358,20 +357,45 @@ export const AdminDashboard: React.FC = () => {
                 ].map(metric => <button key={metric.tab} type="button" onClick={() => chooseTab(metric.tab)} className="border border-[#dce5eb] bg-white px-5 py-5 text-left transition-colors hover:border-[#8fb9d7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]"><p className="text-[12px] font-medium text-[#617688]">{metric.label}</p><p className="mt-3 text-[29px] font-bold tabular-nums text-[#1b3a52]">{metric.value}</p><span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-[#005BAC]">Lihat data <ArrowRight size={13}/></span></button>)}
               </div>
               <div className="grid gap-5 xl:grid-cols-[1.3fr_1fr]">
-                <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pengumuman terbaru</h3><p className="mt-1 text-xs text-[#6b8090]">Pengumuman yang disimpan pada database lokal</p><div className="mt-5 divide-y divide-[#e7edf1]">{dbAnnouncements === null ? <p className="py-4 text-sm text-[#708392]">Memuat pengumuman...</p> : dbAnnouncements.length ? dbAnnouncements.slice(0, 5).map(a => <div key={a.id} className="py-3"><p className="text-[11px] text-[#6b8191]">{a.date} · {a.category}</p><p className="mt-1 text-[13px] font-semibold leading-5 text-[#2a465a]">{a.title}</p></div>) : <p className="py-4 text-sm text-[#708392]">Belum ada pengumuman.</p>}</div></section>
+                <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pengumuman terbaru</h3><p className="mt-1 text-xs text-[#6b8090]">Pengumuman yang tersimpan pada PostgreSQL</p><div className="mt-5 divide-y divide-[#e7edf1]">{dbAnnouncements === null ? <p className="py-4 text-sm text-[#708392]">Memuat pengumuman...</p> : dbAnnouncements.length ? dbAnnouncements.slice(0, 5).map(a => <div key={a.id} className="py-3"><p className="text-[11px] text-[#6b8191]">{a.date} · {a.category}</p><p className="mt-1 text-[13px] font-semibold leading-5 text-[#2a465a]">{a.title}</p></div>) : <p className="py-4 text-sm text-[#708392]">Belum ada pengumuman.</p>}</div></section>
                 <section className="border border-[#dce5eb] bg-white p-5 sm:p-6"><h3 className="text-base font-semibold text-[#1d3b52]">Pekerjaan pengelolaan</h3><p className="mt-1 text-xs text-[#6b8090]">Akses cepat ke modul yang paling sering diperbarui</p><div className="mt-5 divide-y divide-[#e7edf1]">{[{ tab: 'announcements' as Tab, text: 'Perbarui pengumuman' },{ tab: 'locations' as Tab, text: 'Periksa jadwal dan lokasi' },{ tab: 'documents' as Tab, text: 'Kelola dokumen publik' },{ tab: 'faq' as Tab, text: 'Perbarui pertanyaan umum' }].map(task => <button key={task.tab} type="button" onClick={() => chooseTab(task.tab)} className="flex w-full items-center justify-between gap-3 py-3 text-left text-[13px] font-medium text-[#3e5b70] hover:text-[#005BAC]">{task.text}<ArrowRight size={15} aria-hidden="true" /></button>)}</div></section>
               </div>
-              <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-[12px] leading-6 text-[#536f83]"><strong className="font-semibold text-[#23485f]">Catatan prototipe:</strong> Menggunakan API dan autentikasi pada server lokal dengan database SQLite; bukan sistem resmi instansi. Perubahan dapat dilihat pada browser yang membuka server yang sama.</div>
+              <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-[12px] leading-6 text-[#536f83]"><strong className="font-semibold text-[#23485f]">Lingkungan sistem:</strong> Portal Pegawai terhubung ke backend API lokal dengan autentikasi sesi dan basis data PostgreSQL. Perubahan konten yang dipublikasikan akan dibaca oleh website publik melalui API yang sama.</div>
             </div>
           ) : activeTab === 'settings' ? (
-            <section className="border border-[#dce5eb] bg-white p-6 sm:p-8"><div className="mb-5 flex items-center gap-2"><CheckCircle2 size={19} className="text-[#005BAC]"/><h3 className="font-semibold text-[#1d3b52]">Informasi Akun Demonstrasi</h3></div><dl className="divide-y divide-[#e4ebf0] text-sm"><div className="grid gap-2 py-4 sm:grid-cols-[180px_1fr]"><dt className="font-semibold text-[#385469]">Akun</dt><dd className="text-[#607789]">admin (akun demo tunggal)</dd></div><div className="grid gap-2 py-4 sm:grid-cols-[180px_1fr]"><dt className="font-semibold text-[#385469]">Login</dt><dd className="text-[#607789]">Diverifikasi oleh backend dengan password hash dan cookie sesi HttpOnly</dd></div><div className="grid gap-2 py-4 sm:grid-cols-[180px_1fr]"><dt className="font-semibold text-[#385469]">Penyimpanan</dt><dd className="text-[#607789]">SQLite server lokal; data bertahan setelah browser ditutup</dd></div><div className="grid gap-2 py-4 sm:grid-cols-[180px_1fr]"><dt className="font-semibold text-[#385469]">Pengguna</dt><dd className="text-[#607789]">Satu akun admin prototipe; kredensial awal ada di folder server/data (jangan publikasikan)</dd></div></dl><p className="mt-5 border-l-[3px] border-[#c09c4b] bg-[#fff9eb] px-4 py-3 text-xs leading-6 text-[#71603c]">Server ini hanya untuk demonstrasi lokal. Untuk publikasi produksi masih diperlukan pengamanan, audit, HTTPS, dan pengaturan infrastruktur.</p></section>
+            <div className="grid gap-5 xl:grid-cols-2">
+              <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
+                <div className="mb-5 flex items-center gap-2">
+                  <CheckCircle2 size={19} className="text-[#005BAC]"/>
+                  <h3 className="font-semibold text-[#1d3b52]">Konfigurasi Sistem</h3>
+                </div>
+                <dl className="divide-y divide-[#e4ebf0] text-sm">
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Portal</dt><dd className="text-[#607789]">Portal Pegawai UPPD Kabupaten Banyumas</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Backend</dt><dd className="text-[#607789]">Node.js / Express API pada server lokal</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Basis data</dt><dd className="text-[#607789]">PostgreSQL melalui Prisma ORM</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Status koneksi</dt><dd className={backendReady ? "font-semibold text-[#25704a]" : "font-semibold text-[#a33c33]"}>{backendReady ? 'PostgreSQL terhubung' : 'Backend / PostgreSQL tidak terhubung'}</dd></div>
+                </dl>
+              </section>
+              <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
+                <div className="mb-5 flex items-center gap-2">
+                  <Settings size={19} className="text-[#005BAC]"/>
+                  <h3 className="font-semibold text-[#1d3b52]">Akses & Keamanan</h3>
+                </div>
+                <dl className="divide-y divide-[#e4ebf0] text-sm">
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Autentikasi</dt><dd className="text-[#607789]">Password hash dan cookie sesi HttpOnly</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Peran</dt><dd className="text-[#607789]">Administrator, Operator, dan Penanggung Jawab sesuai hak akses</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Publikasi</dt><dd className="text-[#607789]">Konten publik diambil dari endpoint API yang membaca PostgreSQL</dd></div>
+                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Lingkungan</dt><dd className="text-[#607789]">Pengembangan dan demonstrasi lokal</dd></div>
+                </dl>
+              </section>
+            </div>
           ) : (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
               <div className="flex flex-col justify-between gap-3 border-b border-[#e4ebef] pb-5 sm:flex-row sm:items-center"><p className="text-xs text-[#657a8c]">{rows.length} entri ditampilkan</p><div className="relative w-full sm:max-w-[280px]"><Search size={16} aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8ba0ae]"/><label className="sr-only" htmlFor="admin-search">Cari data</label><input id="admin-search" type="search" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} placeholder="Cari dalam daftar..." className={`${field} pl-9`} /></div></div>
               <div className="divide-y divide-[#e7edf1]">{rows.length ? rows.map(item => <article key={item.id} className="py-5">{renderRow(item)}</article>) : <p className="py-12 text-center text-sm text-[#6c8192]">Belum ada data yang cocok dengan pencarian.</p>}</div>
               {activeTab === 'posters' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Poster dapat menggunakan URL atau file JPG/PNG/WEBP yang diunggah ke server lokal.</p>}
               {activeTab === 'documents' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Dokumen dapat menggunakan URL atau PDF yang diunggah ke server lokal.</p>}
-              {activeTab === 'messages' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Pesan demonstrasi berasal dari formulir publik, tersimpan di database lokal, dan tidak dikirim ke instansi.</p>}
+              {activeTab === 'messages' && <p className="border-t border-[#e7edf1] pt-4 text-xs leading-5 text-[#718696]">Pesan berasal dari formulir publik dan tersimpan pada PostgreSQL. Balasan diproses melalui fitur Gmail yang tersedia pada Portal Pegawai.</p>}
             </section>
           )}
         </main>
