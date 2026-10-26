@@ -15,7 +15,7 @@
 
   body {
     background-color: var(--bg-slate);
-    color: #1e293b;
+    color: #000;
     font-family:
       system-ui,
       -apple-system,
@@ -252,4 +252,9 @@
   .notification-bell-idle {
     transition: none !important;
   }
+}
+
+
+@layer base {
+  input::placeholder, textarea::placeholder { color: #000; opacity: 1; }
 }
