@@ -80,7 +80,7 @@ export const ProfilePage: React.FC = () => {
             >
               <button
                 onClick={() => setSelectedPerson(null)}
-                className="absolute top-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-600 p-2.5 rounded-full transition-colors z-20 shadow-sm"
+                className="absolute top-4 right-4 bg-slate-100 hover:bg-slate-200 text-black p-2.5 rounded-full transition-colors z-20 shadow-sm"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -92,7 +92,7 @@ export const ProfilePage: React.FC = () => {
                     <span className="text-xs font-bold text-[#005BAC] bg-blue-50 px-3 py-1 rounded-full uppercase tracking-wider inline-block mb-1">
                       Detail Dokumen
                     </span>
-                    <h3 className="font-bold text-xl text-slate-900 tracking-tight">
+                    <h3 className="font-bold text-xl text-black tracking-tight">
                       {selectedPerson.name}
                     </h3>
                   </div>
@@ -121,10 +121,10 @@ export const ProfilePage: React.FC = () => {
                   <span className="text-xs font-bold text-[#005BAC] bg-blue-50 px-4 py-1.5 rounded-full uppercase tracking-wider inline-block mb-3">
                     {selectedPerson.role}
                   </span>
-                  <h3 className="font-bold text-xl sm:text-2xl text-slate-900 tracking-tight">
+                  <h3 className="font-bold text-xl sm:text-2xl text-black tracking-tight">
                     {selectedPerson.name}
                   </h3>
-                  <p className="text-slate-500 text-xs mt-3 leading-relaxed">
+                  <p className="text-black text-xs mt-3 leading-relaxed">
                     Unit Pelayanan Pendapatan Daerah (UPPD) Kabupaten Banyumas Badan Pengelola Pendapatan Daerah Provinsi Jawa Tengah.
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export const ProfilePage: React.FC = () => {
         {/* Navigasi profil dipertahankan, disederhanakan untuk desktop dan mobile. */}
         <div className="mt-9 grid grid-cols-1 items-start gap-7 lg:grid-cols-[270px_minmax(0,1fr)]">
           <nav aria-label="Menu profil" className="border border-[#dce5eb] bg-white p-3 lg:sticky lg:top-[130px]">
-            <h2 className="border-b border-[#e2eaf0] px-3 pb-3 pt-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#5d7385]">
+            <h2 className="border-b border-[#e2eaf0] px-3 pb-3 pt-2 text-[11px] font-bold uppercase tracking-[0.12em] text-black">
               Topik Profil
             </h2>
             <div className="mt-2 flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
@@ -166,7 +166,7 @@ export const ProfilePage: React.FC = () => {
                     type="button"
                     aria-current={active ? 'true' : undefined}
                     onClick={() => setActiveTab(item.id)}
-                    className={`flex shrink-0 items-center justify-between gap-4 rounded-sm border-l-[3px] px-3 py-3 text-left text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] lg:w-full ${active ? 'border-[#005BAC] bg-[#ebf3fa] text-[#005BAC]' : 'border-transparent text-[#466174] hover:bg-[#f3f7fa] hover:text-[#005BAC]'}`}
+                    className={`flex shrink-0 items-center justify-between gap-4 rounded-sm border-l-[3px] px-3 py-3 text-left text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] lg:w-full ${active ? 'border-[#005BAC] bg-[#ebf3fa] text-[#005BAC]' : 'border-transparent text-black hover:bg-[#f3f7fa] hover:text-[#005BAC]'}`}
                   >
                     <span>{item.label}</span>
                   </button>
@@ -197,11 +197,11 @@ export const ProfilePage: React.FC = () => {
               <section className="space-y-6" aria-labelledby="sejarah-title">
                 <div className="border-b border-[#e2eaf0] pb-4">
                   <h2 id="sejarah-title" className="text-2xl font-semibold text-[#1d3b53]">Sejarah Bapenda Jawa Tengah dan SAMSAT Banyumas</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#617586]">Perjalanan perkembangan kelembagaan berdasarkan bahan sejarah yang sudah tersedia dalam project.</p>
+                  <p className="mt-2 text-sm leading-6 text-black">Perjalanan perkembangan kelembagaan berdasarkan bahan sejarah yang sudah tersedia dalam project.</p>
                 </div>
                 <figure className="max-w-lg overflow-hidden border border-[#dce5eb] bg-white">
                   <img src="/images/gedung.jpeg" alt="Dokumentasi gedung UPPD Kabupaten Banyumas" loading="lazy" className="h-60 w-full object-cover sm:h-72" />
-                  <figcaption className="p-3 text-xs text-[#5b6f7f]">Dokumentasi UPPD Kabupaten Banyumas</figcaption>
+                  <figcaption className="p-3 text-xs text-black">Dokumentasi UPPD Kabupaten Banyumas</figcaption>
                 </figure>
                 <EditorialAccordion
                   initialOpen="periode-1967"
@@ -243,10 +243,10 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     Struktur Organisasi
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     Bagan Tata Kerja UPPD SAMSAT Kabupaten Banyumas. (Klik kartu untuk memperbesar)
                   </p>
                 </div>
@@ -296,10 +296,10 @@ export const ProfilePage: React.FC = () => {
                         <br />
                         TATA USAHA
                       </p>
-                      <p className="font-bold text-sm text-slate-800 mt-2">
+                      <p className="font-bold text-sm text-black mt-2">
                         NOVY SETIAWAN, SH.
                       </p>
-                      <p className="text-xs text-slate-500 mt-1 font-medium tracking-wide">
+                      <p className="text-xs text-black mt-1 font-medium tracking-wide">
                         NIP. 19851126 201101 1 006
                       </p>
                     </motion.div>
@@ -330,10 +330,10 @@ export const ProfilePage: React.FC = () => {
                             <br />
                             PAJAK DAERAH (PPD)
                           </p>
-                          <p className="font-bold text-sm text-slate-800 mt-2">
+                          <p className="font-bold text-sm text-black mt-2">
                             RIZA UYUN INDRIYANI, SE, M.AKUN.
                           </p>
-                          <p className="text-xs text-slate-500 mt-1 font-medium tracking-wide">
+                          <p className="text-xs text-black mt-1 font-medium tracking-wide">
                             NIP. 198811192011012011
                           </p>
                         </motion.div>
@@ -360,10 +360,10 @@ export const ProfilePage: React.FC = () => {
                             <br />
                             (PRPL & PAD)
                           </p>
-                          <p className="font-bold text-sm text-slate-800 mt-2">
+                          <p className="font-bold text-sm text-black mt-2">
                             FAJAR POEROESAKTI, SH, MH.
                           </p>
-                          <p className="text-xs text-slate-500 mt-1 font-medium tracking-wide">
+                          <p className="text-xs text-black mt-1 font-medium tracking-wide">
                             NIP. 19730124 200801 1 001
                           </p>
                         </motion.div>
@@ -377,7 +377,7 @@ export const ProfilePage: React.FC = () => {
                   <h3 id="struktur-personil-title" className="text-lg font-semibold text-[#1e3c53]">
                     Dokumentasi Struktur Organisasi
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                  <p className="mt-2 text-sm leading-6 text-black">
                     Foto atau bagan personel UPPD Kabupaten Banyumas.
                   </p>
                   <figure className="mt-5 overflow-hidden rounded-md border border-[#dce5eb] bg-[#f6f9fb]">
@@ -387,7 +387,7 @@ export const ProfilePage: React.FC = () => {
                       loading="lazy"
                       className="block h-auto w-full object-contain"
                     />
-                    <figcaption className="border-t border-[#dce5eb] bg-white px-4 py-3 text-xs text-[#647788]">
+                    <figcaption className="border-t border-[#dce5eb] bg-white px-4 py-3 text-xs text-black">
                       Foto dokumentasi struktur organisasi dan personel UPPD Kabupaten Banyumas.
                     </figcaption>
                   </figure>
@@ -403,10 +403,10 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     Profil Penyelenggara
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     KEBIJAKAN MUTU & MAKLUMAT PELAYANAN UNIT PELAYANAN PENDAPATAN DAERAH (UPPD) KABUPATEN BANYUMAS
                   </p>
                 </div>
@@ -419,13 +419,13 @@ export const ProfilePage: React.FC = () => {
                     <h3 className="text-base font-semibold text-[#005BAC] uppercase tracking-wide mb-3 mt-1">
                       KEBIJAKAN MUTU
                     </h3>
-                    <p className="text-sm font-bold text-slate-800 leading-relaxed">
+                    <p className="text-sm font-bold text-black leading-relaxed">
                       UNIT PELAYANAN PENDAPATAN DAERAH (UPPD)
                     </p>
-                    <p className="text-sm text-slate-700 font-semibold mt-2">
+                    <p className="text-sm text-black font-semibold mt-2">
                       BERKOMITMEN
                     </p>
-                    <p className="text-xs sm:text-sm text-slate-600 mt-3 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-black mt-3 leading-relaxed">
                       Mewujudkan Pelayanan Prima Dengan Cara Melakukan Perbaikan Pengelolaan Pendapatan Daerah Secara Berkesinambungan
                     </p>
                   </div>
@@ -434,60 +434,60 @@ export const ProfilePage: React.FC = () => {
                     <h3 className="text-lg sm:text-xl font-semibold text-[#005BAC] leading-relaxed">
                       MAKLUMAT PELAYANAN
                     </h3>
-                    <p className="text-xs sm:text-sm text-slate-700 mt-3 leading-relaxed italic font-medium px-2">
+                    <p className="text-xs sm:text-sm text-black mt-3 leading-relaxed italic font-medium px-2">
                       "DENGAN INI KAMI MENYATAKAN SANGGUP MELAKSANAKAN PELAYANAN SESUAI DENGAN STANDAR PELAYANAN YANG DITETAPKAN DAN APABILA TIDAK MENEPATI KAMI BERSEDIA MENERIMA SANKSI DAN/ATAU MEMBERIKAN KOMPENSASI SESUAI DENGAN PERATURAN PERUNDANG-UNDANGAN"
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-8 bg-white p-6 rounded-md border border-slate-200 shadow-sm">
-                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider text-center mb-6 pb-2 border-b border-slate-100">
+                  <h4 className="text-xs font-semibold text-black uppercase tracking-wider text-center mb-6 pb-2 border-b border-slate-100">
                     Pejabat Penanggung Jawab Pelayanan SAMSAT
                   </h4>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                     <div className="p-4 rounded-xl bg-slate-50/50 border border-slate-100 flex flex-col justify-between">
                       <div>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase leading-snug">
+                        <p className="text-[11px] font-bold text-black uppercase leading-snug">
                           Dirlantas Kepolisian Daerah<br />Jawa Tengah
                         </p>
                       </div>
                       <div className="my-4 py-2">
-                        <span className="font-serif italic text-slate-400 text-sm select-none"></span>
+                        <span className="font-serif italic text-black text-sm select-none"></span>
                       </div>
                       <div>
-                        <p className="font-semibold text-xs text-slate-900">AGUS SURYO NUGROHO</p>
-                        <p className="text-[11px] font-semibold text-slate-500 uppercase mt-0.5">Komisaris Besar Polisi</p>
+                        <p className="font-semibold text-xs text-black">AGUS SURYO NUGROHO</p>
+                        <p className="text-[11px] font-semibold text-black uppercase mt-0.5">Komisaris Besar Polisi</p>
                       </div>
                     </div>
 
                     <div className="p-4 rounded-xl bg-slate-50/50 border border-slate-100 flex flex-col justify-between">
                       <div>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase leading-snug">
+                        <p className="text-[11px] font-bold text-black uppercase leading-snug">
                           Plt. Kepala Badan Pengelola Pendapatan Daerah<br />Provinsi Jawa Tengah
                         </p>
                       </div>
                       <div className="my-4 py-2">
-                        <span className="font-serif italic text-slate-400 text-sm select-none"></span>
+                        <span className="font-serif italic text-black text-sm select-none"></span>
                       </div>
                       <div>
-                        <p className="font-semibold text-xs text-slate-900">EDDY S. BRAMIYANTO</p>
-                        <p className="text-[11px] font-semibold text-slate-500 uppercase mt-0.5">Pembina Utama Muda</p>
+                        <p className="font-semibold text-xs text-black">EDDY S. BRAMIYANTO</p>
+                        <p className="text-[11px] font-semibold text-black uppercase mt-0.5">Pembina Utama Muda</p>
                       </div>
                     </div>
 
                     <div className="p-4 rounded-xl bg-slate-50/50 border border-slate-100 flex flex-col justify-between">
                       <div>
-                        <p className="text-[11px] font-bold text-slate-500 uppercase leading-snug">
+                        <p className="text-[11px] font-bold text-black uppercase leading-snug">
                           PT. Jasa Raharja<br />Cabang Utama Jawa Tengah
                         </p>
                       </div>
                       <div className="my-4 py-2">
-                        <span className="font-serif italic text-slate-400 text-sm select-none"></span>
+                        <span className="font-serif italic text-black text-sm select-none"></span>
                       </div>
                       <div>
-                        <p className="font-semibold text-xs text-slate-900">SIGIT HARISMUN</p>
-                        <p className="text-[11px] font-semibold text-slate-500 uppercase mt-0.5">Kepala Cabang</p>
+                        <p className="font-semibold text-xs text-black">SIGIT HARISMUN</p>
+                        <p className="text-[11px] font-semibold text-black uppercase mt-0.5">Kepala Cabang</p>
                       </div>
                     </div>
                   </div>
@@ -503,10 +503,10 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     Penilaian Kinerja
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     Target dan realisasi penerimaan daerah UPPD Kabupaten Banyumas. (Klik gambar tabel untuk memperbesar)
                   </p>
                 </div>
@@ -525,7 +525,7 @@ export const ProfilePage: React.FC = () => {
                         className={`p-5 rounded-md border text-left transition-colors duration-200 relative overflow-hidden z-10 ${
                           isActive
                             ? 'text-white border-[#005BAC] shadow-md'
-                            : 'bg-white text-slate-700 border-slate-200 hover:border-[#005BAC]'
+                            : 'bg-white text-black border-slate-200 hover:border-[#005BAC]'
                         }`}
                       >
                         {isActive && (
@@ -564,7 +564,7 @@ export const ProfilePage: React.FC = () => {
                       <h3 className="text-xl font-semibold text-[#005BAC] mb-3">
                         Target Realisasi APBD
                       </h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">
+                      <p className="text-sm text-black leading-relaxed">
                         Informasi mengenai target dan realisasi Anggaran Pendapatan dan Belanja Daerah (APBD) UPPD Kabupaten Banyumas.
                       </p>
 
@@ -607,7 +607,7 @@ export const ProfilePage: React.FC = () => {
                       <h3 className="text-xl font-semibold text-[#005BAC] mb-3">
                         Target Penerimaan PAD
                       </h3>
-                      <p className="text-sm text-slate-600 leading-relaxed">
+                      <p className="text-sm text-black leading-relaxed">
                         Informasi mengenai target penerimaan Pendapatan Asli Daerah (PAD).
                       </p>
                     </motion.div>
@@ -624,20 +624,20 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     Maklumat Pelayanan
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     Dokumen resmi Maklumat Pelayanan SAMSAT Kabupaten Banyumas.
                   </p>
                 </div>
 
                 <div className="bg-slate-50 rounded-md border border-slate-200 p-12 text-center flex flex-col items-center justify-center">
 
-                  <h3 className="font-semibold text-base text-slate-800 mb-1">
+                  <h3 className="font-semibold text-base text-black mb-1">
                     Dokumen Belum Tersedia
                   </h3>
-                  <p className="text-xs text-slate-500 max-w-sm leading-relaxed">
+                  <p className="text-xs text-black max-w-sm leading-relaxed">
                     Berkas gambar Maklumat Pelayanan saat ini belum diunggah atau sedang dalam tahap pembaruan data.
                   </p>
                 </div>
@@ -652,10 +652,10 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     Standar Operasional Prosedur (SOP)
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     Dokumen dan alur Standar Operasional Prosedur pelayanan SAMSAT Kabupaten Banyumas. (Klik gambar untuk memperbesar)
                   </p>
                 </div>
@@ -698,10 +698,10 @@ export const ProfilePage: React.FC = () => {
                 className="space-y-6"
               >
                 <div className="border-b border-slate-100 pb-4">
-                  <h2 className="text-2xl font-semibold text-slate-900">
+                  <h2 className="text-2xl font-semibold text-black">
                     SIPP Pelayanan Publik
                   </h2>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-black mt-1">
                     Sistem Informasi Pelayanan Publik (SIPP) UPPD Kabupaten Banyumas. (Klik gambar untuk memperbesar)
                   </p>
                 </div>
