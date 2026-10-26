@@ -17,7 +17,7 @@ const serviceSections = [
   { id: 'cek-pajak', label: 'Cek Pajak Kendaraan' },
   { id: 'alur-pelayanan', label: 'Alur Pelayanan' },
   { id: 'lokasi-pelayanan', label: 'Lokasi Pelayanan' },
-  { id: 'gerai-samsat', label: 'Gerai SAMSAT & BUMDes' },
+  { id: 'gerai-samsat', label: 'Gerai SAMSAT' },
   { id: 'layanan-digital', label: 'Layanan Digital SAMSAT' },
 ];
 
@@ -243,13 +243,13 @@ export const ServicesPage: React.FC = () => {
             </section>
 
             <section id="gerai-samsat" className="mb-16 scroll-mt-36">
-              <h2 className="text-[24px] font-bold text-[#1d3b53]">Gerai SAMSAT dan Mitra BUMDes</h2>
+              <h2 className="text-[24px] font-bold text-[#1d3b53]">Gerai SAMSAT</h2>
               <p className="mt-2 max-w-3xl text-sm leading-7 text-[#5d7182]">Alternatif titik layanan yang dapat membantu masyarakat mengakses pelayanan lebih dekat.</p>
               <div className="mt-6 grid overflow-hidden border border-[#dce5eb] bg-white lg:grid-cols-[0.9fr_1.1fr]">
                 <img src="/images/samsat_ritamall.jpeg" alt="Dokumentasi gerai SAMSAT Rita SuperMall" loading="lazy" className="h-[260px] w-full object-cover lg:h-full" />
                 <div className="p-6 sm:p-8">
                   <h3 className="text-xl font-bold text-[#1e3c53]">Pelayanan lebih dekat dengan masyarakat</h3>
-                  <p className="mt-4 text-sm leading-7 text-[#596f80]">Gerai SAMSAT dan mitra BUMDes dapat menjadi alternatif pelayanan bagi masyarakat yang ingin mengurus pajak kendaraan. Tidak semua layanan tersedia pada setiap gerai.</p>
+                  <p className="mt-4 text-sm leading-7 text-[#596f80]">Gerai SAMSAT menjadi salah satu alternatif lokasi pelayanan bagi masyarakat yang ingin mengurus pajak kendaraan. Tidak semua layanan tersedia pada setiap gerai.</p>
                   <div className="mt-6">
                     <EditorialAccordion items={[
                       { id: 'gerai-contoh', title: 'Contoh lokasi gerai', content: <p>Rita SuperMall Purwokerto dan gerai lain yang tercantum pada daftar lokasi pelayanan.</p> },
