@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSamsat } from '../../context/SamsatContext';
+import { resolveChatAnswer } from './matchChatbotAnswer';
 import { MessageCircle, X, Send, User } from 'lucide-react';
 
 
@@ -12,7 +13,7 @@ interface ChatMessage {
 }
 
 export const SamsatChatbot: React.FC = () => {
-  const { chatbotFaqs, setCurrentPage } = useSamsat();
+  const { chatbotFaqs, faqs, serviceLocations, setCurrentPage } = useSamsat();
   const [isOpen, setIsOpen] = useState(false);
   const [mascotImageFailed, setMascotImageFailed] = useState(false);
   const [inputText, setInputText] = useState('');
@@ -52,23 +53,9 @@ export const SamsatChatbot: React.FC = () => {
     setInputText('');
     setIsTyping(true);
 
-    // Dynamic response lookup against chatbotFaqs
+    // Responses come only from active database records or a brief greeting.
     setTimeout(() => {
-      let botResponse = '';
-      const lowerQuery = query.toLowerCase();
-
-      // Hanya jawaban aktif dari API publik yang boleh dijadikan respons.
-      const match = chatbotFaqs.find(f => {
-        if (!f.isEnabled) return false;
-        const title = f.question.toLowerCase().trim();
-        const keywordMatch = f.keywords.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
-        return lowerQuery === title || lowerQuery.includes(title) || (lowerQuery.length >= 4 && title.includes(lowerQuery)) || keywordMatch;
-      });
-      if (match) {
-        botResponse = match.answer;
-      } else {
-        botResponse = 'Maaf, jawaban untuk pertanyaan tersebut belum tersedia. Silakan lihat halaman FAQ atau hubungi petugas melalui halaman Kontak.';
-      }
+      const botResponse = resolveChatAnswer(query, chatbotFaqs, faqs, serviceLocations).text;
 
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
