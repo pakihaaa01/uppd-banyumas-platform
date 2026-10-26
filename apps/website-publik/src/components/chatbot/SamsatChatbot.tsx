@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSamsat } from '../../context/SamsatContext';
-import {
-  Bot,
-  X,
-  Send,
-  MessageSquare,
-  Sparkles,
-  User,
-  ChevronRight,
-  HelpCircle,
-  ExternalLink
-} from 'lucide-react';
+import { Bot, X, Send, User } from 'lucide-react';
+
+
+// Gambar karakter yang sudah tersedia di aset website. Bila gambar tidak ada,
+// tampilkan ikon standar agar tombol chatbot tetap dapat digunakan.
+const MascotAvatar: React.FC<{ size?: 'small' | 'medium' | 'large' }> = ({ size = 'small' }) => {
+  const [failed, setFailed] = useState(false);
+  const style = size === 'large' ? 'h-14 w-14' : size === 'medium' ? 'h-10 w-10' : 'h-8 w-8';
+  return (
+    <span className={`${style} inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-1 ring-slate-200/50`}>
+      {failed ? <Bot className="h-1/2 w-1/2 text-[#005BAC]" aria-hidden="true" /> :
+        <img src="/images/karakter.png" alt="" className="h-full w-full object-contain" onError={() => setFailed(true)} />}
+    </span>
+  );
+};
 
 interface ChatMessage {
   id: string;
@@ -31,7 +35,7 @@ export const SamsatChatbot: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'bot',
-      text: 'Halo 👋\nSaya adalah asisten virtual SAMSAT Banyumas.\nSaya dapat membantu menjawab pertanyaan seputar layanan SAMSAT.',
+      text: 'Halo! Saya asisten virtual UPPD Banyumas. Silakan pilih pertanyaan di bawah atau tuliskan pertanyaan tentang pelayanan SAMSAT.',
       timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -42,15 +46,8 @@ export const SamsatChatbot: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const quickSuggestions = [
-    'Cara Bayar Pajak',
-    'Lokasi SAMSAT',
-    'Jadwal SAMSAT Keliling',
-    'Download SIGNAL',
-    'Download Sekpole',
-    'Persyaratan Pajak',
-    'Hubungi Petugas'
-  ];
+  // Saran cepat juga berasal dari jawaban yang diaktifkan petugas.
+  const quickSuggestions = chatbotFaqs.filter(f => f.isEnabled).slice(0, 6).map(f => f.question);
 
   const handleSendMessage = (textToSend?: string) => {
     const query = (textToSend || inputText).trim();
@@ -73,22 +70,17 @@ export const SamsatChatbot: React.FC = () => {
       let botResponse = '';
       const lowerQuery = query.toLowerCase();
 
-      // Search match in chatbotFaqs
+      // Hanya jawaban aktif dari API publik yang boleh dijadikan respons.
       const match = chatbotFaqs.find(f => {
         if (!f.isEnabled) return false;
-        const matchTitle = f.question.toLowerCase().includes(lowerQuery) || lowerQuery.includes(f.question.toLowerCase());
-        const matchKeywords = f.keywords.some(k => lowerQuery.includes(k.toLowerCase()));
-        return matchTitle || matchKeywords;
+        const title = f.question.toLowerCase().trim();
+        const keywordMatch = f.keywords.some(k => k.trim() && lowerQuery.includes(k.trim().toLowerCase()));
+        return lowerQuery === title || lowerQuery.includes(title) || title.includes(lowerQuery) || keywordMatch;
       });
-
       if (match) {
         botResponse = match.answer;
-      } else if (lowerQuery.includes('kontak') || lowerQuery.includes('wa') || lowerQuery.includes('telepon')) {
-        botResponse = 'Anda dapat menghubungi Call Center SAMSAT Banyumas di (0281) 635123 atau WhatsApp Resmi Pengaduan di 0812-2345-6789.';
-      } else if (lowerQuery.includes('lokasi') || lowerQuery.includes('alamat')) {
-        botResponse = 'SAMSAT Banyumas memiliki 10 titik layanan termasuk SAMSAT Induk Purwokerto, Drive Thru, Wangon, Sokaraja, Rita Mall, dan SAMSAT Keliling.';
       } else {
-        botResponse = `Maaf, saya belum sepenuhnya memahami pertanyaan "${query}". Anda dapat memilih menu saran cepat di bawah atau mengunjungi halaman FAQ & Kontak petugas kami.`;
+        botResponse = 'Maaf, jawaban untuk pertanyaan tersebut belum tersedia. Silakan lihat halaman FAQ atau hubungi petugas melalui halaman Kontak.';
       }
 
       const botMsg: ChatMessage = {
@@ -118,13 +110,13 @@ export const SamsatChatbot: React.FC = () => {
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.95 }}
-        className="relative w-14 h-14 rounded-full bg-gradient-to-r from-[#005BAC] to-blue-700 text-white flex items-center justify-center shadow-2xl border-2 border-white cursor-pointer group"
+        className="relative h-16 w-16 rounded-full bg-[#005BAC] text-white flex items-center justify-center shadow-xl border-2 border-white cursor-pointer group"
         aria-label="SAMSAT Assistant Chatbot"
       >
         {isOpen ? (
           <X className="w-7 h-7" />
         ) : (
-          <Bot className="w-7 h-7 group-hover:rotate-12 transition-transform" />
+          <MascotAvatar size="large" />
         )}
 
         {/* Notification Badge */}
@@ -136,7 +128,7 @@ export const SamsatChatbot: React.FC = () => {
         )}
       </motion.button>
 
-      {/* Expandable Chat Modal Window */}
+      {/* Panel percakapan dengan avatar karakter UPPD */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -150,17 +142,14 @@ export const SamsatChatbot: React.FC = () => {
             <div className="bg-gradient-to-r from-slate-900 via-[#003d75] to-[#005BAC] p-4 text-white flex items-center justify-between shrink-0 shadow-md">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 text-sky-300">
-                    <Bot className="w-6 h-6" />
-                  </div>
+                  <MascotAvatar size="medium" />
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-slate-900 rounded-full" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-extrabold text-sm tracking-tight text-white">SAMSAT Assistant</h3>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <h3 className="font-extrabold text-sm tracking-tight text-white">Asisten UPPD Banyumas</h3>
                   </div>
-                  <p className="text-[11px] text-sky-200">Asisten Virtual SAMSAT Banyumas</p>
+                  <p className="text-[11px] text-sky-200">Informasi layanan SAMSAT</p>
                 </div>
               </div>
 
@@ -180,9 +169,7 @@ export const SamsatChatbot: React.FC = () => {
                   className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.sender === 'bot' && (
-                    <div className="w-7 h-7 rounded-xl bg-[#005BAC] text-white flex items-center justify-center shrink-0 text-xs shadow-sm">
-                      <Bot className="w-4 h-4" />
-                    </div>
+                    <MascotAvatar />
                   )}
 
                   <div
@@ -213,9 +200,7 @@ export const SamsatChatbot: React.FC = () => {
               {/* Typing Animation Indicator */}
               {isTyping && (
                 <div className="flex items-center gap-2 text-slate-400 text-xs">
-                  <div className="w-7 h-7 rounded-xl bg-[#005BAC] text-white flex items-center justify-center shrink-0">
-                    <Bot className="w-4 h-4" />
-                  </div>
+                  <MascotAvatar />
                   <div className="bg-white px-4 py-2.5 rounded-2xl border border-slate-200 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 bg-[#005BAC] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <span className="w-1.5 h-1.5 bg-[#005BAC] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
