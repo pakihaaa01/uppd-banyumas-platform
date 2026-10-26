@@ -75,7 +75,7 @@ export const SakpoleModal: React.FC = () => {
 
         {/* Body: Steps */}
         <div className="p-6 space-y-5 overflow-y-auto">
-          <div className="flex items-center gap-2 text-xs font-bold text-slate-800">
+          <div className="flex items-center gap-2 text-xs font-bold text-black">
             <ListChecks className="w-4 h-4 text-[#005BAC]" />
             <span>Tata Cara Mengunduh & Memasang Sekpole</span>
           </div>
@@ -87,8 +87,8 @@ export const SakpoleModal: React.FC = () => {
                   {idx + 1}
                 </span>
                 <div>
-                  <p className="text-xs font-bold text-slate-900">{s.title}</p>
-                  <p className="text-xs text-slate-500 leading-relaxed mt-0.5">{s.desc}</p>
+                  <p className="text-xs font-bold text-black">{s.title}</p>
+                  <p className="text-xs text-black leading-relaxed mt-0.5">{s.desc}</p>
                 </div>
               </li>
             ))}
@@ -123,7 +123,7 @@ export const SakpoleModal: React.FC = () => {
           </a>
           <button
             onClick={closeSakpoleModal}
-            className="w-full px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+            className="w-full px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-black font-bold text-xs transition-colors"
           >
             Tutup
           </button>
