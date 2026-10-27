@@ -4,14 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "server": "node --experimental-sqlite server/index.mjs",
-    "dev:frontend": "vite --port=3000 --host=127.0.0.1",
-    "reset-admin": "node --experimental-sqlite server/reset-password.mjs",
-    "start": "node --experimental-sqlite server/index.mjs"
+    "dev:frontend": "vite --port=3001 --host=127.0.0.1",
+    "dev": "vite --port=3001 --host=127.0.0.1 --strictPort",
+    "start": "vite --port=3001 --host=127.0.0.1 --strictPort"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

@@ -1,3 +1,5 @@
+import {useOperational} from '../../context/OperationalContext';
+import {trackEvent} from '../../lib/analytics';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSamsat } from '../../context/SamsatContext';
@@ -15,6 +17,7 @@ interface ChatMessage {
 }
 
 export const SamsatChatbot: React.FC = () => {
+  const {settings,ready}=useOperational();
   const { chatbotFaqs, faqs, serviceLocations, setCurrentPage } = useSamsat();
   const [isOpen, setIsOpen] = useState(false);
   const [mascotImageFailed, setMascotImageFailed] = useState(false);
@@ -61,7 +64,9 @@ export const SamsatChatbot: React.FC = () => {
 
     // Responses come only from active database records or a brief greeting.
     setTimeout(() => {
-      const botResponse = resolveChatAnswer(query, chatbotFaqs, faqs, serviceLocations);
+      const botResponse: ChatAnswer = !settings.features.taxEnabled && /cek\s*pajak|simulasi/i.test(query)
+        ? {source:'unavailable',text:settings.features.taxMessage}
+        : resolveChatAnswer(query, chatbotFaqs, faqs, serviceLocations);
 
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
@@ -78,6 +83,8 @@ export const SamsatChatbot: React.FC = () => {
   };
 
 
+  if (!ready) return null;
+  if (!settings.features.chatbotEnabled) return <details className="fixed bottom-4 right-4 z-50 max-w-[280px] rounded-lg border border-slate-200 bg-white p-4 text-sm text-black shadow"><summary className="cursor-pointer font-semibold">Mas Sajak dalam pemeliharaan</summary><p className="mt-2">{settings.features.chatbotMessage}</p></details>;
   return (
     <div className="fixed bottom-3 right-3 z-50 sm:bottom-5 sm:right-6">
       {/* Mas Sajak tampil utuh sebagai tombol; hilang ketika panel percakapan dibuka. */}
@@ -98,7 +105,7 @@ export const SamsatChatbot: React.FC = () => {
             </div>
             <motion.button
               type="button"
-              onClick={() => setIsOpen(true)}
+              onClick={() => {setIsOpen(true);trackEvent('open_chatbot');}}
               whileHover={{ scale: 1.045, y: -3 }}
               whileTap={{ scale: 0.97 }}
               className="group relative flex min-h-[104px] w-[108px] cursor-pointer items-end justify-center bg-transparent p-0 outline-none drop-shadow-[0_8px_8px_rgba(21,40,53,0.22)] focus-visible:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] sm:w-[132px]"
@@ -183,7 +190,7 @@ export const SamsatChatbot: React.FC = () => {
                   >
                     <p>{msg.text}</p>
                     {msg.links && <div className="mt-3 space-y-2">
-                      {msg.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
+                      {msg.links.map(link => <a key={link.url} href={link.url} onClick={()=>trackEvent('open_maps')} target="_blank" rel="noopener noreferrer"
                         className="block rounded-md border border-[#005BAC] px-3 py-2 font-semibold text-[#005BAC] underline underline-offset-2 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">{link.label}</a>)}
                     </div>}
                     {msg.choices && <div className="mt-3 space-y-2">
@@ -276,4 +283,5 @@ export const SamsatChatbot: React.FC = () => {
     </div>
   );
 };
+
 

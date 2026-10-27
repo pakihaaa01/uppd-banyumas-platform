@@ -13,8 +13,8 @@ const monthNumbers: Record<string, number> = {
 
 function parseDate(value: string): Date {
   const match = /^(\d{1,2}) (\w+) (\d{4})$/.exec(value);
-  if (!match || !monthNumbers[match[2]]) throw new Error(`Tanggal tidak dikenal: ${value}`);
-  const day = Number(match[1]), month = monthNumbers[match[2]], year = Number(match[3]);
+  if (!match || !monthNumbers[match[2] ?? ""]) throw new Error(`Tanggal tidak dikenal: ${value}`);
+  const day = Number(match[1]), month = monthNumbers[match[2] ?? ""]!, year = Number(match[3]);
   const date = new Date(Date.UTC(year, month - 1, day));
   if (date.getUTCDate() !== day || date.getUTCMonth() !== month - 1) {
     throw new Error(`Tanggal tidak valid: ${value}`);
@@ -51,8 +51,8 @@ async function main(): Promise<void> {
       category: item.category,
       shortDescription: item.shortDescription,
       content: item.content,
-      isNew: item.isNew,
-      isImportant: item.isImportant,
+      isNew: item.isNew ?? false,
+      isImportant: item.isImportant ?? false,
       status: 'DRAFT' as const,
       createdById: author.id,
     };
@@ -75,3 +75,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

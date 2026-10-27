@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import {useEffect} from 'react';
+import {OperationalProvider,useOperational} from './context/OperationalContext';
+import {trackPage} from './lib/analytics';
+import React from 'react';
 import { SamsatProvider, useSamsat } from './context/SamsatContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
@@ -9,10 +12,11 @@ import { PublicInfoPage } from './components/pages/PublicInfoPage';
 import { FaqPage } from './components/pages/FaqPage';
 import { ContactPage } from './components/pages/ContactPage';
 import { SamsatChatbot } from './components/chatbot/SamsatChatbot';
-import { AdminGate } from './components/admin/AdminGate';
 
 const PublicSite: React.FC = () => {
   const { currentPage } = useSamsat();
+  const {analyticsReady}=useOperational();
+  useEffect(()=>{if(analyticsReady)trackPage(currentPage);},[currentPage,analyticsReady]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-black font-sans selection:bg-[#005BAC] selection:text-white">
@@ -33,28 +37,12 @@ const PublicSite: React.FC = () => {
   );
 };
 
-// Root-level router: keeps the Admin Dashboard fully separated from the
-// public-facing site (its own shell, no shared Navbar/Footer), reached via
-// the #admin URL hash so it can be bookmarked / opened directly.
-const RootRouter: React.FC = () => {
-  const [hash, setHash] = useState<string>(window.location.hash);
-
-  useEffect(() => {
-    const handleHashChange = () => setHash(window.location.hash);
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  const isAdminRoute = hash.startsWith('#admin') || window.location.pathname.startsWith('/admin');
-
-  return isAdminRoute ? <AdminGate /> : <PublicSite />;
-};
-
 export default function App() {
   return (
     <SamsatProvider>
-      <RootRouter />
+      <OperationalProvider><PublicSite /></OperationalProvider>
     </SamsatProvider>
   );
 }
+
 

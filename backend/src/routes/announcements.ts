@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth } from '../middleware/auth';
+import { requireAdministrator } from '../middleware/auth';
 
 export const announcementsRouter = Router();
 
-announcementsRouter.use(requireAuth);
+announcementsRouter.use(requireAdministrator);
 
 const announcementFields = {
   id: true,
@@ -15,6 +15,8 @@ const announcementFields = {
   content: true,
   isNew: true,
   isImportant: true,
+  showInNotifications: true,
+  notificationExpiresAt: true,
   status: true,
   createdById: true,
   createdAt: true,
@@ -37,6 +39,8 @@ type DraftData = {
   date?: Date;
   isNew?: boolean;
   isImportant?: boolean;
+  showInNotifications?: boolean;
+  notificationExpiresAt?: Date | null;
 };
 
 type ValidationResult =
@@ -62,7 +66,7 @@ function validateDraft(
     ...Object.keys(textLimits),
     'date',
     'isNew',
-    'isImportant'
+    'isImportant', 'showInNotifications', 'notificationExpiresAt'
   ];
 
   if (
@@ -123,7 +127,7 @@ function validateDraft(
     data.date = date;
   }
 
-  for (const field of ['isNew', 'isImportant'] as const) {
+  for (const field of ['isNew', 'isImportant', 'showInNotifications'] as const) {
     if (!Object.hasOwn(values, field)) continue;
 
     const value = values[field];
@@ -138,6 +142,12 @@ function validateDraft(
     data[field] = value;
   }
 
+  if (Object.hasOwn(values, 'notificationExpiresAt')) {
+    const v=values.notificationExpiresAt;
+    if (v === null || v === '') data.notificationExpiresAt=null;
+    else if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v) && !Number.isNaN(Date.parse(v))) data.notificationExpiresAt=new Date(v);
+    else return {valid:false,message:'Waktu berakhir notifikasi tidak valid.'};
+  }
   return { valid: true, data };
 }
 
@@ -202,6 +212,8 @@ announcementsRouter.post('/', async (req, res) => {
         content: data.content,
         isNew: data.isNew ?? true,
         isImportant: data.isImportant ?? false,
+        showInNotifications: data.showInNotifications ?? true,
+        notificationExpiresAt: data.notificationExpiresAt ?? null,
         status: 'DRAFT',
         createdById: res.locals.currentUser.id
       },
@@ -232,7 +244,6 @@ announcementsRouter.patch('/:id', async (req, res) => {
     const result = await prisma.announcement.updateMany({
       where: {
         id: req.params.id,
-        createdById: res.locals.currentUser.id,
         status: 'DRAFT'
       },
       data: validation.data
@@ -240,7 +251,7 @@ announcementsRouter.patch('/:id', async (req, res) => {
 
     if (result.count === 0) {
       res.status(404).json({
-        message: 'Draf milik Anda tidak ditemukan'
+        message: 'Draf tidak ditemukan'
       });
       return;
     }
@@ -259,14 +270,13 @@ announcementsRouter.delete('/:id', async (req, res) => {
     const result = await prisma.announcement.deleteMany({
       where: {
         id: req.params.id,
-        createdById: res.locals.currentUser.id,
         status: 'DRAFT'
       }
     });
 
     if (result.count === 0) {
       res.status(404).json({
-        message: 'Draf milik Anda tidak ditemukan'
+        message: 'Draf tidak ditemukan'
       });
       return;
     }
@@ -323,3 +333,4 @@ announcementsRouter.post('/:id/unpublish', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+

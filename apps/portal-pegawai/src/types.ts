@@ -17,6 +17,9 @@ export interface Announcement {
   content: string;
   isNew?: boolean;
   isImportant?: boolean;
+  showInNotifications?: boolean;
+  notificationExpiresAt?: string | null;
+  updatedAt?: string;
 }
 
 export interface ServiceLocation {
@@ -119,3 +122,4 @@ export interface DashboardStats {
   faqPopularity: { question: string; views: number }[];
   locationClicks: { locationName: string; clicks: number }[];
 }
+

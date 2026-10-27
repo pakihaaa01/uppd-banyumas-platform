@@ -20,7 +20,6 @@ export const ContactPage: React.FC = () => {
     const saved = await addContactMessage({
       name: formData.name.trim(),
       email: formData.email.trim(),
-      phone: formData.phone.trim(),
       subject: formData.subject.trim(),
       message: formData.message.trim(),
     });
@@ -112,3 +111,4 @@ export const ContactPage: React.FC = () => {
     </main>
   );
 };
+

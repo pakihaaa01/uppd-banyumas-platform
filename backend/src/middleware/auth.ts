@@ -28,7 +28,7 @@ export async function requireAuth(
     if (
       !session ||
       session.expiresAt <= new Date() ||
-      !session.user.isActive
+      !session.user.isActive || session.user.role !== 'ADMINISTRATOR'
     ) {
       res.status(401).json({ message: 'Sesi tidak valid' });
       return;

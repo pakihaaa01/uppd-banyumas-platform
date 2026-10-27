@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, Bell, ChevronRight, Menu, X } from 'lucide-react';
+import {PublicNotifications} from './PublicNotifications';
+import React, { useEffect, useState } from 'react';
+import { ArrowUpRight, ChevronRight, Menu, X } from 'lucide-react';
 import { useSamsat } from '../../context/SamsatContext';
 import type { PageRoute } from '../../types';
 import { goToServiceSection } from '../../utils/serviceNavigation';
@@ -21,57 +22,18 @@ export const Navbar: React.FC = () => {
   const {
     currentPage,
     setCurrentPage,
-    announcements,
-    hasNewNotification,
-    clearNotificationBadge,
   } = useSamsat();
-
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [notificationOpen, setNotificationOpen] = useState(false);
-  const notificationRef = useRef<HTMLDivElement>(null);
-  const notificationButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
-        setNotificationOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
-
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        if (notificationOpen) {
-          setNotificationOpen(false);
-          notificationButtonRef.current?.focus();
-        }
-        setMobileMenuOpen(false);
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [notificationOpen]);
+  useEffect(()=>{const close=(event:KeyboardEvent)=>{if(event.key==='Escape')setMobileMenuOpen(false);};document.addEventListener('keydown',close);return()=>document.removeEventListener('keydown',close);},[]);
 
   const navigate = (route: PageRoute) => {
     setCurrentPage(route);
     setMobileMenuOpen(false);
-    setNotificationOpen(false);
   };
 
   const openTaxService = () => {
     setMobileMenuOpen(false);
-    setNotificationOpen(false);
     goToServiceSection(setCurrentPage, 'cek-pajak');
-  };
-
-  const toggleNotification = () => {
-    const opening = !notificationOpen;
-    setNotificationOpen(opening);
-    setMobileMenuOpen(false);
-    if (opening && hasNewNotification) clearNotificationBadge();
   };
 
   return (
@@ -118,43 +80,7 @@ export const Navbar: React.FC = () => {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <div className="relative" ref={notificationRef}>
-            <button
-              ref={notificationButtonRef}
-              type="button"
-              aria-label={hasNewNotification ? 'Pengumuman baru' : 'Lihat pengumuman'}
-              aria-expanded={notificationOpen}
-              aria-controls="navbar-notifications"
-              onClick={toggleNotification}
-              className={`relative inline-flex h-10 w-10 items-center justify-center rounded-md border transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] ${notificationOpen ? 'border-[#005BAC] bg-[#eef5fc] text-[#005BAC]' : 'border-[#dce5eb] bg-white text-[#314b60] hover:bg-[#f3f7fa]'}`}
-            >
-              <Bell size={18} strokeWidth={1.8} aria-hidden="true" />
-              {hasNewNotification && <span className="absolute right-[8px] top-[7px] h-[7px] w-[7px] rounded-full bg-[#bb493e] ring-2 ring-white" aria-hidden="true" />}
-            </button>
-
-            {notificationOpen && (
-              <div id="navbar-notifications" role="region" aria-label="Pengumuman terbaru" className="absolute right-0 top-[calc(100%+13px)] w-[min(360px,calc(100vw-25px))] overflow-hidden rounded-md border border-[#d9e2e9] bg-white shadow-[0_16px_45px_rgba(18,40,60,0.16)]">
-                <div className="flex items-center justify-between border-b border-[#e8edf1] px-5 py-4">
-                  <div>
-                    <h2 className="text-[14px] font-bold text-[#1b344b]">Pengumuman</h2>
-                    <p className="mt-0.5 text-xs text-black">Informasi terbaru UPPD Banyumas</p>
-                  </div>
-                  <span className="text-xs font-medium text-black">{announcements.length} informasi</span>
-                </div>
-                <div className="max-h-[320px] divide-y divide-[#edf0f3] overflow-y-auto">
-                  {announcements.length ? announcements.slice(0, 4).map((ann) => (
-                    <button key={ann.id} type="button" onClick={() => navigate('home')} className="block w-full px-5 py-3.5 text-left transition-colors hover:bg-[#f5f8fb] focus-visible:bg-[#f5f8fb]">
-                      <p className="mb-1 text-[11px] text-black">{ann.date}{ann.isNew ? ' · Baru' : ''}</p>
-                      <p className="line-clamp-2 text-[13px] font-semibold leading-5 text-[#23394d]">{ann.title}</p>
-                    </button>
-                  )) : <p className="p-5 text-sm text-black">Belum ada pengumuman.</p>}
-                </div>
-                <button type="button" onClick={() => navigate('home')} className="flex w-full items-center justify-center gap-1 border-t border-[#e8edf1] bg-[#f8fafc] px-4 py-3 text-xs font-semibold text-[#005BAC] hover:bg-[#eef5fb]">
-                  Kembali ke beranda <ChevronRight size={14} aria-hidden="true" />
-                </button>
-              </div>
-            )}
-          </div>
+          <PublicNotifications />
 
           <button
             type="button"
@@ -169,7 +95,7 @@ export const Navbar: React.FC = () => {
             aria-controls="navbar-mobile-menu"
             aria-expanded={mobileMenuOpen}
             aria-label={mobileMenuOpen ? 'Tutup navigasi' : 'Buka navigasi'}
-            onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setNotificationOpen(false); }}
+            onClick={() => { setMobileMenuOpen(!mobileMenuOpen); }}
             className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#dce5eb] text-[#203b52] hover:bg-[#f3f7fa] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC] xl:hidden"
           >
             {mobileMenuOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}
@@ -200,4 +126,5 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
+
 

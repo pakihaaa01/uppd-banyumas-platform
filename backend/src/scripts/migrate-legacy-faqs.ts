@@ -13,7 +13,7 @@ async function main() {
     if(!apply){console.log('AKAN DITAMBAHKAN (nonaktif): '+item.question);continue;}
     await prisma.fAQ.create({data:{
       question:item.question,answer:item.answer,category:item.category,
-      isPopular:item.isPopular,isEnabled:false,viewCount:0
+      isPopular:item.isPopular ?? false,isEnabled:false,viewCount:0
     }});
     inserted++;
     console.log('DITAMBAHKAN (nonaktif): '+item.question);

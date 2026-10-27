@@ -235,7 +235,7 @@ documentsRouter.post('/', async (req, res) => {
         fileSize: data.fileSize,
         downloadUrl: data.downloadUrl,
         updateDate: data.updateDate,
-        description: data.description,
+        description: data.description ?? null,
         isPublished: false
       }
     });
@@ -421,3 +421,4 @@ documentsRouter.get('/:id/file', async (req, res) => {
     res.send(contents);
   } catch { res.status(404).json({ message: 'PDF tidak tersedia' }); }
 });
+

@@ -68,6 +68,7 @@ export function AdminArchive({onChange}: {onChange?: (count:number)=>void}) {
     <div className="grid gap-4 md:grid-cols-2">{items.length?items.map(item=><article key={item.id} className="overflow-hidden rounded-xl border border-[#dce5eb] bg-white">
       <div className="flex h-44 items-center justify-center bg-[#f3f6f8] p-3"><img src={'http://127.0.0.1:3000' + item.image} alt={item.title} className="h-full w-full object-contain"/></div>
       <div className="space-y-3 p-4"><span className={'inline-block rounded-full px-2 py-1 text-[11px] font-semibold '+(item.isPublished?'bg-green-50 text-green-800':'bg-slate-100 text-slate-600')}>{item.isPublished?'Dipublikasikan':'Draft'}</span><h4 className="font-semibold text-[#193a52]">{item.title}</h4><p className="text-xs leading-5 text-[#667e8c]">{item.description}</p><div className="flex flex-wrap gap-2"><button type="button" disabled={busy} onClick={()=>void toggle(item)} className={action}>{item.isPublished?'Tarik Publikasi':'Publikasikan'}</button>{!item.isPublished&&<><button type="button" disabled={busy} onClick={()=>edit(item)} className={action}><Pencil size={13}/></button><button type="button" disabled={busy} onClick={()=>void remove(item)} className={action}><Trash2 size={13}/></button></>}<a href={'http://127.0.0.1:3000' + item.image} target="_blank" rel="noopener noreferrer" className={action}><ExternalLink size={13}/></a></div></div>
-    </article>):<p className="text-sm text-[#647b8d]">Belum ada dokumentasi di PostgreSQL.</p>}</div>}
+    </article>):<p className="text-sm text-[#647b8d]">Belum ada dokumentasi yang tersimpan.</p>}</div>}
   </section>;
 }
+

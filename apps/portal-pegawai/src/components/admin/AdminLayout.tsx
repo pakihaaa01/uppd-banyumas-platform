@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LogOut } from 'lucide-react';
 import type { PortalUser } from './AdminGate';
 import { AdminDashboard } from './AdminDashboard';
-import { RoleWorkspace } from './RoleWorkspace';
+
 
 type Props = {
   user: PortalUser;
@@ -11,6 +11,7 @@ type Props = {
 
 export const AdminLayout: React.FC<Props> = ({ onLogout, user }) => {
   const [confirmLogout, setConfirmLogout] = useState(false);
+
 
   return (
     <div className="min-h-screen bg-[#f6f8fa] font-sans text-[#23394b]">
@@ -39,11 +40,7 @@ export const AdminLayout: React.FC<Props> = ({ onLogout, user }) => {
         </div>
       </header>
       
-      {user.role === 'ADMINISTRATOR' ? (
-        <AdminDashboard />
-      ) : (
-        <RoleWorkspace user={user} />
-      )}
+      <AdminDashboard user={user} />
 
     </div>
   );

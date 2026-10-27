@@ -56,3 +56,7 @@ Thumbs.db# Backend SQLite lama dari ZIP
 **/KREDENSIAL*
 **/*.pem
 **/*.key
+
+
+# Also ignore linked development dependencies
+**/node_modules

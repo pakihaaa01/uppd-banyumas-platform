@@ -1,25 +1,10 @@
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
-import { requireAuth } from '../middleware/auth';
+import { requireAdministrator } from '../middleware/auth';
 
 export const faqsRouter = Router();
 
-// Seluruh pengelolaan FAQ memerlukan sesi aktif.
-faqsRouter.use(requireAuth);
-
-// Administrator dan Operator boleh mengelola FAQ.
-faqsRouter.use((_req, res, next) => {
-  const role = res.locals.currentUser.role;
-
-  if (role !== 'ADMINISTRATOR' && role !== 'OPERATOR') {
-    res.status(403).json({
-      message: 'Akses khusus Administrator dan Operator'
-    });
-    return;
-  }
-
-  next();
-});
+faqsRouter.use(requireAdministrator);
 
 const textLimits = {
   question: 500,
@@ -235,3 +220,4 @@ faqsRouter.post('/:id/disable', async (req, res) => {
     res.json({message:'FAQ disembunyikan dari website publik'});
   } catch(error) {console.error(error);res.status(500).json({message:'Gagal menyembunyikan FAQ'});}
 });
+

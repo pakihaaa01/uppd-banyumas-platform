@@ -23,6 +23,7 @@ const publicFields = {
 usersRouter.get('/', async (_req, res) => {
   try {
     const users = await prisma.user.findMany({
+      where: { role: 'ADMINISTRATOR' },
       select: publicFields,
       orderBy: { createdAt: 'desc' }
     });
@@ -50,9 +51,7 @@ usersRouter.post('/', async (req, res) => {
       password.length > 256 ||
       Buffer.byteLength(password, 'utf8') > 72 ||
       !(
-        role === 'ADMINISTRATOR' ||
-        role === 'OPERATOR' ||
-        role === 'PENANGGUNG_JAWAB'
+        role === 'ADMINISTRATOR'
       )
     ) {
       res.status(400).json({
@@ -167,7 +166,7 @@ usersRouter.patch('/:id', async (req, res) => {
     // Perubahan akun dan pencabutan sesi dilakukan bersama.
     const user = await prisma.$transaction(async tx => {
       const updated = await tx.user.update({
-        where: { id },
+        where: { id, role: 'ADMINISTRATOR' },
         data,
         select: publicFields
       });

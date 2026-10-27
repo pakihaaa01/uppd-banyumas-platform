@@ -19,7 +19,10 @@ publicRouter.get('/announcements', async (_req, res) => {
         shortDescription: true,
         content: true,
         isNew: true,
-        isImportant: true
+        isImportant: true,
+        showInNotifications: true,
+        notificationExpiresAt: true,
+        updatedAt: true
       },
       orderBy: [
         { date: 'desc' },
@@ -159,3 +162,4 @@ publicRouter.get('/archive', async (_req, res) => {
     res.status(500).json({ message: 'Gagal memuat dokumentasi publik' });
   }
 });
+

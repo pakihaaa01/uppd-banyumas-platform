@@ -166,7 +166,7 @@ export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (cou
     setInfo('');
   }
 
-  // Menyimpan lokasi baru atau hasil edit ke PostgreSQL.
+  // Menyimpan lokasi baru atau hasil edit.
   async function saveLocation(
     event: FormEvent<HTMLFormElement>
   ) {
@@ -204,7 +204,7 @@ export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (cou
       setEditingId(null);
 
       setInfo(
-        'Titik layanan berhasil disimpan ke PostgreSQL.'
+        'Titik layanan berhasil disimpan.'
       );
 
       // Memuat ulang daftar setelah penyimpanan.
@@ -277,7 +277,7 @@ export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (cou
       );
 
       setInfo(
-        'Titik layanan berhasil dihapus dari PostgreSQL.'
+        'Titik layanan berhasil dihapus.'
       );
     } catch (err) {
       setError(
@@ -301,7 +301,7 @@ export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (cou
 
           <p className="mt-1 text-xs text-[#647b8d]">
             Pengelolaan lokasi layanan khusus Administrator
-            melalui PostgreSQL.
+            melalui portal ini.
           </p>
         </div>
 
@@ -761,3 +761,4 @@ export function AdminLocations({ onLocationsChange }: { onLocationsChange?: (cou
     </div>
   );
 }
+

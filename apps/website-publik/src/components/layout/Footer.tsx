@@ -1,3 +1,4 @@
+import {useOperational} from '../../context/OperationalContext';
 import React from 'react';
 import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Phone, Twitter, Youtube } from 'lucide-react';
 import { useSamsat } from '../../context/SamsatContext';
@@ -20,6 +21,8 @@ const socialLinks = [
 ];
 
 export const Footer: React.FC = () => {
+  const {settings,mainLocation}=useOperational();
+  const contact=settings.contact;
   const { setCurrentPage } = useSamsat();
 
   return (
@@ -56,15 +59,15 @@ export const Footer: React.FC = () => {
             </button>
             <div className="mt-6 flex items-start gap-2 text-[12px] leading-5 text-white">
               <MapPin size={15} className="mt-0.5 shrink-0 text-[#9ac4e0]" aria-hidden="true" />
-              <span>Kabupaten Banyumas, Jawa Tengah</span>
+              <span>{mainLocation?.address || "Kabupaten Banyumas, Jawa Tengah"}</span>
             </div>
           </div>
 
           <div>
             <h3 className="mb-5 border-b border-white/20 pb-3 text-[13px] font-semibold text-white">Kontak</h3>
             <div className="space-y-4 text-[13px]">
-              <a href="tel:+62281637801" className="flex items-start gap-3 text-white hover:text-white focus-visible:outline-2 focus-visible:outline-white"><Phone size={17} className="mt-0.5 shrink-0 text-[#9ac4e0]" aria-hidden="true" /><span>(0281) 637801</span></a>
-              <a href="mailto:Up3adbms@gmail.com" className="flex items-start gap-3 break-all text-white hover:text-white focus-visible:outline-2 focus-visible:outline-white"><Mail size={17} className="mt-0.5 shrink-0 text-[#9ac4e0]" aria-hidden="true" /><span>Up3adbms@gmail.com</span></a>
+              <a href={contact.phone ? "tel:"+contact.phone.replace(/[^+0-9]/g,"") : undefined} className="flex items-start gap-3 text-white hover:text-white focus-visible:outline-2 focus-visible:outline-white"><Phone size={17} className="mt-0.5 shrink-0 text-[#9ac4e0]" aria-hidden="true" /><span>{contact.phone || "Telepon belum tersedia"}</span></a>
+              <a href={contact.email ? "mailto:"+contact.email : undefined} className="flex items-start gap-3 break-all text-white hover:text-white focus-visible:outline-2 focus-visible:outline-white"><Mail size={17} className="mt-0.5 shrink-0 text-[#9ac4e0]" aria-hidden="true" /><span>{contact.email || "Email belum tersedia"}</span></a>
               <button type="button" onClick={() => setCurrentPage('contact')} className="inline-flex items-center gap-2 text-left font-medium text-white hover:text-white focus-visible:outline-2 focus-visible:outline-white">Halaman kontak & pengaduan <ArrowUpRight size={15} aria-hidden="true" /></button>
             </div>
             <div className="mt-7 flex items-center gap-2" aria-label="Media sosial">
@@ -82,4 +85,5 @@ export const Footer: React.FC = () => {
     </footer>
   );
 };
+
 

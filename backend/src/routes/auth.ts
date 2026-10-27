@@ -48,7 +48,7 @@ authRouter.post('/login', loginLimiter, async (req, res) => {
       where: { username }
     });
 
-    const valid = user?.isActive
+    const valid = (user?.isActive && user.role === 'ADMINISTRATOR')
       ? await bcrypt.compare(password, user.passwordHash)
       : false;
 
@@ -106,7 +106,7 @@ authRouter.get('/me', async (req, res) => {
     if (
       !session ||
       session.expiresAt <= new Date() ||
-      !session.user.isActive
+      !session.user.isActive || session.user.role !== 'ADMINISTRATOR'
     ) {
       res.status(401).json({ message: 'Sesi tidak valid' });
       return;
@@ -144,3 +144,4 @@ authRouter.post('/logout', async (req, res) => {
     res.status(500).json({ message: 'Kesalahan server' });
   }
 });
+

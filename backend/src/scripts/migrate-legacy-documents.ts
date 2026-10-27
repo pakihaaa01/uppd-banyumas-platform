@@ -12,8 +12,8 @@ const months: Record<string, number> = {
 };
 function parseDate(value: string): Date {
   const match = /^(\d{1,2}) (\w+) (\d{4})$/.exec(value);
-  if (!match || !months[match[2]]) throw new Error('Format tanggal tidak valid: ' + value);
-  const day = Number(match[1]), month = months[match[2]], year = Number(match[3]);
+  if (!match || !months[match[2] ?? ""]) throw new Error('Format tanggal tidak valid: ' + value);
+  const day = Number(match[1]), month = months[match[2] ?? ""]!, year = Number(match[3]);
   const result = new Date(Date.UTC(year, month - 1, day));
   if (result.getUTCDate() !== day || result.getUTCMonth() !== month - 1) {
     throw new Error('Tanggal tidak valid: ' + value);
@@ -58,3 +58,4 @@ async function main() {
 }
 main().catch(error => { console.error(error); process.exitCode = 1; })
   .finally(async () => { await prisma.$disconnect(); });
+

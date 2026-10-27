@@ -1,4 +1,4 @@
-import {
+import type {
   Announcement,
   ServiceLocation,
   BUMDesPoster,
@@ -213,7 +213,7 @@ export const INITIAL_BUMDES_POSTERS: BUMDesPoster[] = Array.from({ length: 32 },
     { v: 'Tambak Sembada', d: 'Tambak' },
     { v: 'Lumbir Sentosa', d: 'Lumbir' }
   ];
-  const item = villages[index % villages.length];
+  const item = villages[index % villages.length]!;
   const num = index + 1;
   return {
     id: `poster-${num}`,
@@ -550,3 +550,4 @@ export const INITIAL_DASHBOARD_STATS: DashboardStats = {
     { locationName: 'SAMSAT Keliling', clicks: 3500 }
   ]
 };
+

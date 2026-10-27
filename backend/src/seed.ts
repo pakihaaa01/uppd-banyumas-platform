@@ -3,38 +3,7 @@ import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { prisma } from './lib/prisma';
 
-const accounts = [
-  {
-    username: 'admin.demo',
-    displayName: 'Administrator Demo',
-    role: 'ADMINISTRATOR'
-  },
-  {
-    username: 'operator.konten',
-    displayName: 'Operator Konten Demo',
-    role: 'OPERATOR'
-  },
-  {
-    username: 'operator.pelayanan',
-    displayName: 'Operator Pelayanan Demo',
-    role: 'OPERATOR'
-  },
-  {
-    username: 'pj.pelayanan',
-    displayName: 'Penanggung Jawab Pelayanan',
-    role: 'PENANGGUNG_JAWAB'
-  },
-  {
-    username: 'pj.informasi',
-    displayName: 'Penanggung Jawab Informasi',
-    role: 'PENANGGUNG_JAWAB'
-  },
-  {
-    username: 'pj.profil',
-    displayName: 'Penanggung Jawab Profil',
-    role: 'PENANGGUNG_JAWAB'
-  }
-] as const;
+const accounts = [{ username: 'admin.demo', displayName: 'Administrator Demo', role: 'ADMINISTRATOR' }] as const;
 
 async function main() {
   const password = process.env.DEMO_PASSWORD;
@@ -80,3 +49,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+

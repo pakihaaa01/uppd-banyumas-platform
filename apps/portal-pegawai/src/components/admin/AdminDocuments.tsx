@@ -144,7 +144,7 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
         <label className="text-xs font-semibold text-[#385469]">Ukuran Berkas<input required maxLength={50} placeholder="Contoh: 2 MB" className={inputStyle + ' mt-2'} value={form.fileSize} onChange={e => setForm({...form,fileSize:e.target.value})}/></label>
         <label className="sm:col-span-2 text-xs font-semibold text-[#385469]">Tautan Dokumen (HTTPS/HTTP)<input type="url" maxLength={2048} placeholder="https://..." className={inputStyle + ' mt-2'} value={form.downloadUrl} onChange={e => setForm({...form,downloadUrl:e.target.value})}/></label>
         <label className="sm:col-span-2 text-xs font-semibold text-[#385469]">Keterangan<textarea rows={4} maxLength={5000} className={inputStyle + ' mt-2'} value={form.description ?? ''} onChange={e => setForm({...form,description:e.target.value})}/></label>
-        <p className="sm:col-span-2 text-xs leading-5 text-[#728697]">Tautan dokumen boleh dikosongkan saat menyimpan Draft. Publikasi hanya tersedia setelah tautan HTTP/HTTPS terisi. Unggah PDF langsung belum tersedia.</p>
+        <p className="sm:col-span-2 text-xs leading-5 text-[#728697]">Tautan dokumen boleh dikosongkan saat menyimpan Draft. Setelah menyimpan Draft, unggah PDF maksimal 10 MB atau isi tautan HTTP/HTTPS sebelum publikasi.</p>
       </div>
       <div className="flex justify-end gap-2 border-t border-[#e6edf2] p-5">
         <button type="button" className={buttonStyle} disabled={busy} onClick={() => setShowForm(false)}>Batal</button>
@@ -179,3 +179,4 @@ export function AdminDocuments({ onDocumentsChange }: { onDocumentsChange?: (cou
     </div>}
   </section>;
 }
+

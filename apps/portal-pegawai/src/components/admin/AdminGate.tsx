@@ -8,7 +8,7 @@ export type PortalUser = {
   id: string;
   username: string;
   displayName: string;
-  role: 'ADMINISTRATOR' | 'OPERATOR' | 'PENANGGUNG_JAWAB';
+  role: 'ADMINISTRATOR';
 };
 
 export const AdminGate: React.FC = () => {
@@ -18,7 +18,7 @@ export const AdminGate: React.FC = () => {
   useEffect(() => {
     let active = true;
 
-    apiRequest<{ user: PortalUser }>('/api/v1/auth/me')
+    const refresh = () => { apiRequest<{ user: PortalUser }>('/api/v1/auth/me')
       .then((result) => {
         if (!active) return;
         setUser(result.user);
@@ -26,10 +26,13 @@ export const AdminGate: React.FC = () => {
       })
       .catch(() => {
         if (active) setStatus('login');
-      });
+      }); };
+    refresh();
+    window.addEventListener('uppd-auth-change', refresh);
 
     return () => {
       active = false;
+      window.removeEventListener('uppd-auth-change', refresh);
     };
   }, []);
 
@@ -80,3 +83,4 @@ export const AdminGate: React.FC = () => {
     />
   );
 };
+

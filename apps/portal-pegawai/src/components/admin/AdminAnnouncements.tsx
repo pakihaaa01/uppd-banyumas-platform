@@ -24,6 +24,8 @@ type Draft = {
   content: string;
   isNew: boolean;
   isImportant: boolean;
+  showInNotifications: boolean;
+  notificationExpiresAt: string | null;
   status: string;
 };
 
@@ -46,6 +48,8 @@ function emptyForm(): DraftForm {
     shortDescription: '',
     content: '',
     isNew: true,
+    showInNotifications: true,
+    notificationExpiresAt: null,
     isImportant: false
   };
 }
@@ -145,7 +149,9 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
       shortDescription: item.shortDescription,
       content: item.content,
       isNew: item.isNew,
-      isImportant: item.isImportant
+      isImportant: item.isImportant,
+      showInNotifications: item.showInNotifications ?? true,
+      notificationExpiresAt: item.notificationExpiresAt ?? null
     });
 
     setEditingId(item.id);
@@ -176,7 +182,7 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
       setPreview(false);
       setEditingId(null);
 
-      setInfo('Draft berhasil disimpan ke PostgreSQL.');
+      setInfo('Draft berhasil disimpan.');
 
       // Memuat ulang daftar dari backend.
       try {
@@ -274,7 +280,7 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
         current.filter((draft) => draft.id !== item.id)
       );
 
-      setInfo('Draft berhasil dihapus dari PostgreSQL.');
+      setInfo('Draft berhasil dihapus.');
     } catch (err) {
       setError(
         err instanceof Error
@@ -357,6 +363,11 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
               <label className="flex items-center gap-2 text-[13px] text-[#385469]"><input type="checkbox" checked={form.isNew} onChange={(e) => setForm({ ...form, isNew: e.target.checked })} /> Tandai sebagai baru</label>
               <label className="flex items-center gap-2 text-[13px] text-[#385469]"><input type="checkbox" checked={form.isImportant} onChange={(e) => setForm({ ...form, isImportant: e.target.checked })} /> Pengumuman penting</label>
             </div>
+            <div className="space-y-3 sm:col-span-2">
+              <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.showInNotifications} onChange={e=>setForm({...form,showInNotifications:e.target.checked})}/> Tampilkan melalui lonceng notifikasi</label>
+              {form.showInNotifications && <label className="block text-sm">Batas tampil di notifikasi (WIB, opsional)<input type="datetime-local" className={field} value={form.notificationExpiresAt ? new Date(new Date(form.notificationExpiresAt).getTime()+7*3600000).toISOString().slice(0,16):''} onChange={e=>setForm({...form,notificationExpiresAt:e.target.value?new Date(e.target.value+':00+07:00').toISOString():null})}/></label>}
+              <p className="text-xs">Setelah batas waktu, pengumuman tetap tersedia di Informasi Publik tetapi hilang dari lonceng. Kosongkan untuk tanpa batas waktu.</p>
+            </div>
             {preview && <div className="rounded-lg border border-[#dce5eb] bg-[#f8fafc] p-5 sm:col-span-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-[#005BAC]">Pratinjau</p>
               <h4 className="mt-3 text-lg font-bold text-[#193a52]">{form.title || 'Judul Pengumuman'}</h4>
@@ -387,7 +398,7 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
             </div>
           </div>
           <div className="border-b border-[#e7edf2] bg-[#fafcfd] px-5 py-3 text-xs text-[#718596]">{loading ? 'Memuat data...' : filtered.length + ' dari ' + drafts.length + ' pengumuman'}</div>
-          {loading ? <div className="px-5 py-12 text-center text-sm text-[#647b8d]">Memuat pengumuman dari database...</div> :
+          {loading ? <div className="px-5 py-12 text-center text-sm text-[#647b8d]">Memuat pengumuman...</div> :
           filtered.length === 0 ? <div className="px-5 py-12 text-center"><FileText size={28} className="mx-auto mb-3 text-[#a4b2bd]" /><p className="text-sm font-medium text-[#385469]">Tidak ada pengumuman yang sesuai.</p><p className="mt-1 text-xs text-[#8294a1]">Coba ubah pencarian atau filter status.</p></div> :
           <div className="divide-y divide-[#e7edf2]">
             {filtered.map((item) => (
@@ -422,3 +433,4 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
     </section>
   );
 }
+

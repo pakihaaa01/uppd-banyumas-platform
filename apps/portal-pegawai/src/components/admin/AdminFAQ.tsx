@@ -44,7 +44,7 @@ function emptyForm(): FAQForm {
   };
 }
 
-export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
+export function AdminFAQ({onChange}: {onChange?: (count:number)=>void}) {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [form, setForm] = useState<FAQForm>(emptyForm);
 
@@ -62,7 +62,7 @@ export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
   const [error, setError] = useState('');
   const [info, setInfo] = useState('');
 
-  // Mengambil daftar FAQ dari PostgreSQL.
+  // Mengambil daftar FAQ.
   useEffect(() => {
     let active = true;
 
@@ -144,7 +144,7 @@ export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
       setShowForm(false);
       setEditingId(null);
       setPreview(false);
-      setInfo('FAQ berhasil disimpan ke PostgreSQL.');
+      setInfo('FAQ berhasil disimpan.');
 
       try {
         const result = await apiRequest<{ faqs: FAQ[] }>(API);
@@ -187,7 +187,7 @@ export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
         current.filter((faq) => faq.id !== item.id)
       );
 
-      setInfo('FAQ berhasil dihapus dari PostgreSQL.');
+      setInfo('FAQ berhasil dihapus.');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Gagal menghapus FAQ.'
@@ -223,7 +223,7 @@ export function OperatorFAQ({onChange}: {onChange?: (count:number)=>void}) {
           </h2>
 
           <p className="mt-1 text-xs text-[#647b8d]">
-            Kelola pertanyaan dan jawaban menggunakan PostgreSQL.
+            Kelola pertanyaan dan jawaban pada website publik.
           </p>
         </div>
 

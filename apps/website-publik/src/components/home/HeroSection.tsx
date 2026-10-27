@@ -1,3 +1,4 @@
+import {useOperational} from '../../context/OperationalContext';
 import React, { useEffect, useState } from 'react';
 import { useSamsat } from '../../context/SamsatContext';
 import { goToServiceSection } from '../../utils/serviceNavigation';
@@ -15,14 +16,18 @@ const heroPhotos = [
 
 export const HeroSection: React.FC = () => {
   const { setCurrentPage } = useSamsat();
+  const {settings}=useOperational();
+  const heroPhotos=settings.hero.slides.map((src,index)=>({src,label:'Foto pelayanan '+(index+1)}));
+  const slideKey=settings.hero.slides.join('|');
   const [activeIndex, setActiveIndex] = useState(0);
   // Foto berganti otomatis; tanpa kontrol navigasi atau tombol jeda.
   useEffect(() => {
+    setActiveIndex(0);
     const timer = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % heroPhotos.length);
-    }, 6500);
+    }, settings.hero.seconds*1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [slideKey, settings.hero.seconds]);
 
   return (
     <section
@@ -84,4 +89,5 @@ export const HeroSection: React.FC = () => {
     </section>
   );
 };
+
 

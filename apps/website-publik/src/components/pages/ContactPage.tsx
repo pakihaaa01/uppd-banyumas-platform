@@ -1,3 +1,5 @@
+import {trackEvent} from '../../lib/analytics';
+import {useOperational} from '../../context/OperationalContext';
 import React, { useState } from 'react';
 import { EditorialAccordion } from '../shared/EditorialAccordion';
 import { useSamsat } from '../../context/SamsatContext';
@@ -8,6 +10,8 @@ const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-whit
 const labelClass = 'block text-[13px] font-semibold text-[#354e60]';
 
 export const ContactPage: React.FC = () => {
+  const {settings,mainLocation,ready}=useOperational();
+  const contact=settings.contact;
   const { addContactMessage } = useSamsat();
   const [formData, setFormData] = useState(emptyForm);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -37,34 +41,32 @@ export const ContactPage: React.FC = () => {
           title="Kontak dan Informasi Pelayanan"
           description="Informasi lokasi, saluran komunikasi, dan panduan untuk menghubungi UPPD Kabupaten Banyumas serta SAMSAT Purwokerto."
         />
+        {!ready && <p role="status" className="mt-6 text-black">Informasi kantor sedang dimuat atau belum tersedia.</p>}
         <div className="mt-10 grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="space-y-6">
             <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-details">
               <h2 id="contact-details" className="text-xl font-bold text-[#1d3b53]">Informasi Kantor</h2>
-              <p className="mt-2 text-sm leading-6 text-black">UPPD Kabupaten Banyumas — SAMSAT Purwokerto</p>
+              <p className="mt-2 text-sm leading-6 text-black">UPPD Kabupaten Banyumas — {mainLocation?.name || "Kantor utama"}</p>
               <dl className="mt-6 space-y-6 border-t border-[#e2e9ee] pt-6">
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-black">Jl. Prof. M. Yamin No.7, Karangklesem, Karangpucung, Kec. Purwokerto Selatan, Kabupaten Banyumas, Jawa Tengah 53142</dd></div>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-black">{mainLocation?.address || "Alamat kantor utama belum tersedia."}</dd></div>
                 <div>
                     <dt className="text-[13px] font-bold text-[#1f3b51]">Telepon dan WhatsApp</dt>
                     <dd className="mt-1 space-y-1.5 text-sm text-black">
-                      <p><a className="hover:underline" href="tel:+62281637801">(0281) 637801</a></p>
-                      <p><a className="inline-flex items-center gap-1 font-semibold text-[#005BAC] hover:underline" href="https://wa.me/6285112680759" target="_blank" rel="noopener noreferrer">0851-12680759</a></p>
+                      <p><a className="hover:underline" href={contact.phone ? "tel:"+contact.phone.replace(/[^+0-9]/g,"") : undefined}>{contact.phone || "Belum tersedia"}</a></p>
+                      <p><a className="inline-flex items-center gap-1 font-semibold text-[#005BAC] hover:underline" href={contact.whatsapp ? "https://wa.me/"+contact.whatsapp : undefined} target="_blank" rel="noopener noreferrer">{contact.whatsapp || "Belum tersedia"}</a></p>
                     </dd>
                 </div>
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-black"><a href="mailto:Up3adbms@gmail.com" className="break-all hover:underline">Up3adbms@gmail.com</a></dd></div>
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Jam pelayanan yang tercantum pada project</dt>
-                    <dd className="mt-1 text-sm leading-7 text-black">Senin–Kamis: 08.00–13.00 WIB<br />Jumat: 08.00–11.00 WIB<br />Sabtu: 08.00–12.00 WIB</dd>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-black"><a href={contact.email ? "mailto:"+contact.email : undefined} className="break-all hover:underline">{contact.email || "Belum tersedia"}</a></dd></div>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Jam pelayanan kantor utama</dt>
+                    <dd className="mt-1 text-sm leading-7 text-black">{mainLocation?.operatingHours || "Jadwal belum tersedia."}</dd>
                     <p className="mt-2 text-xs leading-5 text-black">Jadwal perlu dikonfirmasi kepada instansi sebelum berkunjung.</p>
                 </div>
               </dl>
             </section>
             <section className="overflow-hidden border border-[#dce5eb] bg-white" aria-labelledby="contact-map">
-              <div className="px-6 py-5"><h2 id="contact-map" className="text-lg font-bold text-[#1d3b53]">Peta Lokasi</h2><p className="mt-1 text-sm text-black">Arah menuju SAMSAT Purwokerto</p></div>
-              <iframe
-                title="Lokasi SAMSAT Purwokerto pada Google Maps"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63299.38060169357!2d109.20501587910154!3d-7.441859599999992!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e655c2b92579f25%3A0x42cc86a8369ade7a!2sSamsat%20Purwokerto!5e0!3m2!1sen!2sus!4v1787848499967!5m2!1sen!2sus"
-                className="h-[290px] w-full border-0" loading="lazy" allowFullScreen
-              />
+              <div className="px-6 py-5"><h2 id="contact-map" className="text-lg font-bold text-[#1d3b53]">Peta Lokasi</h2><p className="mt-1 text-sm text-black">Arah menuju {mainLocation?.name || "kantor utama"}</p></div>
+              {mainLocation && <a onClick={()=>trackEvent('open_maps')} href={mainLocation.mapsUrl || 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mainLocation.name+' '+mainLocation.address)} target="_blank" rel="noopener noreferrer" className="mx-6 mb-6 inline-block rounded border border-blue-700 px-4 py-3 font-semibold text-blue-800">Buka lokasi di Google Maps</a>}
+
             </section>
             <section aria-labelledby="contact-guidance" className="border border-[#dce5eb] bg-white p-6 sm:p-8">
               <h2 id="contact-guidance" className="mb-4 text-lg font-bold text-[#1d3b53]">Panduan Menghubungi Layanan</h2>
@@ -110,4 +112,5 @@ export const ContactPage: React.FC = () => {
     </main>
   );
 };
+
 

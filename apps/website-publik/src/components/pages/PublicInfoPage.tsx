@@ -1,3 +1,4 @@
+import {trackEvent} from '../../lib/analytics';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ArrowUpRight, X } from 'lucide-react';
@@ -120,7 +121,7 @@ export const PublicInfoPage: React.FC = () => {
                       {doc.description && <p>{doc.description}</p>}
                       <p className="text-[12px] text-black">Metadata entri: {doc.fileType} · {doc.fileSize} · {doc.updateDate}</p>
                       {hasFile ? (
-                        <a href={doc.downloadUrl} target="_blank" rel="noopener noreferrer" className="inline-block font-semibold text-[#005BAC] underline underline-offset-4">Buka berkas dokumen</a>
+                        <a href={doc.downloadUrl} onClick={()=>trackEvent('open_document')} target="_blank" rel="noopener noreferrer" className="inline-block font-semibold text-[#005BAC] underline underline-offset-4">Buka berkas dokumen</a>
                       ) : (
                         <p className="inline-block border border-[#dae3e9] bg-[#f2f5f7] px-3 py-2 text-[12px] text-black">Berkas belum tersedia untuk diunduh</p>
                       )}
@@ -180,4 +181,5 @@ export const PublicInfoPage: React.FC = () => {
     </main>
   );
 };
+
 

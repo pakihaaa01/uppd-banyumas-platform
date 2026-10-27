@@ -1,25 +1,16 @@
-/** Permintaan API pada server lokal. Cookie sesi hanya ditangani browser (HttpOnly). */
+export class ApiError extends Error {
+  constructor(message: string, public status: number) { super(message); this.name = 'ApiError'; }
+}
+
+/** Cookie sesi dikelola browser; respons dinamis tidak disimpan dalam cache. */
 export async function apiRequest<T>(url: string, method = 'GET', data?: unknown): Promise<T> {
   const response = await fetch(url, {
-    method,
-    credentials: 'same-origin',
-    headers: {
-      'X-Requested-With': 'UPPD-Portal',
-      ...(data === undefined ? {} : { 'Content-Type': 'application/json' }),
-    },
-    ...(data === undefined ? {} : { body: JSON.stringify(data) }),
+    method, credentials: 'same-origin', cache: 'no-store',
+    headers: {'X-Requested-With':'UPPD-Portal', ...(data === undefined ? {} : {'Content-Type':'application/json'})},
+    ...(data === undefined ? {} : {body:JSON.stringify(data)}),
   });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || `Permintaan gagal (${response.status}).`);
+  const result = await response.json().catch(() => null);
+  if (!response.ok) throw new ApiError(result?.message || result?.error || `Permintaan gagal (${response.status}).`, response.status);
+  if (result === null) throw new ApiError('Respons belum dapat dibaca. Silakan coba lagi.', response.status);
   return result as T;
-}
-export async function uploadFile(file: File): Promise<{url:string;fileSize:string;fileType:string}> {
-  const response=await fetch('/api/admin/upload',{
-    method:'POST', credentials:'same-origin',
-    headers:{'X-Requested-With':'UPPD-Portal','Content-Type':file.type},
-    body:file,
-  });
-  const result=await response.json().catch(()=>({}));
-  if (!response.ok) throw new Error(result.error || 'Unggah file gagal.');
-  return result;
 }

@@ -63,6 +63,8 @@ model Announcement {
   content          String
   isNew            Boolean            @default(true)
   isImportant      Boolean            @default(false)
+  showInNotifications Boolean @default(true)
+  notificationExpiresAt DateTime?
   status           AnnouncementStatus @default(DRAFT)
 
   createdById String
@@ -199,4 +201,26 @@ model VisualArchive {
   updatedAt   DateTime @updatedAt
 
   @@index([isPublished, createdAt])
+}
+
+
+model SiteSettings {
+  id String @id
+  value Json
+  version Int @default(0)
+  updatedAt DateTime @updatedAt
+}
+model HeroImage {
+  id String @id @default(uuid())
+  mime String
+  data Bytes
+  createdAt DateTime @default(now())
+}
+model ReplyTemplate {
+  id String @id @default(uuid())
+  title String
+  body String
+  version Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

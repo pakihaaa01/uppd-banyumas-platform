@@ -258,8 +258,8 @@ locationsRouter.post('/', async (req, res) => {
         phone: data.phone,
         mapsUrl: data.mapsUrl,
         type: data.type,
-        mapsEmbedUrl: data.mapsEmbedUrl,
-        description: data.description,
+        mapsEmbedUrl: data.mapsEmbedUrl ?? null,
+        description: data.description ?? null,
         isMain: data.isMain ?? false,
         isDriveThru: data.isDriveThru ?? false,
         isPublished: false
@@ -367,3 +367,4 @@ locationsRouter.post('/:id/unpublish', async (req, res) => {
     res.status(500).json({ message: 'Gagal menarik publikasi lokasi' });
   }
 });
+

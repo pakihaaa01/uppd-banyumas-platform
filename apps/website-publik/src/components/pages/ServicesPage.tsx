@@ -1,3 +1,4 @@
+import {useOperational} from '../../context/OperationalContext';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSamsat } from '../../context/SamsatContext';
 import type { ServiceLocation } from '../../types';
@@ -31,6 +32,7 @@ const locationTypes = [
 ];
 
 export const ServicesPage: React.FC = () => {
+  const {settings,ready,failed}=useOperational();
   const { serviceLocations, trackLocationClick, trackAppDownload } = useSamsat();
   const [locationSearch, setLocationSearch] = useState('');
   const [filterType, setFilterType] = useState('all');
@@ -130,7 +132,7 @@ export const ServicesPage: React.FC = () => {
 
           <div className="min-w-0">
             <section id="cek-pajak" className="mb-16 scroll-mt-36">
-              <VehicleTaxChecker />
+              {!ready ? <p role="status" className="border border-slate-200 bg-white p-6 text-black">{failed?'Status layanan belum dapat dimuat. Silakan coba lagi.':'Memuat layanan…'}</p> : settings.features.taxEnabled ? <VehicleTaxChecker /> : <section className="border border-slate-200 bg-white p-6 text-black" role="status"><h2 className="text-xl font-semibold">Simulasi Cek Pajak dalam pemeliharaan</h2><p className="mt-3 whitespace-pre-line">{settings.features.taxMessage}</p></section>}
             </section>
 
             <section id="alur-pelayanan" className="mb-16 scroll-mt-36">
@@ -308,4 +310,5 @@ export const ServicesPage: React.FC = () => {
     </main>
   );
 };
+
 

@@ -1,3 +1,7 @@
+import { settingsRouter, publicSettingsRouter } from './routes/settings';
+import { templatesRouter } from './routes/templates';
+import { analyticsRouter } from './routes/analytics';
+import { dashboardRouter } from './routes/dashboard';
 import { prisma } from './lib/prisma';
 import 'dotenv/config';
 import express from 'express';
@@ -58,6 +62,11 @@ app.get('/api/v1/health/db', async (_req, res) => {
   }
 });
 
+app.use('/api/v1/settings', settingsRouter);
+app.use('/api/v1/templates', templatesRouter);
+app.use('/api/v1/analytics', analyticsRouter);
+app.use('/api/v1/dashboard', dashboardRouter);
+app.use('/api/v1/public', publicSettingsRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', usersRouter);
 app.use('/api/v1/announcements', announcementsRouter);
@@ -72,6 +81,13 @@ app.use('/api/v1/documents', documentsRouter);
 app.use('/api/v1/archive', archiveRouter);
 app.use('/api/v1/public/documents', publicDocumentsRouter);
 
+app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (error?.type === 'entity.too.large') { res.status(413).json({message:'Ukuran berkas terlalu besar.'}); return; }
+  console.error('Request failed:', error?.message);
+  res.status(500).json({message:'Permintaan belum berhasil diproses. Silakan coba lagi.'});
+});
+
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);
 });
+
