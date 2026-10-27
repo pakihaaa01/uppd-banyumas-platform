@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import type { PortalUser } from './AdminGate';
 import { AdminDashboard } from './AdminDashboard';
 import { RoleWorkspace } from './RoleWorkspace';
@@ -11,8 +11,6 @@ type Props = {
 
 export const AdminLayout: React.FC<Props> = ({ onLogout, user }) => {
   const [confirmLogout, setConfirmLogout] = useState(false);
-
-  const returnToSite = () => { window.location.href = '/'; };
 
   return (
     <div className="min-h-screen bg-[#f6f8fa] font-sans text-[#23394b]">
@@ -27,9 +25,6 @@ export const AdminLayout: React.FC<Props> = ({ onLogout, user }) => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" onClick={returnToSite} className="inline-flex min-h-10 items-center gap-1.5 rounded border border-[#cfdae2] px-3 py-2 text-xs font-semibold text-[#284b63] hover:bg-[#f0f5f8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">
-              <ArrowLeft size={15} aria-hidden="true" /> <span className="hidden min-[410px]:inline">Situs Publik</span><span className="min-[410px]:hidden">Kembali</span>
-            </button>
             {!confirmLogout ? (
               <button type="button" onClick={() => setConfirmLogout(true)} className="inline-flex min-h-10 items-center gap-1.5 rounded border border-[#cfdae2] px-3 py-2 text-xs font-semibold text-[#344c5b] hover:bg-[#f0f5f8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">
                 <LogOut size={15} aria-hidden="true" /> Keluar
