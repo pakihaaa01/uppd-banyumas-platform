@@ -407,7 +407,7 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-xs leading-6 text-[#536f83]">
-                Seluruh modul utama Portal Pegawai menggunakan backend API yang terhubung ke PostgreSQL. SQLite tidak digunakan sebagai basis data aplikasi.
+                Seluruh modul utama Portal Pegawai menggunakan backend API yang terhubung ke PostgreSQL sebagai basis data aplikasi.
               </div>
             </div>
           ) : (
