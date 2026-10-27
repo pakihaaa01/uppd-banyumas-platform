@@ -34,7 +34,7 @@ export const AdminLogin: React.FC<Props> = ({ onSuccess }) => {
             <img src="/logo-bapenda.png" alt="Bapenda Jawa Tengah" className="h-10 w-auto max-w-[120px] object-contain" />
             <div className="border-l border-[#dce5eb] pl-3">
               <p className="text-sm font-bold text-[#193a52]">UPPD Kabupaten Banyumas</p>
-              <p className="text-[11px] text-[#647b8d]">Administrasi Website · Prototipe</p>
+              <p className="text-[11px] text-[#647b8d]">Portal Pegawai UPPD Kabupaten Banyumas</p>
             </div>
           </div>
           <button 
@@ -50,9 +50,9 @@ export const AdminLogin: React.FC<Props> = ({ onSuccess }) => {
       <div className="flex flex-1 items-center justify-center px-5 py-14">
         <div className="w-full max-w-[440px] border border-[#d9e3e9] bg-white p-7 shadow-[0_8px_32px_rgba(20,52,76,0.045)] sm:p-9">
           <div className="mb-7 border-b border-[#e4ebef] pb-6">
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.10em] text-[#005BAC]">Panel Administrasi</p>
-            <h1 className="text-[27px] font-bold tracking-[-0.02em] text-[#1d3b52]">Masuk ke Dashboard</h1>
-            <p className="mt-2 text-sm leading-6 text-[#5d7384]">Gunakan akun admin yang terdaftar pada sistem PostgreSQL untuk mengelola layanan.</p>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.10em] text-[#005BAC]">Portal Pegawai</p>
+            <h1 className="text-[27px] font-bold tracking-[-0.02em] text-[#1d3b52]">Masuk ke Portal Pegawai</h1>
+            <p className="mt-2 text-sm leading-6 text-[#5d7384]">Gunakan akun pegawai yang terdaftar pada PostgreSQL untuk mengakses fitur sesuai hak akses.</p>
           </div>
 
           <form onSubmit={submit} className="space-y-5">
@@ -105,9 +105,9 @@ export const AdminLogin: React.FC<Props> = ({ onSuccess }) => {
           </form>
 
           <div className="mt-7 border-t border-[#e4ebef] pt-5">
-            <p className="text-xs font-semibold text-[#365165]">Akun untuk demonstrasi</p>
-            <p className="mt-2 text-xs leading-6 text-[#61798a]">Gunakan akun <code>admin.demo</code> atau akun pegawai yang tersimpan di database PostgreSQL.</p>
-            <p className="mt-2 text-[11px] leading-5 text-[#798b98]">Login diverifikasi oleh backend PostgreSQL. Versi ini untuk demonstrasi internal pegawai.</p>
+            <p className="text-xs font-semibold text-[#365165]">Akun Pegawai</p>
+            <p className="mt-2 text-xs leading-6 text-[#61798a]">Gunakan akun pegawai yang telah terdaftar pada PostgreSQL.</p>
+            <p className="mt-2 text-[11px] leading-5 text-[#798b98]">Login diverifikasi oleh backend dan data akun disimpan pada PostgreSQL.</p>
           </div>
         </div>
       </div>
