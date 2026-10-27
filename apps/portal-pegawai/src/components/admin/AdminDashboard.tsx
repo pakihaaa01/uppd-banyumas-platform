@@ -37,7 +37,7 @@ const pageInfo: Record<Tab, { title: string; desc: string }> = {
   posters: { title: 'Poster BUMDes', desc: 'Kelola referensi gambar poster yang tampil sebagai materi informasi.' },
   documents: { title: 'Informasi Publik', desc: 'Kelola daftar metadata dan tautan dokumen publik.' },
   faq: { title: 'Pertanyaan Umum', desc: 'Ubah informasi tanya jawab yang ditampilkan pada halaman FAQ.' },
-  messages: { title: 'Pesan Masyarakat', desc: 'Lihat pesan simulasi dari formulir kontak yang tersimpan di database lokal.' },
+  messages: { title: 'Pesan Masyarakat', desc: 'Kelola pesan dari formulir kontak website publik yang tersimpan di PostgreSQL.' },
   chatbot: { title: 'Jawaban Chatbot', desc: 'Kelola jawaban berbasis PostgreSQL. Hanya jawaban Aktif yang tampil pada chatbot website publik.' },
   settings: { title: 'Pengaturan Portal Pegawai', desc: 'Ringkasan lingkungan sistem, autentikasi, dan penyimpanan data Portal Pegawai.' },
   archive: { title: 'Dokumentasi Pelayanan', desc: 'Kelola tiga gambar dokumentasi yang ditampilkan pada halaman Informasi Publik.' },
@@ -216,7 +216,7 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const remove = async (id: string) => {
-    if (!window.confirm('Hapus entri ini dari database prototipe?')) return;
+    if (!window.confirm('Hapus entri ini dari PostgreSQL? Tindakan ini tidak dapat dibatalkan.')) return;
     switch (activeTab) {
       case 'announcements': await deleteAnnouncement(id);break;
       case 'locations': await deleteServiceLocation(id);break;
@@ -363,31 +363,52 @@ export const AdminDashboard: React.FC = () => {
               <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-[12px] leading-6 text-[#536f83]"><strong className="font-semibold text-[#23485f]">Lingkungan sistem:</strong> Portal Pegawai terhubung ke backend API lokal dengan autentikasi sesi dan basis data PostgreSQL. Perubahan konten yang dipublikasikan akan dibaca oleh website publik melalui API yang sama.</div>
             </div>
           ) : activeTab === 'settings' ? (
-            <div className="grid gap-5 xl:grid-cols-2">
+            <div className="space-y-5">
               <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
-                <div className="mb-5 flex items-center gap-2">
-                  <CheckCircle2 size={19} className="text-[#005BAC]"/>
-                  <h3 className="font-semibold text-[#1d3b52]">Konfigurasi Sistem</h3>
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-[#005BAC]">Portal Pegawai UPPD Kabupaten Banyumas</p>
+                    <h3 className="mt-1 text-lg font-bold text-[#1d3b52]">Status Sistem</h3>
+                    <p className="mt-1 text-xs leading-5 text-[#667c8c]">Ringkasan koneksi aplikasi, basis data, dan publikasi konten.</p>
+                  </div>
+                  <span className={`inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold ${backendReady ? 'bg-[#e9f6ef] text-[#25704a]' : 'bg-[#fff1ef] text-[#a33c33]'}`}>
+                    <span className={`h-2 w-2 rounded-full ${backendReady ? 'bg-[#2c8a5b]' : 'bg-[#c44c40]'}`} />
+                    {backendReady ? 'Sistem terhubung' : 'Koneksi bermasalah'}
+                  </span>
                 </div>
-                <dl className="divide-y divide-[#e4ebf0] text-sm">
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Portal</dt><dd className="text-[#607789]">Portal Pegawai UPPD Kabupaten Banyumas</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Backend</dt><dd className="text-[#607789]">Node.js / Express API pada server lokal</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Basis data</dt><dd className="text-[#607789]">PostgreSQL melalui Prisma ORM</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Status koneksi</dt><dd className={backendReady ? "font-semibold text-[#25704a]" : "font-semibold text-[#a33c33]"}>{backendReady ? 'PostgreSQL terhubung' : 'Backend / PostgreSQL tidak terhubung'}</dd></div>
-                </dl>
               </section>
-              <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
-                <div className="mb-5 flex items-center gap-2">
-                  <Settings size={19} className="text-[#005BAC]"/>
-                  <h3 className="font-semibold text-[#1d3b52]">Akses & Keamanan</h3>
-                </div>
-                <dl className="divide-y divide-[#e4ebf0] text-sm">
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Autentikasi</dt><dd className="text-[#607789]">Password hash dan cookie sesi HttpOnly</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Peran</dt><dd className="text-[#607789]">Administrator, Operator, dan Penanggung Jawab sesuai hak akses</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Publikasi</dt><dd className="text-[#607789]">Konten publik diambil dari endpoint API yang membaca PostgreSQL</dd></div>
-                  <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Lingkungan</dt><dd className="text-[#607789]">Pengembangan dan demonstrasi lokal</dd></div>
-                </dl>
-              </section>
+
+              <div className="grid gap-5 xl:grid-cols-2">
+                <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
+                  <div className="mb-5 flex items-center gap-2">
+                    <CheckCircle2 size={19} className="text-[#005BAC]"/>
+                    <h3 className="font-semibold text-[#1d3b52]">Konfigurasi Aplikasi</h3>
+                  </div>
+                  <dl className="divide-y divide-[#e4ebf0] text-sm">
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Portal</dt><dd className="text-[#607789]">Portal Pegawai UPPD Kabupaten Banyumas</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Backend</dt><dd className="text-[#607789]">Node.js dan Express API</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Basis data</dt><dd className="font-semibold text-[#25704a]">PostgreSQL · Prisma ORM</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Penyimpanan</dt><dd className="text-[#607789]">Data terstruktur di PostgreSQL; file unggahan disimpan pada server aplikasi</dd></div>
+                  </dl>
+                </section>
+
+                <section className="border border-[#dce5eb] bg-white p-6 sm:p-7">
+                  <div className="mb-5 flex items-center gap-2">
+                    <Settings size={19} className="text-[#005BAC]"/>
+                    <h3 className="font-semibold text-[#1d3b52]">Akses & Keamanan</h3>
+                  </div>
+                  <dl className="divide-y divide-[#e4ebf0] text-sm">
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Autentikasi</dt><dd className="text-[#607789]">Password hash dan cookie sesi HttpOnly</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Hak akses</dt><dd className="text-[#607789]">Administrator, Operator, dan Penanggung Jawab</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Website publik</dt><dd className="text-[#607789]">Konten aktif dibaca melalui API yang terhubung ke PostgreSQL</dd></div>
+                    <div className="grid gap-2 py-4 sm:grid-cols-[150px_1fr]"><dt className="font-semibold text-[#385469]">Status database</dt><dd className={backendReady ? "font-semibold text-[#25704a]" : "font-semibold text-[#a33c33]"}>{backendReady ? 'PostgreSQL terhubung' : 'PostgreSQL tidak terhubung'}</dd></div>
+                  </dl>
+                </section>
+              </div>
+
+              <div className="border-l-[3px] border-[#005BAC] bg-[#eef5f9] px-5 py-4 text-xs leading-6 text-[#536f83]">
+                Seluruh modul utama Portal Pegawai menggunakan backend API yang terhubung ke PostgreSQL. SQLite tidak digunakan sebagai basis data aplikasi.
+              </div>
             </div>
           ) : (
             <section className="border border-[#dce5eb] bg-white p-5 sm:p-6">
