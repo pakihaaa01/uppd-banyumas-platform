@@ -65,7 +65,7 @@ export const PublicInfoPage: React.FC = () => {
         <PageHeading
           eyebrow="Keterbukaan informasi"
           title="Informasi Publik"
-          description="Akses dokumentasi dan daftar informasi pelayanan yang tersedia pada portal. Keabsahan dan kemutakhiran setiap dokumen perlu diperiksa pada kanal resmi instansi."
+          description="Temukan pengumuman, dokumen publik, dan dokumentasi kegiatan pelayanan UPPD Kabupaten Banyumas. Pilih kategori informasi sesuai kebutuhan Anda."
         />
         <section aria-labelledby="public-archive-title" className="mt-10">
           <div className="mb-6">

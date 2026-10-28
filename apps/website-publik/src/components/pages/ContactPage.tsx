@@ -10,8 +10,10 @@ const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-whit
 const labelClass = 'block text-[13px] font-semibold text-[#354e60]';
 
 export const ContactPage: React.FC = () => {
-  const {settings,mainLocation,ready}=useOperational();
-  const contact=settings.contact;
+  const {settings,ready,offices}=useOperational();
+  const [selectedOffice,setSelectedOffice]=useState('');
+  const office=offices.find(o=>o.id===selectedOffice)??null;
+  const contact={phone:office?.phone??'',whatsapp:office?.whatsapp??'',email:office?.email??''};
   const { addContactMessage } = useSamsat();
   const [formData, setFormData] = useState(emptyForm);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -46,9 +48,11 @@ export const ContactPage: React.FC = () => {
           <div className="space-y-6">
             <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-details">
               <h2 id="contact-details" className="text-xl font-bold text-[#1d3b53]">Informasi Kantor</h2>
-              <p className="mt-2 text-sm leading-6 text-black">UPPD Kabupaten Banyumas — {mainLocation?.name || "Kantor utama"}</p>
+              <label className="mt-5 block text-sm font-semibold">Kantor<select className={fieldClass} value={office?.id??''} onChange={e=>setSelectedOffice(e.target.value)}><option value="">Pilih Kantor</option>{offices.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
+              {!office&&<p className="mt-4 text-sm">Pilih kantor untuk melihat alamat, saluran kontak, dan jadwal pelayanan.</p>}
+              {office&&<>
               <dl className="mt-6 space-y-6 border-t border-[#e2e9ee] pt-6">
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-black">{mainLocation?.address || "Alamat kantor utama belum tersedia."}</dd></div>
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Alamat</dt><dd className="mt-1 text-sm leading-6 text-black">{office.address} — <a href={office.mapsUrl} onClick={()=>trackEvent('open_maps')} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#005BAC] underline">Lihat di Google Maps</a></dd></div>
                 <div>
                     <dt className="text-[13px] font-bold text-[#1f3b51]">Telepon dan WhatsApp</dt>
                     <dd className="mt-1 space-y-1.5 text-sm text-black">
@@ -57,36 +61,18 @@ export const ContactPage: React.FC = () => {
                     </dd>
                 </div>
                 <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-black"><a href={contact.email ? "mailto:"+contact.email : undefined} className="break-all hover:underline">{contact.email || "Belum tersedia"}</a></dd></div>
-                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Jam pelayanan kantor utama</dt>
-                    <dd className="mt-1 text-sm leading-7 text-black">{mainLocation?.operatingHours || "Jadwal belum tersedia."}</dd>
-                    <p className="mt-2 text-xs leading-5 text-black">Jadwal perlu dikonfirmasi kepada instansi sebelum berkunjung.</p>
-                </div>
-              </dl>
-            </section>
-            <section className="overflow-hidden border border-[#dce5eb] bg-white" aria-labelledby="contact-map">
-              <div className="px-6 py-5"><h2 id="contact-map" className="text-lg font-bold text-[#1d3b53]">Peta Lokasi</h2><p className="mt-1 text-sm text-black">Arah menuju {mainLocation?.name || "kantor utama"}</p></div>
-              {mainLocation && <a onClick={()=>trackEvent('open_maps')} href={mainLocation.mapsUrl || 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mainLocation.name+' '+mainLocation.address)} target="_blank" rel="noopener noreferrer" className="mx-6 mb-6 inline-block rounded border border-blue-700 px-4 py-3 font-semibold text-blue-800">Buka lokasi di Google Maps</a>}
-
-            </section>
-            <section aria-labelledby="contact-guidance" className="border border-[#dce5eb] bg-white p-6 sm:p-8">
-              <h2 id="contact-guidance" className="mb-4 text-lg font-bold text-[#1d3b53]">Panduan Menghubungi Layanan</h2>
-              <EditorialAccordion
-                headingLevel="h3"
-                initialOpen="contact-hours"
-                items={[
-                  { id: 'contact-hours', title: 'Waktu yang tepat untuk menghubungi', content: <p>Hubungi kantor pada jam kerja yang berlaku. Jadwal di halaman ini merupakan data project dan dapat berubah; konfirmasikan terlebih dahulu melalui kanal resmi.</p> },
-                  { id: 'contact-docs', title: 'Informasi yang perlu disiapkan', content: <p>Siapkan jenis layanan, pertanyaan yang ingin diajukan, dan rincian kebutuhan administrasi. Jangan pernah membagikan kata sandi, OTP, atau informasi pribadi sensitif melalui formulir demonstrasi.</p> },
-                  { id: 'contact-channels', title: 'Saluran komunikasi alternatif', content: <p>Telepon, email, dan WhatsApp yang tercantum di bagian Informasi Kantor dapat digunakan untuk menanyakan layanan. Ketersediaan saluran perlu dikonfirmasi dengan kantor terkait.</p> },
-                ]}
-              />
+                <div><dt className="text-[13px] font-bold text-[#1f3b51]">Jam pelayanan</dt><dd className="mt-3 overflow-hidden rounded border border-slate-200"><table className="w-full text-left text-sm"><thead className="bg-slate-50"><tr><th className="p-3 font-semibold">Hari</th><th className="p-3 font-semibold">Pelayanan (WIB)</th></tr></thead><tbody>{office.serviceSchedule?.length?office.serviceSchedule.map((row,i)=><tr key={i} className="border-t"><td className="p-3 align-top">{row.day}</td><td className="p-3">{row.closed?'Tutup':row.open+'–'+row.close}{row.note&&<p className="mt-1 text-xs leading-5">{row.note}</p>}</td></tr>):<tr className="border-t"><td className="p-3 align-top">Jadwal kantor</td><td className="whitespace-pre-line p-3">{office.operatingHours||'Belum tersedia'}</td></tr>}</tbody></table></dd></div>
+              </dl></>}
             </section>
           </div>
 
           <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-form-title">
             <div className="border-b border-[#e3eaf0] pb-6">
                 <h2 id="contact-form-title" className="text-xl font-bold text-[#1d3b53]">Formulir Pesan</h2>
-                <p className="mt-2 text-sm leading-6 text-black">Simulasi formulir masukan untuk kebutuhan pengembangan website.</p>
+                <p className="mt-2 text-sm leading-6 text-black">Sampaikan pertanyaan seputar pelayanan, permintaan informasi tambahan, saran, atau pengaduan masyarakat melalui formulir ini.</p>
             </div>
+            <p className="mt-4 text-sm leading-6">Seluruh pesan dan pengaduan melalui formulir ini diterima oleh pengelolaan UPPD Kabupaten Banyumas. Pilihan kantor hanya mengubah informasi kontak yang ditampilkan.</p>
+            {settings.contact.email&&<p className="mt-2 text-sm">Email pengaduan pusat: <a className="text-[#005BAC] underline" href={'mailto:'+settings.contact.email}>{settings.contact.email}</a></p>}
             <div className="mt-5 border-l-[3px] border-[#c08c33] bg-[#fff9ed] px-4 py-3 text-xs leading-6 text-[#715727]">
               <strong>Versi demonstrasi:</strong> Pesan demonstrasi disimpan di database lokal, bukan dikirim ke petugas UPPD. Jangan masukkan data pribadi sensitif atau pengaduan sebenarnya.
             </div>
@@ -108,6 +94,17 @@ export const ContactPage: React.FC = () => {
             </form>
           </section>
         </div>
+        <section aria-labelledby="contact-guidance" className="mt-8 border border-[#dce5eb] bg-white p-6 sm:p-8">
+          <h2 id="contact-guidance" className="mb-5 text-xl font-bold text-[#1d3b53]">Panduan Menghubungi Layanan</h2>
+          <EditorialAccordion headingLevel="h3" initialOpen="channels" items={[
+            {id:'channels',title:'Pilih saluran komunikasi sesuai kebutuhan',content:<p>Untuk pertanyaan singkat tentang lokasi, persyaratan, atau jadwal, gunakan telepon atau WhatsApp kantor yang dipilih. Gunakan formulir untuk pertanyaan, saran, atau pengaduan yang memerlukan penjelasan lebih lengkap. Seluruh pesan formulir dikelola UPPD pusat.</p>},
+            {id:'service',title:'Cara menanyakan informasi pelayanan',content:<p>Sebutkan jenis layanan yang Anda perlukan, nama kantor terkait, dan hal yang ingin diketahui. Contoh: “Apa persyaratan pembayaran pajak tahunan di kantor ini?” Periksa jadwal kantor sebelum menghubungi atau datang langsung.</p>},
+            {id:'complaint',title:'Cara menyampaikan pengaduan',content:<p>Tulis pokok pengaduan pada subjek. Jelaskan kejadian secara berurutan, tanggal kejadian, kantor atau lokasi pelayanan, dan hal yang Anda harapkan untuk ditindaklanjuti. Gunakan bahasa yang jelas dan santun agar petugas dapat memahami persoalan.</p>},
+            {id:'prepare',title:'Informasi yang perlu disiapkan',content:<p>Isi nama dan alamat email yang dapat dihubungi. Berikan rincian yang berkaitan dengan pertanyaan atau kejadian. Jangan mencantumkan password, kode OTP, nomor rekening, atau data pribadi sensitif yang tidak diperlukan. Selama pengujian website, gunakan contoh data.</p>},
+            {id:'reply',title:'Setelah menyampaikan pesan',content:<p>Pastikan muncul pemberitahuan bahwa pesan berhasil disimpan. Penanganan pesan dilakukan oleh pengelola pusat pada jam kerja. Periksa kotak masuk dan folder spam email yang Anda cantumkan. Waktu tanggapan mengikuti proses penanganan yang berlaku; pengiriman pesan tidak berarti urusan pelayanan langsung selesai.</p>}
+          ]}/>
+        </section>
+
       </div>
     </main>
   );

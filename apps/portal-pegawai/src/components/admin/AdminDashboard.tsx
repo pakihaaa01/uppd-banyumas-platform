@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useSamsat } from '../../context/SamsatContext';
 import type { PortalUser } from './AdminGate';
 import { AdminAnnouncements } from './AdminAnnouncements';
@@ -8,7 +8,7 @@ import { AdminArchive } from './AdminArchive';
 import { AdminMessages } from './AdminMessages';
 import { AdminFAQ } from './AdminFAQ';
 import { AdminChatbot } from './AdminChatbot';
-import { AdminAnalytics } from './AdminAnalytics';
+const AdminAnalytics = lazy(() => import('./AdminAnalytics').then(module => ({default: module.AdminAnalytics})));
 import { AdminHelp } from './AdminHelp';
 import { AdminSettings } from './AdminSettings';
 
@@ -21,7 +21,7 @@ const menus = [
   { id: 'faqs', label: 'Pertanyaan Umum', description: 'Kelola pertanyaan dan jawaban pada halaman FAQ.' },
   { id: 'messages', label: 'Pesan Masyarakat', description: 'Periksa pesan masuk dan kelola balasannya.' },
   { id: 'chatbot', label: 'Jawaban Chatbot', description: 'Jawaban aktif ditampilkan melalui Mas Sajak di website publik.' },
-  { id: 'analytics', label: 'Statistik Kunjungan', description: 'Aktivitas pengunjung website publik yang tercatat oleh Google Analytics.' },
+  { id: 'analytics', label: 'Statistik Kunjungan', description: 'Aktivitas pengunjung website publik.' },
   { id: 'help', label: 'Bantuan Pegawai', description: 'Panduan penggunaan portal untuk pekerjaan sehari-hari.' },
   { id: 'settings', label: 'Pengaturan', description: 'Kelola kontak, beranda, template balasan, status fitur, dan akun Anda.' },
 ] as const;
@@ -53,7 +53,7 @@ export function AdminDashboard({ user }: { user: PortalUser }) {
       <main className="min-w-0">
         <div className="mb-6"><h2 className="text-xl font-bold text-[#193a52]">{selected.label}</h2><p className="mt-2 text-sm leading-6">{selected.description}</p></div>
         {dataErrors.length > 0 && <div role="alert" className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm"><p>Data belum berhasil dimuat: {dataErrors.join(', ')}.</p><button type="button" disabled={loading} onClick={updated} className="mt-2 font-semibold underline disabled:opacity-50">{loading ? 'Memuat…' : 'Coba lagi'}</button></div>}
-        {tab === 'analytics' ? <AdminAnalytics/> : tab === 'help' ? <AdminHelp/> : tab === 'settings' ? <AdminSettings user={user} /> : tab === 'chatbot' ? <AdminChatbot /> : tab === 'overview' ? <div className="space-y-5">
+        {tab === 'analytics' ? <Suspense fallback={<p>Memuat statistik…</p>}><AdminAnalytics/></Suspense> : tab === 'help' ? <AdminHelp/> : tab === 'settings' ? <AdminSettings user={user} /> : tab === 'chatbot' ? <AdminChatbot /> : tab === 'overview' ? <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {(['announcements', 'locations', 'documents', 'messages'] as const).map(id => <button key={id} type="button" onClick={() => select(id)} className="rounded-lg border border-[#dce5eb] bg-white p-5 text-left hover:border-[#005BAC] focus-visible:outline-2 focus-visible:outline-[#005BAC]">
               <p className="text-sm">{id === 'messages' ? 'Pesan baru' : menus.find(item => item.id === id)!.label}</p><p className="mt-3 text-3xl font-bold tabular-nums text-[#193a52]">{counts[id] ?? '—'}</p><p className="mt-4 text-xs font-semibold text-[#005BAC]">Lihat data</p>

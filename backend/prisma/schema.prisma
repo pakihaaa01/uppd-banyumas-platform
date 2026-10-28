@@ -96,6 +96,9 @@ enum ServiceLocationType {
 }
 
 model ServiceLocation {
+  whatsapp String @default("")
+  email String @default("")
+  serviceSchedule Json @default("[]")
   id             String              @id @default(uuid())
   name           String
   address        String

@@ -56,6 +56,7 @@ publicRouter.get('/locations', async (_req, res) => {
         address: true,
         operatingHours: true,
         phone: true,
+        whatsapp: true, email: true, serviceSchedule: true,
         mapsUrl: true,
         mapsEmbedUrl: true,
         isMain: true,

@@ -31,13 +31,13 @@ async function collect(days:number){
  const period={dateRanges:[{startDate:(days-1)+'daysAgo',endDate:'today'}]};
  const [total,daily,pages,events,realtime]=await Promise.all([
  report('runReport',{...period,metrics:[{name:'totalUsers'},{name:'sessions'},{name:'screenPageViews'}]}),
- report('runReport',{...period,dimensions:[{name:'date'}],metrics:[{name:'screenPageViews'}],orderBys:[{dimension:{dimensionName:'date'}}]}),
+ report('runReport',{...period,dimensions:[{name:'date'}],metrics:[{name:'totalUsers'},{name:'sessions'},{name:'screenPageViews'}],orderBys:[{dimension:{dimensionName:'date'}}]}),
  report('runReport',{...period,dimensions:[{name:'pageTitle'}],metrics:[{name:'screenPageViews'}],orderBys:[{metric:{metricName:'screenPageViews'},desc:true}],limit:10}),
  report('runReport',{...period,dimensions:[{name:'eventName'}],metrics:[{name:'eventCount'}],dimensionFilter:{filter:{fieldName:'eventName',inListFilter:{values:['open_chatbot','open_maps','open_document','open_digital_service']}}}}),
  report('runRealtimeReport',{metrics:[{name:'activeUsers'},{name:'screenPageViews'}]})
  ]);
  const totals=metrics(total);const rt=metrics(realtime);
- return {configured:true,testing:process.env.GA_ENVIRONMENT!=='production',updatedAt:new Date().toISOString(),days,totals:{users:totals[0]??0,sessions:totals[1]??0,views:totals[2]??0},realtime:{users:rt[0]??0,views:rt[1]??0},daily:rows(daily),pages:rows(pages),events:rows(events)};
+ return {configured:true,testing:process.env.GA_ENVIRONMENT!=='production',updatedAt:new Date().toISOString(),days,totals:{users:totals[0]??0,sessions:totals[1]??0,views:totals[2]??0},realtime:{users:rt[0]??0,views:rt[1]??0},daily:(daily.rows??[]).map(row=>({label:row.dimensionValues?.[0]?.value??'',users:Number(row.metricValues?.[0]?.value??0),sessions:Number(row.metricValues?.[1]?.value??0),views:Number(row.metricValues?.[2]?.value??0)})),pages:rows(pages),events:rows(events)};
 }
 analyticsRouter.get('/',async(req,res)=>{
  const days=Number(req.query.days??7);

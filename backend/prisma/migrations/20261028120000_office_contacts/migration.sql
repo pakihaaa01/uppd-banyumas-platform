@@ -1,0 +1,3 @@
+ALTER TABLE "ServiceLocation" ADD COLUMN "whatsapp" TEXT NOT NULL DEFAULT '', ADD COLUMN "email" TEXT NOT NULL DEFAULT '', ADD COLUMN "serviceSchedule" JSONB NOT NULL DEFAULT '[]';
+-- Preserve existing phone, address and operatingHours. Copy central contact only to the selected/main office.
+UPDATE "ServiceLocation" SET "whatsapp" = COALESCE((SELECT "value"->'contact'->>'whatsapp' FROM "SiteSettings" WHERE id='main'), ''), "email" = COALESCE((SELECT "value"->'contact'->>'email' FROM "SiteSettings" WHERE id='main'), '') WHERE id = COALESCE(NULLIF((SELECT "value"->'contact'->>'mainLocationId' FROM "SiteSettings" WHERE id='main'), ''), (SELECT id FROM "ServiceLocation" WHERE "isMain"=true ORDER BY "createdAt" LIMIT 1));

@@ -287,12 +287,13 @@ locationsRouter.patch('/:id', async (req, res) => {
       return;
     }
 
+    const previous = await prisma.serviceLocation.findUnique({where:{id:String(req.params.id)}});
     const result = await prisma.serviceLocation.updateMany({
       where: {
         id: req.params.id,
         isPublished: false
       },
-      data: validation.data
+      data: {...validation.data, ...(validation.data.operatingHours !== undefined && previous?.operatingHours !== validation.data.operatingHours ? {serviceSchedule: []} : {})}
     });
 
     if (result.count === 0) {

@@ -23,6 +23,9 @@ export interface Announcement {
 }
 
 export interface ServiceLocation {
+  whatsapp?: string;
+  email?: string;
+  serviceSchedule?: {day:string;open:string;close:string;closed:boolean;note:string}[];
   id: string;
   name: string;
   address: string;

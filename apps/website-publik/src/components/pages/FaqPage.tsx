@@ -55,7 +55,7 @@ export const FaqPage: React.FC = () => {
           <section aria-label="Daftar pertanyaan" className="min-w-0">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-[20px] font-bold text-[#1d3b53]">Daftar Tanya Jawab</h2>
-              <p aria-live="polite" className="text-xs text-black">{filteredFaqs.length} pertanyaan ditemukan</p>
+
             </div>
             {filteredFaqs.length ? (
               <EditorialAccordion
@@ -81,4 +81,5 @@ export const FaqPage: React.FC = () => {
     </main>
   );
 };
+
 

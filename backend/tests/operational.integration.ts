@@ -34,6 +34,19 @@ try{
  const second=await call('/auth/login','POST',{username:admin.username,password});const otherCookie=second.response.headers.get('set-cookie')!.split(';')[0]!;
  const token='test-retired-'+suffix;await prisma.session.create({data:{userId:operator.id,tokenHash:createHash('sha256').update(token).digest('hex'),expiresAt:new Date(Date.now()+60000)}});
  await call('/settings','GET',undefined,401,'uppd_session='+token);
+ const officeA=await prisma.serviceLocation.create({data:{name:'Office A '+suffix,address:'Alamat A',phone:'111',operatingHours:'Jadwal lama',mapsUrl:'https://maps.google.com/',type:'induk',isPublished:true}});
+ const officeB=await prisma.serviceLocation.create({data:{name:'Office B '+suffix,address:'Alamat B',phone:'222',operatingHours:'Jadwal B',mapsUrl:'https://maps.google.com/',type:'gerai',isPublished:true}});
+ const officePayload={address:'Alamat baru A',phone:'333',whatsapp:'628123456789',email:'kantor-a@example.com',mapsUrl:'https://maps.google.com/',operatingHours:'Jadwal lama',serviceSchedule:[{day:'Senin–Jumat',open:'08:00',close:'14:00',closed:false,note:''},{day:'Minggu',open:'',close:'',closed:true,note:''}],updatedAt:officeA.updatedAt.toISOString()};
+ await call('/settings/offices/'+officeA.id,'PATCH',officePayload,401,'');
+ await call('/settings/offices/'+officeA.id,'PATCH',{...officePayload,serviceSchedule:[{day:'Senin',open:'15:00',close:'08:00',closed:false,note:''}]},400);
+ const centralBefore=(await call('/public/settings')).data.settings.contact;
+ await call('/settings/offices/'+officeA.id,'PATCH',officePayload);
+ await call('/settings/offices/'+officeA.id,'PATCH',officePayload,409);
+ const directory=(await call('/public/locations')).data.locations;
+ const updated=directory.find((o:any)=>o.id===officeA.id);assert.equal(updated.address,'Alamat baru A');assert.equal(updated.email,'kantor-a@example.com');assert.equal(updated.serviceSchedule[1].closed,true);
+ assert.equal(directory.find((o:any)=>o.id===officeB.id).phone,'222');
+ assert.deepEqual((await call('/public/settings')).data.settings.contact,centralBefore);
+ await prisma.serviceLocation.deleteMany({where:{id:{in:[officeA.id,officeB.id]}}});
  const current=(await call('/settings')).data;let version=current.version;const settings=current.settings;
  await call('/settings/contact','PUT',{value:{...settings.contact,email:'invalid'},version},400);
  await call('/settings/hero','PUT',{value:{slides:['https://example.com/file.svg'],seconds:5},version},400);
@@ -68,7 +81,7 @@ try{
   if(uri.includes('analyticsdata.googleapis.com')){reportCalls++;const b=JSON.parse(String(init?.body));return new Response(JSON.stringify({rows:[{dimensionValues:b.dimensions?[{value:b.dimensions[0].name==='date'?'20261027':'Beranda'}]:[],metricValues:b.metrics.map(()=>({value:'3'}))}]}),{status:200});}
   throw Error('Unexpected outbound request');
  };
- const stats=(await call('/analytics')).data;assert.equal(stats.configured,true);assert.equal(stats.testing,true);assert.equal(stats.realtime.users,3);assert.equal(stats.totals.views,3);assert.equal(stats.daily[0].label,'20261027');assert.equal(reportCalls,5);
+ const stats=(await call('/analytics')).data;assert.equal(stats.configured,true);assert.equal(stats.testing,true);assert.equal(stats.realtime.users,3);assert.equal(stats.totals.views,3);assert.equal(stats.daily[0].label,'20261027');assert.equal(stats.daily[0].users,3);assert.equal(stats.daily[0].sessions,3);assert.equal(stats.daily[0].views,3);assert.equal(reportCalls,5);
  await call('/analytics');assert.equal(reportCalls,5);assert(oauthCalls>=1);
  globalThis.fetch=async()=>new Response('{}',{status:403});await call('/analytics?days=30','GET',undefined,502);
  console.log(`${checks} HTTP assertions passed: authorization, conflicts, settings, image bytes, templates, publication, password/session revocation, GA unset/success/cache/error.`);

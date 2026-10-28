@@ -105,3 +105,15 @@ Referensi resmi:
 - [Realtime reports](https://developers.google.com/analytics/devguides/reporting/data/v1/realtime-basics)
 - [Verifikasi pemasangan Analytics](https://developers.google.com/analytics/devguides/collection/ga4/troubleshoot)
 - [Keaktualan data](https://support.google.com/analytics/answer/11198161?hl=id)
+
+## Pembaruan 28 Oktober 2026 — Pilihan kantor untuk masyarakat
+
+Jalankan migrasi `20261028120000_office_contacts` lalu generate Prisma dan restart backend/aplikasi. Migrasi menambahkan WhatsApp, email kontak, dan jadwal terstruktur per kantor. Alamat, telepon, jadwal teks lama, serta pesan masyarakat tetap dipertahankan.
+
+Pengaturan → Informasi Kantor sekarang mengedit setiap kantor dalam data Titik Layanan, termasuk kantor terbit. Pilih Kantor, perbarui informasi, dan simpan. Jadwal dapat ditulis per hari atau kelompok hari, dengan jam buka/tutup WIB, status Tutup, dan catatan. Jadwal lama ditampilkan sampai jadwal tabel disimpan. Jika jadwal teks di Titik Layanan diubah, tabel terstruktur dikosongkan agar sumber informasi tidak bertentangan.
+
+Pada Kontak publik, pilihan kantor mengubah kartu informasi saja. Formulir tetap masuk ke daftar Pesan Masyarakat pusat; tidak ada alamat penerima atau kantor tujuan yang dikirim dari dropdown. Email kontak kantor terpisah dari email pengaduan pusat pada konfigurasi kontak global. Kontak footer tetap pusat. Kantor draft tidak ditampilkan publik.
+
+Grafik statistik kini berupa area biru bergradasi dengan garis monotone, tooltip, pilihan metrik Pengguna/Sesi/Tayangan, serta tabel angka yang dapat dibuka untuk aksesibilitas. Backend mengambil ketiga metrik per tanggal dari GA4. Jumlah pengguna periode tidak dihitung dengan menjumlahkan pengguna harian karena orang yang sama dapat datang pada beberapa hari.
+
+Panduan Kontak berada di bawah dua kolom dengan lebar penuh. Peta terpisah diganti tautan setelah alamat. Jumlah hasil FAQ dan paragraf petunjuk demonstrasi statistik dihapus.

@@ -1,6 +1,7 @@
 import {useEffect,useState,type FormEvent} from 'react';
 import {apiRequest} from '../../lib/api';
 import type {PortalUser} from './AdminGate';
+import {OfficeSettings} from './OfficeSettings';
 import {TemplateSettings} from './TemplateSettings';
 type Settings={contact:{phone:string;whatsapp:string;email:string;mainLocationId:string};hero:{slides:string[];seconds:number};features:{taxEnabled:boolean;chatbotEnabled:boolean;taxMessage:string;chatbotMessage:string}};
 type Section='contact'|'hero'|'templates'|'features'|'account';
@@ -10,9 +11,9 @@ const button='min-h-11 rounded-md bg-[#005BAC] px-5 py-2.5 text-sm font-semibold
 const secondary='min-h-10 rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-black disabled:opacity-40';
 export function AdminSettings({user}:{user:PortalUser}){
  const [tab,setTab]=useState<Section>('contact');const [data,setData]=useState<Settings|null>(null);const [baseline,setBaseline]=useState('');const [version,setVersion]=useState(0);
- const [locations,setLocations]=useState<{id:string;name:string;isPublished:boolean}[]>([]);const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');
+ const [busy,setBusy]=useState(false);const [error,setError]=useState('');const [notice,setNotice]=useState('');
  const [account,setAccount]=useState({displayName:user.displayName,currentPassword:'',newPassword:'',confirmPassword:''});
- async function load(){setBusy(true);setError('');try{const [r,l]=await Promise.all([apiRequest<{settings:Settings;version:number}>('/api/v1/settings'),apiRequest<{locations:{id:string;name:string;isPublished:boolean}[]}>('/api/v1/locations')]);setData(r.settings);setBaseline(JSON.stringify(r.settings));setVersion(r.version);setLocations(l.locations.filter(x=>x.isPublished));}catch(e){setError(e instanceof Error?e.message:'Pengaturan belum dapat dimuat.');}finally{setBusy(false);}}
+ async function load(){setBusy(true);setError('');try{const r=await apiRequest<{settings:Settings;version:number}>('/api/v1/settings');setData(r.settings);setBaseline(JSON.stringify(r.settings));setVersion(r.version);}catch(e){setError(e instanceof Error?e.message:'Pengaturan belum dapat dimuat.');}finally{setBusy(false);}}
  useEffect(()=>{void load();},[]);
  async function save(e:FormEvent){e.preventDefault();if(!data||busy)return;setBusy(true);setError('');setNotice('');try{
  if(tab==='account'){
@@ -29,13 +30,9 @@ export function AdminSettings({user}:{user:PortalUser}){
  <nav aria-label="Bagian pengaturan" className="flex flex-wrap gap-2">{tabs.map(t=><button type="button" key={t.id} disabled={busy} aria-pressed={tab===t.id} onClick={()=>changeTab(t.id)} className={tab===t.id?button:secondary}>{t.label}</button>)}</nav>
  {error&&<div role="alert" className="rounded border border-red-200 bg-red-50 p-4 text-sm"><p>{error}</p><button type="button" disabled={busy} className="mt-2 underline" onClick={()=>{if(!data||JSON.stringify(data)===baseline||window.confirm('Muat ulang dan buang perubahan yang belum disimpan?'))void load();}}>Muat ulang pengaturan</button></div>}
  {notice&&<p role="status" className="rounded border border-green-200 bg-green-50 p-4 text-sm">{notice}</p>}
- {tab==='templates'?<TemplateSettings/>:!data?<p role="status">{busy?'Memuat pengaturan…':'Pengaturan belum tersedia.'}</p>:<form onSubmit={save} className="space-y-6 rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
+ {tab==='contact'?<OfficeSettings/>:tab==='templates'?<TemplateSettings/>:!data?<p role="status">{busy?'Memuat pengaturan…':'Pengaturan belum tersedia.'}</p>:<form onSubmit={save} className="space-y-6 rounded-lg border border-slate-200 bg-white p-5 sm:p-7">
  <h3 className="text-lg font-semibold">{tabs.find(t=>t.id===tab)?.label}</h3>
  <fieldset disabled={busy} className="space-y-5">
- {tab==='contact'&&<><p className="text-sm leading-6">Kontak ini digunakan pada halaman Kontak dan footer. Alamat dan jam kantor mengikuti Titik Layanan.</p>
- <label className="block text-sm font-medium">Kantor utama<select className={field} value={data.contact.mainLocationId} onChange={e=>setData({...data,contact:{...data.contact,mainLocationId:e.target.value}})}><option value="">Gunakan titik yang ditandai sebagai kantor utama</option>{locations.map(l=><option key={l.id} value={l.id}>{l.name}</option>)}</select></label>
- {(['phone','whatsapp','email'] as const).map(key=><label key={key} className="block text-sm font-medium">{{phone:'Telepon utama',whatsapp:'WhatsApp (contoh: 628123456789)',email:'Email'}[key]}<input type={key==='email'?'email':'text'} maxLength={key==='email'?254:key==='phone'?80:20} className={field} value={data.contact[key]} onChange={e=>setData({...data,contact:{...data.contact,[key]:e.target.value}})}/></label>)}
- <p className="text-sm">Untuk mengganti alamat atau jam, buka menu Titik Layanan dan edit kantor yang dipilih.</p></>}
  {tab==='hero'&&<><p className="text-sm leading-6">Pratinjau memakai potongan gambar seperti beranda. Gunakan foto melebar dengan objek utama di tengah. Maksimal delapan foto.</p>
  <div className="grid gap-4 sm:grid-cols-2">{data.hero.slides.map((src,i)=><article key={src} className="overflow-hidden rounded-lg border border-slate-200"><div className="relative aspect-[16/9]"><img src={src} alt={'Pratinjau foto '+(i+1)} className="h-full w-full object-cover"/><div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 to-transparent p-4 text-white"><span className="text-xs">Pratinjau foto {i+1}</span><p className="mt-4 max-w-40 font-bold">Informasi dan Pelayanan Pajak Kendaraan</p></div></div><div className="flex flex-wrap gap-2 p-3"><button type="button" className={secondary} disabled={i===0||busy} onClick={()=>move(i,-1)}>Majukan</button><button type="button" className={secondary} disabled={i===data.hero.slides.length-1||busy} onClick={()=>move(i,1)}>Mundurkan</button><button type="button" className={secondary} disabled={data.hero.slides.length<=1||busy} onClick={()=>setData({...data,hero:{...data.hero,slides:data.hero.slides.filter((_,j)=>j!==i)}})}>Hapus</button></div></article>)}</div>
  <label className="block text-sm font-medium">Unggah foto<input type="file" accept="image/jpeg,image/png,image/webp" className={field} disabled={busy||data.hero.slides.length>=8} onChange={e=>{void upload(e.target.files?.[0]);e.target.value='';}}/></label>
