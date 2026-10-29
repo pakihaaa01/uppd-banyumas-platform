@@ -1,3 +1,4 @@
+import { expireAnnouncements } from '../lib/announcementExpiry';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAdministrator } from '../middleware/auth';
@@ -5,6 +6,10 @@ import { requireAdministrator } from '../middleware/auth';
 export const announcementsRouter = Router();
 
 announcementsRouter.use(requireAdministrator);
+announcementsRouter.use(async (_req, _res, next) => {
+  try { await expireAnnouncements(); next(); }
+  catch (error) { next(error); }
+});
 
 const announcementFields = {
   id: true,
@@ -146,7 +151,7 @@ function validateDraft(
     const v=values.notificationExpiresAt;
     if (v === null || v === '') data.notificationExpiresAt=null;
     else if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v) && !Number.isNaN(Date.parse(v))) data.notificationExpiresAt=new Date(v);
-    else return {valid:false,message:'Waktu berakhir notifikasi tidak valid.'};
+    else return {valid:false,message:'Waktu berakhir pengumuman tidak valid.'};
   }
   return { valid: true, data };
 }
@@ -297,11 +302,11 @@ announcementsRouter.post('/:id/publish', async (req, res) => {
   }
   try {
     const result = await prisma.announcement.updateMany({
-      where: { id: req.params.id, status: 'DRAFT' },
+      where: { id: req.params.id, status: 'DRAFT', OR: [{ notificationExpiresAt: null }, { notificationExpiresAt: { gt: new Date() } }] },
       data: { status: 'PUBLISHED', publishedAt: new Date(), reviewedById: null, reviewedAt: null, reviewNote: null }
     });
     if (!result.count) {
-      res.status(404).json({ message: 'Draft tidak ditemukan atau sudah diterbitkan' });
+      res.status(409).json({ message: 'Draft tidak ditemukan, sudah diterbitkan, atau batas tampil sudah lewat. Perbarui atau kosongkan batas tampil sebelum menerbitkan.' });
       return;
     }
     res.json({ message: 'Pengumuman berhasil dipublikasikan' });

@@ -9,7 +9,8 @@ publicRouter.get('/announcements', async (_req, res) => {
     const announcements = await prisma.announcement.findMany({
       where: {
         status: 'PUBLISHED',
-        publishedAt: { lte: new Date() }
+        publishedAt: { lte: new Date() },
+        OR: [{ notificationExpiresAt: null }, { notificationExpiresAt: { gt: new Date() } }]
       },
       select: {
         id: true,

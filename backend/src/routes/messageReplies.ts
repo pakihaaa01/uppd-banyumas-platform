@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { prisma } from '../lib/prisma';
 import { requireAdministrator } from '../middleware/auth';
@@ -23,15 +24,23 @@ async function sendGmail(to: string, subject: string, body: string): Promise<str
   const token = await tokenResponse.json() as { access_token?: string };
   if (!token.access_token) throw new Error('Access token Gmail tidak tersedia');
   const clean = (value: string) => value.replace(/[\r\n]+/g, ' ').trim();
+  const sender = GMAIL_SENDER_EMAIL.trim();
+  if (!/^[^\s<>@]+@[^\s<>@]+\.[^\s<>@]+$/.test(sender)) {
+    throw new Error('GMAIL_SENDER_EMAIL harus berupa alamat email pengirim yang valid.');
+  }
+  const senderName = clean(process.env.GMAIL_SENDER_NAME || 'Demo Portal UPPD Banyumas');
+  const encodedBody = Buffer.from(body, 'utf8').toString('base64').match(/.{1,76}/g)?.join('\r\n') ?? '';
   const mime = [
-    'From: ' + clean(GMAIL_SENDER_EMAIL),
+    'From: =?UTF-8?B?' + Buffer.from(senderName).toString('base64') + '?= <' + sender + '>',
+    'Date: ' + new Date().toUTCString(),
+    'Message-ID: <' + randomUUID() + '@' + sender.split('@')[1] + '>',
     'To: ' + clean(to),
     'Subject: =?UTF-8?B?' + Buffer.from(subject).toString('base64') + '?=',
     'MIME-Version: 1.0',
     'Content-Type: text/plain; charset=UTF-8',
     'Content-Transfer-Encoding: base64',
     '',
-    Buffer.from(body,'utf8').toString('base64')
+    encodedBody
   ].join('\r\n');
   const raw = Buffer.from(mime,'utf8').toString('base64url');
   const response = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
@@ -65,7 +74,7 @@ messageRepliesRouter.post('/:id/send',async(req,res)=>{
   if(!body){res.status(400).json({message:'Simpan Draft balasan terlebih dahulu'});return;}
   try{
     // Penyerahan ke Gmail sukses tidak menjamin email dibaca/diterima di inbox.
-    const gmailId=await sendGmail(current.email,'Re: '+current.subject,body);
+    const gmailId=await sendGmail(current.email,'Tanggapan atas pesan Anda: '+current.subject,body);
     await prisma.contactMessage.update({
       where:{id:current.id},
       data:{status:'COMPLETED',replySentAt:new Date(),replyGmailId:gmailId,replyLastError:null}
@@ -79,3 +88,4 @@ messageRepliesRouter.post('/:id/send',async(req,res)=>{
     res.status(502).json({message:reason});
   }
 });
+

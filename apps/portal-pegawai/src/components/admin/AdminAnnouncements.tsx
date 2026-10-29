@@ -111,6 +111,17 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
     };
   }, []);
 
+  useEffect(() => {
+    if (saving) return;
+    let active = true;
+    const timer = window.setInterval(() => {
+      void apiRequest<{ announcements: Draft[] }>(API).then(data => {
+        if (active) setDrafts(data.announcements);
+      }).catch(() => { /* Keep the current list when the backend is offline. */ });
+    }, 15_000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, [saving]);
+
   // Pencarian pengumuman berdasarkan judul dan kategori.
   const filtered = drafts.filter((item) =>
     (statusFilter === 'ALL' || item.status === statusFilter) &&
@@ -365,8 +376,8 @@ export function AdminAnnouncements({ onAnnouncementsChange }: { onAnnouncementsC
             </div>
             <div className="space-y-3 sm:col-span-2">
               <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={form.showInNotifications} onChange={e=>setForm({...form,showInNotifications:e.target.checked})}/> Tampilkan melalui lonceng notifikasi</label>
-              {form.showInNotifications && <label className="block text-sm">Batas tampil di notifikasi (WIB, opsional)<input type="datetime-local" className={field} value={form.notificationExpiresAt ? new Date(new Date(form.notificationExpiresAt).getTime()+7*3600000).toISOString().slice(0,16):''} onChange={e=>setForm({...form,notificationExpiresAt:e.target.value?new Date(e.target.value+':00+07:00').toISOString():null})}/></label>}
-              <p className="text-xs">Setelah batas waktu, pengumuman tetap tersedia di Informasi Publik tetapi hilang dari lonceng. Kosongkan untuk tanpa batas waktu.</p>
+              <label className="block text-sm">Batas tampil pengumuman (WIB, opsional)<input type="datetime-local" className={field} value={form.notificationExpiresAt ? new Date(new Date(form.notificationExpiresAt).getTime()+7*3600000).toISOString().slice(0,16):''} onChange={e=>setForm({...form,notificationExpiresAt:e.target.value?new Date(e.target.value+':00+07:00').toISOString():null})}/></label>
+              <p className="text-xs">Setelah batas waktu, pengumuman otomatis menjadi Draft dan tidak ditampilkan di website publik maupun lonceng notifikasi. Kosongkan untuk tanpa batas waktu.</p>
             </div>
             {preview && <div className="rounded-lg border border-[#dce5eb] bg-[#f8fafc] p-5 sm:col-span-2">
               <p className="text-[11px] font-bold uppercase tracking-wider text-[#005BAC]">Pratinjau</p>

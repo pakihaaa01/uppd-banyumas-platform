@@ -1,3 +1,4 @@
+import { startAnnouncementExpiry } from './lib/announcementExpiry';
 import { settingsRouter, publicSettingsRouter } from './routes/settings';
 import { templatesRouter } from './routes/templates';
 import { analyticsRouter } from './routes/analytics';
@@ -86,6 +87,8 @@ app.use((error: any, _req: express.Request, res: express.Response, _next: expres
   console.error('Request failed:', error?.message);
   res.status(500).json({message:'Permintaan belum berhasil diproses. Silakan coba lagi.'});
 });
+
+startAnnouncementExpiry();
 
 app.listen(PORT, '127.0.0.1', () => {
   console.log(`Backend berjalan di http://localhost:${PORT}`);

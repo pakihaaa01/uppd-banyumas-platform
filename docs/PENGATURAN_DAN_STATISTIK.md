@@ -127,3 +127,13 @@ Kartu Informasi Kantor dan Formulir Pesan menggunakan tinggi sejajar pada deskto
 Formulir publik hanya mengirim nama, email, dan isi pesan. Subjek tidak lagi menjadi kolom, validasi, atau payload dari masyarakat. Riwayat subjek pesan lama tetap disimpan; pesan baru memakai judul internal “Pesan masyarakat” agar balasan Gmail dan template lama tetap kompatibel. Tidak diperlukan migrasi database untuk koreksi ini. Restart backend dan frontend bersama-sama setelah pembaruan.
 
 - Halaman Kontak menampilkan email pusat `up3adbms@gmail.com` untuk setiap pilihan kantor. Baris WhatsApp tidak ditampilkan jika nomornya kosong.
+
+## Pengumuman kedaluwarsa dan balasan Gmail
+
+- Batas tampil pengumuman berlaku untuk seluruh publikasi, bukan hanya lonceng. Field database `notificationExpiresAt` tetap digunakan sehingga tidak perlu migrasi. Jadwal yang sudah tersimpan juga mengikuti aturan baru.
+- Backend mengubah pengumuman kedaluwarsa menjadi Draft saat startup, setiap 15 detik, dan sebelum permintaan pengelolaan pengumuman. API publik langsung menyaring batas waktu. Halaman publik yang sudah terbuka menghapus item kedaluwarsa setiap detik; daftar admin diperbarui setiap 15 detik.
+- Backend harus berjalan untuk memperbarui status database. Jika mati, pembaruan dilakukan saat backend kembali berjalan. Isi pengumuman tidak dihapus. Perbarui atau kosongkan batas waktu sebelum menerbitkan ulang.
+- Jam batas tampil menggunakan WIB. Tidak ada perubahan CAPTCHA maupun verifikasi penjumlahan.
+- Gmail memakai nama pengirim `Demo Portal UPPD Banyumas` secara default. Atur `GMAIL_SENDER_NAME` di backend untuk nama yang sesuai. `GMAIL_SENDER_EMAIL` wajib sesuai akun OAuth atau alias pengirim yang telah diverifikasi Gmail; untuk testing gunakan alamat Gmail pribadi yang terhubung, bukan alamat kantor yang belum diotorisasi.
+- Balasan memakai subjek yang jelas, Date, Message-ID unik, dan baris base64 MIME maksimal 76 karakter. Perubahan ini tidak menjamin lolos spam. Penyebab spam tetap memerlukan alasan Gmail dan hasil SPF/DKIM/DMARC dari pesan penerima. Jangan membagikan token OAuth.
+- Tidak menjalankan pengujian atas perubahan ini sesuai permintaan pengguna.

@@ -12,6 +12,16 @@ const PORTAL = false;
 function usePortalState() {
   const [currentPage, setPage] = useState<PageRoute>('home');
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  useEffect(() => {
+    const removeExpired = () => setAnnouncements(items => {
+      const now = Date.now();
+      const visible = items.filter(item => !item.notificationExpiresAt || Date.parse(item.notificationExpiresAt) > now);
+      return visible.length === items.length ? items : visible;
+    });
+    removeExpired();
+    const timer = window.setInterval(removeExpired, 1000);
+    return () => window.clearInterval(timer);
+  }, []);
   const [serviceLocations, setServiceLocations] = useState<ServiceLocation[]>([]);
   const [documents, setDocuments] = useState<PublicDocument[]>([]);
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
