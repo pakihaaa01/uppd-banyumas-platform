@@ -117,3 +117,13 @@ Pada Kontak publik, pilihan kantor mengubah kartu informasi saja. Formulir tetap
 Grafik statistik kini berupa area biru bergradasi dengan garis monotone, tooltip, pilihan metrik Pengguna/Sesi/Tayangan, serta tabel angka yang dapat dibuka untuk aksesibilitas. Backend mengambil ketiga metrik per tanggal dari GA4. Jumlah pengguna periode tidak dihitung dengan menjumlahkan pengguna harian karena orang yang sama dapat datang pada beberapa hari.
 
 Panduan Kontak berada di bawah dua kolom dengan lebar penuh. Peta terpisah diganti tautan setelah alamat. Jumlah hasil FAQ dan paragraf petunjuk demonstrasi statistik dihapus.
+
+## Koreksi formulir 29 Oktober 2026
+
+Setelah penyimpanan informasi kantor berhasil, editor dikosongkan, pilihan kembali ke Pilih Kantor, dan halaman bergulir ke judul Informasi Kantor dengan pesan sukses. Jika gagal, isian tetap tersedia untuk diperbaiki.
+
+Kartu Informasi Kantor dan Formulir Pesan menggunakan tinggi sejajar pada desktop; pada ponsel tinggi mengikuti isi masing-masing. Email pengaduan pusat serta kalimat penjelasan pilihan kantor di formulir dihapus dari tampilan.
+
+Formulir publik hanya mengirim nama, email, dan isi pesan. Subjek tidak lagi menjadi kolom, validasi, atau payload dari masyarakat. Riwayat subjek pesan lama tetap disimpan; pesan baru memakai judul internal “Pesan masyarakat” agar balasan Gmail dan template lama tetap kompatibel. Tidak diperlukan migrasi database untuk koreksi ini. Restart backend dan frontend bersama-sama setelah pembaruan.
+
+- Halaman Kontak menampilkan email pusat `up3adbms@gmail.com` untuk setiap pilihan kantor. Baris WhatsApp tidak ditampilkan jika nomornya kosong.

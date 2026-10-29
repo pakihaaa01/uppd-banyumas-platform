@@ -100,10 +100,10 @@ function usePortalState() {
     return item ? changeChatbot('/' + encodeURIComponent(id) + '/toggle', 'POST', { isEnabled: !item.isEnabled }, item.isEnabled ? 'Jawaban dinonaktifkan.' : 'Jawaban diaktifkan.') : Promise.resolve(false);
   };
   const deleteChatbotFaq = (id: string) => changeChatbot('/' + encodeURIComponent(id), 'DELETE', undefined, 'Jawaban dihapus.');
-  const addContactMessage = async (data: Omit<ContactMessage, 'id' | 'createdAt' | 'status' | 'phone'>) => {
+  const addContactMessage = async (data: Omit<ContactMessage, 'id' | 'createdAt' | 'status' | 'phone' | 'subject'>) => {
     try {
-      const { name, email, subject, message } = data;
-      await apiRequest('/api/v1/contact', 'POST', { name, email, subject, message });
+      const { name, email, message } = data;
+      await apiRequest('/api/v1/contact', 'POST', { name, email, message });
       showToast('Pesan berhasil disimpan.'); return true;
     } catch (error) { showToast(error instanceof Error ? error.message : 'Gagal mengirim pesan', 'error'); return false; }
   };

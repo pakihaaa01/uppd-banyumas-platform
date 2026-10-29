@@ -15,7 +15,8 @@ const {authRouter}=await import('../src/routes/auth');
 const {analyticsRouter}=await import('../src/routes/analytics');
 const {announcementsRouter}=await import('../src/routes/announcements');
 const {publicRouter}=await import('../src/routes/public');
-const app=express();app.use(express.json(),cookieParser());app.use('/settings',settingsRouter);app.use('/public',publicSettingsRouter,publicRouter);app.use('/templates',templatesRouter);app.use('/auth',authRouter);app.use('/analytics',analyticsRouter);app.use('/announcements',announcementsRouter);
+const {contactRouter}=await import('../src/routes/contact');
+const app=express();app.use(express.json(),cookieParser());app.use('/settings',settingsRouter);app.use('/public',publicSettingsRouter,publicRouter);app.use('/templates',templatesRouter);app.use('/auth',authRouter);app.use('/analytics',analyticsRouter);app.use('/announcements',announcementsRouter);app.use('/contact',contactRouter);
 app.use((e:any,_q:express.Request,r:express.Response,_n:express.NextFunction)=>r.status(e.status??500).json({message:e.message}));
 const server=app.listen(0,'127.0.0.1');await new Promise<void>(r=>server.once('listening',r));
 const address=server.address();assert(address&&typeof address!=='string');const base='http://127.0.0.1:'+address.port;
@@ -29,6 +30,13 @@ async function call(path:string,method='GET',body?:unknown,expected=200,session=
 }
 try{
  await call('/settings','GET',undefined,401);
+ const citizenEmail='test-'+suffix+'@example.com';
+ await call('/contact','POST',{name:'Penguji',email:citizenEmail,message:'Pertanyaan pelayanan tanpa topik'},201,'');
+ const message=await prisma.contactMessage.findFirstOrThrow({where:{email:citizenEmail}});assert.equal(message.message,'Pertanyaan pelayanan tanpa topik');assert.equal(message.subject,'Pesan masyarakat');assert.equal(message.status,'NEW');assert.equal(message.replySentAt,null);
+ await call('/contact','POST',{name:'Penguji',email:citizenEmail,message:'   '},400,'');
+ await call('/contact','POST',{name:'Penguji',email:citizenEmail,message:'Pertanyaan',subject:'Topik lama'},400,'');
+ await prisma.contactMessage.deleteMany({where:{email:citizenEmail}});
+
  await call('/auth/login','POST',{username:operator.username,password},401);
  const login=await call('/auth/login','POST',{username:admin.username,password});cookie=login.response.headers.get('set-cookie')!.split(';')[0]!;
  const second=await call('/auth/login','POST',{username:admin.username,password});const otherCookie=second.response.headers.get('set-cookie')!.split(';')[0]!;

@@ -49,7 +49,7 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
     }
 
     const values = input as Record<string, unknown>;
-    const allowed = ['name', 'email', 'subject', 'message'];
+    const allowed = ['name', 'email', 'message'];
 
     if (Object.keys(values).some(key => !allowed.includes(key))) {
       res.status(400).json({
@@ -60,13 +60,11 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
 
     const limits = {
       name: 100,
-      subject: 200,
       message: 10000
     } as const;
 
     const data = {
       name: '',
-      subject: '',
       message: ''
     };
 
@@ -101,6 +99,8 @@ contactRouter.post('/', contactLimiter, async (req, res) => {
     await prisma.contactMessage.create({
       data: {
         ...data,
+        // Internal email heading; citizens no longer provide a subject.
+        subject: 'Pesan masyarakat',
         email: values.email.trim(),
         status: 'NEW'
       }

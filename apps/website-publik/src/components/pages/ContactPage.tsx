@@ -5,15 +5,15 @@ import { EditorialAccordion } from '../shared/EditorialAccordion';
 import { useSamsat } from '../../context/SamsatContext';
 import { PageHeading } from '../shared/PageHeading';
 
-const emptyForm = { name: '', email: '', subject: '', message: '' };
+const emptyForm = { name: '', email: '', message: '' };
 const fieldClass = 'mt-2 block w-full rounded-md border border-[#cfdce5] bg-white px-3.5 py-3 text-sm text-[#203b51] outline-none placeholder:text-black focus:border-[#005BAC] focus:ring-2 focus:ring-[#e7f2fb]';
 const labelClass = 'block text-[13px] font-semibold text-[#354e60]';
 
 export const ContactPage: React.FC = () => {
-  const {settings,ready,offices}=useOperational();
+  const {ready,offices}=useOperational();
   const [selectedOffice,setSelectedOffice]=useState('');
   const office=offices.find(o=>o.id===selectedOffice)??null;
-  const contact={phone:office?.phone??'',whatsapp:office?.whatsapp??'',email:office?.email??''};
+  const contact={phone:office?.phone??'',whatsapp:office?.whatsapp??'',email:'up3adbms@gmail.com'};
   const { addContactMessage } = useSamsat();
   const [formData, setFormData] = useState(emptyForm);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -21,12 +21,11 @@ export const ContactPage: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!formData.name.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) return;
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) return;
     setSending(true);
     const saved = await addContactMessage({
       name: formData.name.trim(),
       email: formData.email.trim(),
-      subject: formData.subject.trim(),
       message: formData.message.trim(),
     });
     setSending(false);
@@ -44,9 +43,9 @@ export const ContactPage: React.FC = () => {
           description="Informasi lokasi, saluran komunikasi, dan panduan untuk menghubungi UPPD Kabupaten Banyumas serta SAMSAT Purwokerto."
         />
         {!ready && <p role="status" className="mt-6 text-black">Informasi kantor sedang dimuat atau belum tersedia.</p>}
-        <div className="mt-10 grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="space-y-6">
-            <section className="border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-details">
+        <div className="mt-10 grid items-stretch gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="flex min-w-0 flex-col">
+            <section className="h-full border border-[#dce5eb] bg-white p-6 sm:p-8" aria-labelledby="contact-details">
               <h2 id="contact-details" className="text-xl font-bold text-[#1d3b53]">Informasi Kantor</h2>
               <label className="mt-5 block text-sm font-semibold">Kantor<select className={fieldClass} value={office?.id??''} onChange={e=>setSelectedOffice(e.target.value)}><option value="">Pilih Kantor</option>{offices.map(o=><option key={o.id} value={o.id}>{o.name}</option>)}</select></label>
               {!office&&<p className="mt-4 text-sm">Pilih kantor untuk melihat alamat, saluran kontak, dan jadwal pelayanan.</p>}
@@ -57,7 +56,7 @@ export const ContactPage: React.FC = () => {
                     <dt className="text-[13px] font-bold text-[#1f3b51]">Telepon dan WhatsApp</dt>
                     <dd className="mt-1 space-y-1.5 text-sm text-black">
                       <p><a className="hover:underline" href={contact.phone ? "tel:"+contact.phone.replace(/[^+0-9]/g,"") : undefined}>{contact.phone || "Belum tersedia"}</a></p>
-                      <p><a className="inline-flex items-center gap-1 font-semibold text-[#005BAC] hover:underline" href={contact.whatsapp ? "https://wa.me/"+contact.whatsapp : undefined} target="_blank" rel="noopener noreferrer">{contact.whatsapp || "Belum tersedia"}</a></p>
+                      {contact.whatsapp&&<p><a className="inline-flex items-center gap-1 font-semibold text-[#005BAC] hover:underline" href={"https://wa.me/"+contact.whatsapp} target="_blank" rel="noopener noreferrer">{contact.whatsapp}</a></p>}
                     </dd>
                 </div>
                 <div><dt className="text-[13px] font-bold text-[#1f3b51]">Email</dt><dd className="mt-1 text-sm text-black"><a href={contact.email ? "mailto:"+contact.email : undefined} className="break-all hover:underline">{contact.email || "Belum tersedia"}</a></dd></div>
@@ -71,8 +70,7 @@ export const ContactPage: React.FC = () => {
                 <h2 id="contact-form-title" className="text-xl font-bold text-[#1d3b53]">Formulir Pesan</h2>
                 <p className="mt-2 text-sm leading-6 text-black">Sampaikan pertanyaan seputar pelayanan, permintaan informasi tambahan, saran, atau pengaduan masyarakat melalui formulir ini.</p>
             </div>
-            <p className="mt-4 text-sm leading-6">Seluruh pesan dan pengaduan melalui formulir ini diterima oleh pengelolaan UPPD Kabupaten Banyumas. Pilihan kantor hanya mengubah informasi kontak yang ditampilkan.</p>
-            {settings.contact.email&&<p className="mt-2 text-sm">Email pengaduan pusat: <a className="text-[#005BAC] underline" href={'mailto:'+settings.contact.email}>{settings.contact.email}</a></p>}
+            <p className="mt-4 text-sm leading-6">Seluruh pesan dan pengaduan melalui formulir ini diterima oleh pengelolaan UPPD Kabupaten Banyumas.</p>
             <div className="mt-5 border-l-[3px] border-[#c08c33] bg-[#fff9ed] px-4 py-3 text-xs leading-6 text-[#715727]">
               <strong>Versi demonstrasi:</strong> Pesan demonstrasi disimpan di database lokal, bukan dikirim ke petugas UPPD. Jangan masukkan data pribadi sensitif atau pengaduan sebenarnya.
             </div>
@@ -86,9 +84,6 @@ export const ContactPage: React.FC = () => {
                 <div><label htmlFor="contact-name" className={labelClass}>Nama <span aria-hidden="true">*</span></label><input id="contact-name" type="text" autoComplete="name" required maxLength={100} value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Nama Anda" className={fieldClass} /></div>
                 <div><label htmlFor="contact-email" className={labelClass}>Email <span aria-hidden="true">*</span></label><input id="contact-email" type="email" autoComplete="email" required maxLength={150} value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} placeholder="nama@email.com" className={fieldClass} /></div>
               </div>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div><label htmlFor="contact-subject" className={labelClass}>Subjek <span aria-hidden="true">*</span></label><input id="contact-subject" type="text" required maxLength={150} value={formData.subject} onChange={(event) => setFormData({ ...formData, subject: event.target.value })} placeholder="Topik pesan" className={fieldClass} /></div>
-              </div>
               <div><div className="flex items-center justify-between"><label htmlFor="contact-message" className={labelClass}>Isi pesan <span aria-hidden="true">*</span></label><span className="text-xs text-black">{formData.message.length}/1000</span></div><textarea id="contact-message" required rows={6} maxLength={1000} value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} placeholder="Tuliskan contoh pertanyaan atau saran..." className={`${fieldClass} resize-y`} /></div>
               <button type="submit" disabled={sending} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-[#005BAC] px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-[#004a89] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#005BAC]">Simpan contoh pesan</button>
             </form>
@@ -99,7 +94,7 @@ export const ContactPage: React.FC = () => {
           <EditorialAccordion headingLevel="h3" initialOpen="channels" items={[
             {id:'channels',title:'Pilih saluran komunikasi sesuai kebutuhan',content:<p>Untuk pertanyaan singkat tentang lokasi, persyaratan, atau jadwal, gunakan telepon atau WhatsApp kantor yang dipilih. Gunakan formulir untuk pertanyaan, saran, atau pengaduan yang memerlukan penjelasan lebih lengkap. Seluruh pesan formulir dikelola UPPD pusat.</p>},
             {id:'service',title:'Cara menanyakan informasi pelayanan',content:<p>Sebutkan jenis layanan yang Anda perlukan, nama kantor terkait, dan hal yang ingin diketahui. Contoh: “Apa persyaratan pembayaran pajak tahunan di kantor ini?” Periksa jadwal kantor sebelum menghubungi atau datang langsung.</p>},
-            {id:'complaint',title:'Cara menyampaikan pengaduan',content:<p>Tulis pokok pengaduan pada subjek. Jelaskan kejadian secara berurutan, tanggal kejadian, kantor atau lokasi pelayanan, dan hal yang Anda harapkan untuk ditindaklanjuti. Gunakan bahasa yang jelas dan santun agar petugas dapat memahami persoalan.</p>},
+            {id:'complaint',title:'Cara menyampaikan pengaduan',content:<p>Tuliskan pengaduan pada kolom Isi pesan. Jelaskan kejadian secara berurutan, tanggal kejadian, kantor atau lokasi pelayanan, dan hal yang Anda harapkan untuk ditindaklanjuti. Gunakan bahasa yang jelas dan santun agar petugas dapat memahami persoalan.</p>},
             {id:'prepare',title:'Informasi yang perlu disiapkan',content:<p>Isi nama dan alamat email yang dapat dihubungi. Berikan rincian yang berkaitan dengan pertanyaan atau kejadian. Jangan mencantumkan password, kode OTP, nomor rekening, atau data pribadi sensitif yang tidak diperlukan. Selama pengujian website, gunakan contoh data.</p>},
             {id:'reply',title:'Setelah menyampaikan pesan',content:<p>Pastikan muncul pemberitahuan bahwa pesan berhasil disimpan. Penanganan pesan dilakukan oleh pengelola pusat pada jam kerja. Periksa kotak masuk dan folder spam email yang Anda cantumkan. Waktu tanggapan mengikuti proses penanganan yang berlaku; pengiriman pesan tidak berarti urusan pelayanan langsung selesai.</p>}
           ]}/>
